@@ -1,132 +1,115 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { ArrowLeft, MoreHorizontal, BookOpen, Clock, FileText, Smartphone } from 'lucide-react';
+import { ArrowLeft, Check, Lock, Play } from 'lucide-react';
 import { ScreenType } from '../App';
+import courseData from '../data/saikolojia-ya-wateja.json';
 
 interface Props {
-  onNavigate: (screen: ScreenType) => void;
+  onNavigate: (screen: ScreenType, params?: Record<string, any>) => void;
   onBack?: () => void;
 }
 
 export default function CourseDetailScreen({ onNavigate, onBack }: Props) {
+  const [completedLessons, setCompletedLessons] = useState<string[]>([]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('ujuzi_completed_lessons');
+    if (saved) {
+      setCompletedLessons(JSON.parse(saved));
+    }
+  }, []);
+
+  const getStatus = (index: number) => {
+    const isCompleted = completedLessons.includes(index.toString());
+    const isNextToBeDone = !isCompleted && 
+      (index === 0 || completedLessons.includes((index - 1).toString()));
+    
+    if (isCompleted) return 'completed';
+    if (isNextToBeDone) return 'active';
+    return 'locked';
+  };
+
   return (
-    <div className="flex-1 flex flex-col bg-[#050505] text-white h-full overflow-y-auto pb-8">
+    <div className="flex-1 flex flex-col bg-[#ececf0] text-black h-full overflow-y-auto">
       {/* Top Nav */}
-      <div className="flex justify-between items-center p-6 sticky top-0 z-50 bg-[#050505]/80 backdrop-blur-md">
+      <div className="flex items-center p-6 sticky top-0 z-50 bg-[#ececf0]/90 backdrop-blur-md">
         <button 
           onClick={() => onBack ? onBack() : onNavigate('home')}
-          className="w-10 h-10 bg-white text-black rounded-full flex items-center justify-center hover:opacity-90 transition-opacity"
+          className="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center shrink-0 shadow-lg hover:scale-105 transition-transform"
         >
-          <ArrowLeft className="w-5 h-5" />
+          <ArrowLeft className="w-6 h-6" />
         </button>
-        <button className="w-10 h-10 bg-white text-black rounded-full flex items-center justify-center hover:opacity-90 transition-opacity">
-          <MoreHorizontal className="w-5 h-5" />
-        </button>
+        <div className="flex-1 text-center font-bold text-xl tracking-tight pr-12">
+          Njia ya Kujifunza
+        </div>
       </div>
 
-      <div className="px-6 relative">
-        {/* Course Illustration / Hero */}
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6 }}
-          className="w-full aspect-[4/3] flex items-center justify-center mb-8 relative"
-        >
-           {/* Faux Chart Illustration */}
-           <div className="relative w-48 h-40">
-             {/* Chart board */}
-             <div className="absolute inset-0 border-2 border-gray-600 rounded-lg overflow-hidden">
-                <div className="absolute bottom-4 left-4 w-6 h-12 bg-gray-500 rounded-sm" />
-                <div className="absolute bottom-4 left-14 w-6 h-20 bg-gray-400 rounded-sm" />
-                <div className="absolute bottom-4 left-24 w-6 h-16 bg-white rounded-sm" />
-                <div className="absolute bottom-4 left-34 w-6 h-24 bg-gray-300 rounded-sm" />
-             </div>
-             {/* Person Outline */}
-             <div className="absolute -left-8 -bottom-6 w-24 h-32 flex flex-col items-center">
-                 <div className="w-10 h-10 border-2 border-white rounded-full mb-1" />
-                 <div className="w-16 h-20 border-2 border-white rounded-t-2xl relative">
-                    <div className="absolute -right-4 top-4 w-8 h-2 border-2 border-white rotate-45 transform origin-left" />
-                 </div>
-             </div>
-           </div>
-           
-           {/* Ambient glow */}
-           <div className="absolute inset-0 bg-white/5 blur-3xl rounded-full z-[-1]" />
-        </motion.div>
+      <div className="px-6 py-4 relative flex-1">
+        {/* Timeline Path Line */}
+        <div className="absolute left-[54px] top-6 bottom-10 w-0 border-l-[3px] border-[#d5d5d8] border-dotted z-0" />
 
-        {/* Content */}
-        <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
-          <h1 className="font-display text-4xl font-bold mb-4 tracking-tight">Sales Skills</h1>
-          <p className="text-gray-400 text-sm leading-relaxed mb-8">
-            Sales Skills kwa Wajasiriamali ni mwongozo rahisi kukusaidia kuuza bidhaa zako kwa ujasiri. Jifunze mbinu za ukweli zinazofanya kazi mtandaoni na mtaani...
-          </p>
+        <div className="flex flex-col gap-8 relative z-10">
+          {courseData.modules.map((module, idx) => {
+            const status = getStatus(idx);
+            const isCompleted = status === 'completed';
+            const isActive = status === 'active';
+            const isLocked = status === 'locked';
 
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="font-semibold text-lg tracking-wide">Walimu Wako</h3>
-            <span className="text-xs text-gray-500 font-medium">Ona Wote</span>
-          </div>
-
-          {/* Avatars */}
-          <div className="flex gap-4 mb-10 overflow-x-auto pb-2 no-scrollbar">
-            {[1,2,3,4].map((i) => (
-              <div key={i} className="w-14 h-14 rounded-full overflow-hidden border border-gray-800 shrink-0">
-                <img 
-                  src={`https://api.dicebear.com/7.x/notionists/svg?seed=Teacher${i}&backgroundColor=222`} 
-                  alt="Teacher" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            ))}
-          </div>
-
-          {/* Stats Grid */}
-          <div className="bg-[#ececf0] rounded-3xl p-4">
-             <div className="grid grid-cols-2 gap-3">
-                {/* Stat block 1 */}
-                <div className="bg-[#121212] rounded-2xl p-4 flex flex-col justify-between h-24">
-                   <div className="text-gray-400 font-medium text-xs">Muda</div>
-                   <div className="flex items-end gap-1">
-                      <span className="font-display text-3xl font-bold text-white leading-none">2.5</span>
-                      <span className="text-[10px] text-gray-500 mb-1">Masaa</span>
-                   </div>
-                   <Clock className="w-8 h-8 text-white/5 absolute top-4 right-4" />
-                </div>
-                
-                {/* Stat block 2 */}
-                <div className="bg-[#121212] rounded-2xl p-4 flex flex-col justify-between h-24 relative overflow-hidden">
-                   <div className="text-gray-400 font-medium text-xs">Masomo</div>
-                   <div className="flex items-end gap-1">
-                      <span className="font-display text-3xl font-bold text-white leading-none">12</span>
-                      <span className="text-[10px] text-gray-500 mb-1">Sehemu</span>
-                   </div>
-                   <BookOpen className="w-16 h-16 text-white/5 absolute -right-2 -bottom-2" />
+            return (
+              <motion.div 
+                key={idx}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: idx * 0.1 }}
+                className="flex items-start gap-4 relative"
+              >
+                {/* Node Icon */}
+                <div 
+                  className={`w-[60px] h-[60px] rounded-full flex items-center justify-center shrink-0 z-10 transition-transform ${
+                    isActive ? 'scale-110 shadow-lg border-2 border-black bg-white text-black' : 
+                    isCompleted ? 'bg-black text-white shadow-xl' :
+                    'bg-[#e2e2e7] text-[#a1a1a8]'
+                  }`}
+                >
+                  {isCompleted && <Check className="w-7 h-7" strokeWidth={3} />}
+                  {isActive && <Play className="w-6 h-6 ml-1" strokeWidth={2.5} />}
+                  {isLocked && <Lock className="w-6 h-6" />}
                 </div>
 
-                {/* Stat block 3 */}
-                <div className="bg-[#121212] rounded-2xl p-4 flex flex-col justify-between h-24">
-                   <div className="text-gray-400 font-medium text-xs">Rasilimali</div>
-                   <div className="flex items-end gap-1">
-                      <span className="font-display text-3xl font-bold text-white leading-none">3</span>
-                      <span className="text-[10px] text-gray-500 mb-1">Faili</span>
-                   </div>
-                   <FileText className="w-8 h-8 text-white/5 absolute top-4 right-4" />
+                {/* Node Content */}
+                <div 
+                  onClick={() => {
+                    if (isCompleted || isActive) {
+                      onNavigate('lesson', { lessonId: idx.toString() });
+                    }
+                  }}
+                  className={`flex-1 rounded-[1.75rem] p-6 shadow-sm ${
+                    isActive 
+                      ? 'bg-black text-white shadow-2xl cursor-pointer hover:scale-[1.02] transition-transform' 
+                      : isCompleted 
+                        ? 'bg-white text-black shadow-md cursor-pointer hover:bg-gray-50 transition-colors' 
+                        : 'bg-[#f4f4f6] text-[#b0b0b8] opacity-80 pointer-events-none'
+                  }`}
+                >
+                  <div className={`text-[10px] font-bold uppercase tracking-[0.2em] mb-2 ${isActive ? 'text-gray-400' : isCompleted ? 'text-gray-500' : 'text-[#c6c6cc]'}`}>
+                    Somo {idx + 1}
+                  </div>
+                  <h3 className={`font-display font-semibold text-[1.35rem] leading-tight ${isActive ? 'text-white' : isCompleted ? 'text-black' : 'text-[#a1a1a8]'}`}>
+                    {module.title}
+                  </h3>
+                  
+                  {isActive && (
+                    <button className="mt-6 bg-white text-black px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest w-fit flex items-center gap-2 hover:bg-gray-200 transition-colors">
+                       ENDELEA <ArrowLeft className="w-4 h-4 rotate-180" strokeWidth={2.5} />
+                    </button>
+                  )}
                 </div>
-
-                {/* Stat block 4 */}
-                <div className="bg-[#121212] rounded-2xl p-4 flex flex-col justify-between h-24">
-                   <div className="text-gray-400 font-medium text-xs">Upatikanaji</div>
-                   <div className="flex items-end gap-1">
-                      <span className="font-display text-2xl font-bold text-white leading-none">Simu/PC</span>
-                   </div>
-                   <Smartphone className="w-8 h-8 text-white/5 absolute top-4 right-4" />
-                </div>
-             </div>
-             
-             <button className="w-full mt-3 bg-black text-white py-4 rounded-xl font-bold uppercase tracking-widest text-xs hover:bg-gray-900 transition-colors">
-                Anza Sasa hivi
-             </button>
-          </div>
-        </motion.div>
+              </motion.div>
+            )
+          })}
+        </div>
       </div>
     </div>
   );
 }
+

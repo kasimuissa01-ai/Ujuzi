@@ -8,12 +8,17 @@ import OnboardingScreen from './screens/OnboardingScreen';
 import HomeScreen from './screens/HomeScreen';
 import CourseDetailScreen from './screens/CourseDetailScreen';
 import AiTutorScreen from './screens/AiTutorScreen';
-import LearningPathScreen from './screens/LearningPathScreen';
+import LessonDetailScreen from './screens/LessonDetailScreen';
 
-export type ScreenType = 'onboarding' | 'home' | 'course' | 'ai-tutor' | 'path';
+export type ScreenType = 'onboarding' | 'home' | 'course' | 'ai-tutor' | 'lesson';
+
+export type HistoryState = {
+  screen: ScreenType;
+  params?: Record<string, any>;
+};
 
 export default function App() {
-  const [history, setHistory] = useState<ScreenType[]>(['onboarding']);
+  const [history, setHistory] = useState<HistoryState[]>([{ screen: 'onboarding' }]);
 
   // Handle browser back button (PopState)
   useEffect(() => {
@@ -30,11 +35,13 @@ export default function App() {
     window.history.replaceState({ screen: 'onboarding' }, '');
   }, []);
 
-  const currentScreen = history[history.length - 1];
+  const currentRoute = history[history.length - 1];
+  const currentScreen = currentRoute.screen;
+  const currentParams = currentRoute.params;
 
-  const navigate = (screen: ScreenType) => {
-    window.history.pushState({ screen }, '');
-    setHistory(prev => [...prev, screen]);
+  const navigate = (screen: ScreenType, params?: Record<string, any>) => {
+    window.history.pushState({ screen, params }, '');
+    setHistory(prev => [...prev, { screen, params }]);
   };
 
   const goBack = () => {
@@ -51,7 +58,7 @@ export default function App() {
         {currentScreen === 'home' && <HomeScreen onNavigate={navigate} />}
         {currentScreen === 'course' && <CourseDetailScreen onNavigate={navigate} onBack={goBack} />}
         {currentScreen === 'ai-tutor' && <AiTutorScreen onNavigate={navigate} onBack={goBack} />}
-        {currentScreen === 'path' && <LearningPathScreen onNavigate={navigate} onBack={goBack} />}
+        {currentScreen === 'lesson' && <LessonDetailScreen onNavigate={navigate} onBack={goBack} params={currentParams} />}
       </div>
     </div>
   );

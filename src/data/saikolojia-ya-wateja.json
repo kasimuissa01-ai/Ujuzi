@@ -1,0 +1,45 @@
+{
+  "course_title": "Saikolojia ya Wateja",
+  "course_description": "Jifunze jinsi biashara zinavyotumia saikolojia kuwafanya watu kuamini, kupenda na kununua bidhaa zao.",
+  "language": "Swahili",
+  "level": "Beginner",
+  "category": "Marketing",
+  "modules": [
+    {
+      "title": "Watu Hununua Utambulisho, Sio Bidhaa Tu",
+      "summary": "Wateja hununua jinsi bidhaa inavyowafanya wajisikie kuhusu wao wenyewe.",
+      "example": "Kurasa mbili za TikTok zinauza viatu vilevile, lakini ile yenye branding nzuri inaonekana premium zaidi.",
+      "exercise": "Angalia biashara moja Instagram na eleza ni identity gani wanajaribu kuuza."
+    },
+    {
+      "title": "Flip the Status",
+      "summary": "Badilisha kitu cha kawaida kuonekana cha kisasa na cha thamani.",
+      "example": "Pepsi hawauzi soda tu. Wanauza lifestyle ya vijana wa kisasa, music, confidence na energy.",
+      "exercise": "Chukua bidhaa ya kawaida kama juice au chipsi na andika namna ungeifanya ionekane premium."
+    },
+    {
+      "title": "Hijack the Myth",
+      "summary": "Unganisha brand yako na story ambayo watu tayari wanaiamini.",
+      "example": "Brand nyingi za mavazi Afrika hutumia image ya 'young hustler' au 'street culture' kuwafanya vijana wajione sehemu ya movement.",
+      "exercise": "Eleza ni myth gani audience yako tayari wanaamini."
+    },
+    {
+      "title": "Open the Hidden Door",
+      "summary": "Fundisha watu kitu ambacho kinawafanya wajisikie smart zaidi.",
+      "example": "Biashara ya skincare TikTok inaweza kufundisha tofauti ya fake products na original products ili audience wajione wana uelewa zaidi.",
+      "exercise": "Andika maarifa 3 ambayo beginners wengi hawajui kwenye industry yako."
+    },
+    {
+      "title": "Build the Ritual",
+      "summary": "Geuza experience ya kawaida kuwa memorable.",
+      "example": "Baadhi ya sellers wa WhatsApp hutuma voice note ya shukrani baada ya order. Hii hujenga emotional connection.",
+      "exercise": "Taja hatua moja kwenye customer journey yako ambayo unaweza kuifanya memorable."
+    },
+    {
+      "title": "Give Them a Superpower",
+      "summary": "Wateja wanapenda brand zinazowafanya wajione wana uwezo zaidi.",
+      "example": "Flutterwave na M-Pesa zimefanya biashara ndogo Afrika ziweze kupokea malipo kwa urahisi bila kuwa kampuni kubwa.",
+      "exercise": "Biashara yako inawapa watu uwezo gani ambao hawakuwa nao kabla?"
+    }
+  ]
+}
