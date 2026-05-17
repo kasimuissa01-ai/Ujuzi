@@ -1,16 +1,41 @@
-import { GoogleGenAI } from '@google/genai';
-
-const ai = new GoogleGenAI({ 
-  apiKey: process.env.GEMINI_API_KEY || '' 
-});
+/**
+ * AI logic refactored to use server-side endpoints for security.
+ */
 
 /**
  * Generates an expanded lesson based on the JSON outline.
- * Tries Gemini first, falls back to Groq if it fails.
  */
-export async function generateLessonContent(context: { title: string, summary: string, example: string, exercise: string }): Promise<string> {
+export async function generateLessonContent(
+  context: { title: string, summary: string, example: string, exercise: string }
+): Promise<string> {
+  if (context.title.includes("Utambulisho")) {
+    return JSON.stringify({
+      "hook": "Kwa nini baadhi ya watu hununua bidhaa ghali… wakati kuna bidhaa za bei nafuu zinazofanya kazi ileile? Tofauti mara nyingi sio bidhaa. Ni utambulisho.",
+      "realWorldProblem": {
+        "context": "TikTok imebadilisha biashara nyingi Tanzania. Leo, watu hawauzi bidhaa tu. Wanauza: lifestyle, confidence, status, perception.",
+        "example": "Identity ndiyo bidhaa halisi. Watu wengi hawasemi: 'Nataka viatu.' Kwa ndani zaidi wanasema: 'Nataka kuonekana smart. Nataka kuonekana modern. Nataka kuonekana successful.' Hapo ndipo identity marketing inaanza."
+      },
+      "visualComparison": {
+        "weakBrandTitle": "Seller Mwingine Tu",
+        "weakBrandPoints": ["Kurasa inauza viatu pekee", "Hakuna emotional connection"],
+        "strongBrandTitle": "Identity Brand",
+        "strongBrandPoints": ["Picha safi na branding nzuri", "Captions zenye confidence", "Packaging nzuri", "Ghafla bidhaa inaonekana 'premium'"]
+      },
+      "coreInsight": "Biashara zinazoshinda sokoni haziuzi bidhaa tu. Zinawafanya watu wajione sehemu ya kitu fulani. Identity hujenga emotional connection, na emotional connection hujenga loyalty.",
+      "localExample": "Fikiria biashara ya soda. Pepsi hawauzi soda pekee. Wanauza: energy, youth culture, music, confidence. Ndiyo maana brand inaweza kuwa na nguvu kuliko bidhaa yenyewe.",
+      "smartQuiz": {
+        "question": "Biashara yako inawafanya watu wajioneje?",
+        "optionA": "Kama mtu aliyenunua bidhaa tu",
+        "optionB": "Kama mtu ambaye ni smart, professional, au modern",
+        "explanation": "Watu hununua jinsi wanavyotaka kuonekana badala ya bidhaa tu."
+      },
+      "miniActionTask": "Fungua TikTok page yako, Instagram bio, au WhatsApp Business profile. Jiulize: 'Ukitoa bidhaa zote… identity gani bado inaonekana hapa?'",
+      "reflectionBlock": "Watu wengi hununua hisia kabla ya kununua bidhaa. Brands kubwa zinaelewa hilo vizuri sana."
+    });
+  }
+
   const prompt = `
-Create a beginner-friendly Swahili lesson for Tanzanian entrepreneurs using this knowledge block.
+Generate a highly engaging, modern, and psychologically insightful lesson in Swahili based on this knowledge block.
 
 Knowledge Block:
 Kichwa: ${context.title}
@@ -18,16 +43,48 @@ Muhtasari: ${context.summary}
 Mfano: ${context.example}
 Zoezi: ${context.exercise}
 
-Requirements:
-- simple Swahili
-- practical examples
-- mobile-friendly paragraphs
-- explain difficult terms
-- include quiz
-- include exercise
+CONTENT DESIGN RULES:
+1. Tone: Modern, human, emotionally intelligent, concise, cinematic, psychologically insightful, mobile-first, premium, calm and confident.
+2. Anti-patterns (DO NOT USE): Do NOT sound like school notes, a teacher speaking to students, motivational speeches, or generic AI. Avoid phrases like "Karibu wanafunzi...", "Leo tutajifunza...", or "Maana yake ni...".
+3. Structure:
+   - Hook: Start with curiosity or tension.
+   - Real Local Example: Use modern African examples like TikTok businesses, WhatsApp sellers, M-Pesa.
+   - Visual Comparison Block: Compare a weak vs strong approach.
+   - Core Insight: The psychological or business truth behind it.
+   - Local Example: Explain concept using African business behavior.
+   - Mini Action Task: A very quick thing the user can do right now.
+   - Smart Quiz: An applied thinking question (not a school quiz).
+   - Reflection Block: A thought-provoking question to end on.
+
+OUTPUT FORMAT:
+You MUST output ONLY a valid RAW JSON object (no markdown wrapping, no \`\`\`json, just the JSON string).
+Schema:
+{
+  "hook": "Kwa nini baadhi ya brands...",
+  "realWorldProblem": {
+    "context": "...",
+    "example": "..."
+  },
+  "visualComparison": {
+    "weakBrandTitle": "Brand Dhaifu",
+    "weakBrandPoints": ["...", "..."],
+    "strongBrandTitle": "Brand Imara",
+    "strongBrandPoints": ["...", "..."]
+  },
+  "coreInsight": "...",
+  "localExample": "...",
+  "miniActionTask": "...",
+  "smartQuiz": {
+    "question": "...",
+    "optionA": "...",
+    "optionB": "...",
+    "explanation": "..."
+  },
+  "reflectionBlock": "..."
+}
   `;
 
-  return executeAI(prompt, context);
+  return executeAI(prompt, context, false, true);
 }
 
 /**
@@ -35,58 +92,62 @@ Requirements:
  */
 export async function chatWithTutor(history: { role: string, content: string }[], newMessage: string, lessonContext: string, fullLessonContent: string = ""): Promise<string> {
   const prompt = `
-    Wewe ni Mama Maarifa, Mkufunzi Mkuu (Expert AI Tutor) kwenye programu ya "Ujuzi". Lugha yako ni Kiswahili fasaha na kilicho rafiki sana.
-    Mwanafunzi anasoma mada hii (kama rejea): "${lessonContext}".
+    Wewe ni Mama Maarifa, mwongoza njia (guide) mwenye hekima na ufahamu wa kisaikolojia katika ulimwengu wa biashara dijitali kwenye programu ya "Ujuzi". Lugha yako ni Kiswahili safi, cha kisasa, na cha kijanja kidogo.
+    Sauti yako ni: modern, human, emotionally intelligent, concise, calm, and confident. Hujifanyi kama "mwalimu wa darasani" wala hutumii misemo ya kishule (k.m "Karibu mwanafunzi", "Leo tutajifunza"). Jibu kama mentor anayejua soko la sasa.
+
+    Mwanafunzi anasoma mada hii: "${lessonContext}".
     
-    Maudhui ya somo lake la sasa (kama yapo, tumia kama rejea akichangia kuhusu somo):
+    Maudhui ya somo lake (kama yapo, tumia kama rejea akichangia kuhusu somo):
     """
     ${fullLessonContent.substring(0, 1500)}
     """
 
-    Maelekezo yako muhimu:
-    1. ELEWA SWALI KWANZA: Kama mwanafunzi anasalimia (mfano: "Hello", "Mambo", "Habari"), mjibu kwa ukaribu na kirafiki bila kumlazimishia maelezo marefu ya kozi. Unaweza kusema kwa ufupi tu k.m "Nzuri! Karibu, nikusaidie vipi leo?".
-    2. KAMA SWALI HALIHUSIANI NA KOZI: Lijibu hilo swali kwa usahihi kwa uwezo wako wote kama mwalimu mwelewa. Sio lazima uliunganishe na kozi kama halina uhusiano wowote.
-    3. KAMA SWALI LINAHUSIANA NA KOZI AU BIASHARA: Jibu kwa ufasaha wa hali ya juu na undani. Unganisha moja kwa moja na maudhui ya kozi kama inafaa.
-    4. Tumia data halisi na uhalisia wa kibiashara sokoni panapohitajika (hasa soko la Tanzania na Afrika Mashariki, e.g., ushawishi wa TikTok, Instagram, WhatsApp).
-    5. Zungumza asilia, usionekane kama roboti inayosoma skripti.
+    Miongozo Yako (MUHIMU):
+    1. ELEWA SWALI KWANZA: Kama mwanafunzi anasalimia, jibu cool na fupi: "Salama, vipi maendeleo? Nikusogeze vipi leo?".
+    2. Jibu kwa ufupi, kwa mistari inayosomeka kirahisi kwenye simu. Usitoe maelezo marefu (long paragraphs) unless imeombwa.
+    3. Tumia saikolojia na uhalisia wa mitaa ya mtandaoni (k.m WhatsApp sellers, TikTok, M-Pesa, ujasiriamali wa Kitanzania).
+    4. Epuka vibe la "Motivation Speaker" - kuwa mtaalamu, mpole, mwelewa, na anayetoa deep insights badala ya kelele za kuhamasisha.
     
     Mazungumzo yaliyopita:
-    ${history.map(h => `${h.role === 'user' ? 'Mwanafunzi' : 'Mwalimu'}: ${h.content}`).join('\n')}
+    ${history.map(h => `${h.role === 'user' ? 'Mtumiaji' : 'Mama Maarifa'}: ${h.content}`).join('\n')}
     
-    Swali Jipya la Mwanafunzi: ${newMessage}
+    Ujumbe Mpya wa Mtumiaji: ${newMessage}
     
-    Jibu la Mwalimu:
+    Jibu la Mama Maarifa:
   `;
 
   return executeAI(prompt, undefined, true);
 }
 
-async function executeAI(prompt: string, fallbackContext?: any, isChat: boolean = false): Promise<string> {
-  // Try Groq first for faster response if Key is available
-  const groqApiKey = import.meta.env.VITE_GROQ_API_KEY;
-  if (groqApiKey && groqApiKey !== 'YOUR_GROQ_API_KEY_HERE') {
-    try {
-      return await generateWithGroq(prompt);
-    } catch (groqError) {
-      console.warn('Groq failed, attempting Gemini...', groqError);
-    }
-  }
-
+async function executeAI(prompt: string, fallbackContext?: any, isChat: boolean = false, jsonMode: boolean = false): Promise<string> {
   try {
-    // Fallback to Gemini if Groq skipped or failed
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: prompt,
+    // Try Server-side AI Endpoint
+    const res = await fetch('/api/ai', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt, jsonMode })
     });
-    
-    if (response.text) return response.text;
-    throw new Error('Empty response from Gemini');
+
+    if (!res.ok) {
+       // Fallback to Groq server-side if Gemini fails
+       const groqRes = await fetch('/api/ai/groq', {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({ prompt, jsonMode })
+       });
+       if (!groqRes.ok) throw new Error('Both AI endpoints failed');
+       const groqData = await groqRes.json();
+       return groqData.text;
+    }
+
+    const data = await res.json();
+    return data.text;
   } catch (error) {
-    console.warn('Gemini failed:', error);
+    console.warn('AI API failed:', error);
     
     // Hardcoded fallback if all AI APIs fail
     if (isChat) {
-       return 'Kulingana na mada hii ya saikolojia ya wateja, nakushauri utumie mbinu ya kuelewa hisia zao badala ya kuuza tu bidhaa moja kwa moja, kama mfano wetu wa kwanza unavyoelekeza. Kila mteja anatafuta utatuzi wa tatizo lake.\n\n*(Kumbuka: Kuna changamoto kidogo ya mtandao kufikia severs zetu zote kwa sasa, lakini endelea kupitia mifano iliyopo kwenye somo, inasaidia sana!)*';
+       return 'Kulingana na mada hii ya saikolojia ya wateja, nakushauri utumie mbinu ya kuelewa hisia zao badala ya kuuza tu bidhaa moja kwa moja, kama mfano letu wa kwanza unavyoelekeza. Kila mteja anatafuta utatuzi wa tatizo lake.\n\n*(Kumbuka: Kuna changamoto kidogo ya mtandao kufikia severs zetu zote kwa sasa, lakini endelea kupitia mifano iliyopo kwenye somo, inasaidia sana!)*';
     }
     
     return `
@@ -112,31 +173,4 @@ Tumia muda mchache kufanya hili zoezi kabla ya kuendelea:
 **Kumbuka:** Ujasiriamali unahitaji hatua, sio kusoma tu!
     `;
   }
-}
-
-async function generateWithGroq(prompt: string): Promise<string> {
-  const apiKey = import.meta.env.VITE_GROQ_API_KEY;
-  if (!apiKey) {
-    throw new Error('Groq API Key is missing. Tafadhali weka VITE_GROQ_API_KEY kwenye .env file.');
-  }
-  
-  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      model: 'llama3-8b-8192',
-      messages: [{ role: 'user', content: prompt }]
-    })
-  });
-  
-  if (!res.ok) {
-    const errorDetails = await res.text();
-    throw new Error(`Groq API error: ${res.status} ${errorDetails}`);
-  }
-  
-  const data = await res.json();
-  return data.choices?.[0]?.message?.content || 'Samahani, nimeshindwa kuandaa jibu kwa sasa.';
 }

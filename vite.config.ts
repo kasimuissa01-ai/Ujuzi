@@ -19,16 +19,35 @@ export default defineConfig(({mode}) => {
           theme_color: '#ececf0',
           background_color: '#ececf0',
           display: 'standalone',
+          orientation: 'portrait',
+          categories: ['education', 'productivity'],
           icons: [
             {
               src: 'https://i.postimg.cc/J0CyqrKM/IMG-20260510-235338.jpg',
               sizes: '192x192',
               type: 'image/jpeg',
+              purpose: 'any'
             },
             {
               src: 'https://i.postimg.cc/J0CyqrKM/IMG-20260510-235338.jpg',
               sizes: '512x512',
               type: 'image/jpeg',
+              purpose: 'any'
+            },
+            {
+              src: 'https://i.postimg.cc/J0CyqrKM/IMG-20260510-235338.jpg',
+              sizes: '192x192',
+              type: 'image/jpeg',
+              purpose: 'maskable'
+            }
+          ],
+          screenshots: [
+            {
+              src: 'https://i.postimg.cc/J0CyqrKM/IMG-20260510-235338.jpg',
+              sizes: '1080x1920',
+              type: 'image/jpeg',
+              form_factor: 'narrow',
+              label: 'Ujuzi Home Screen'
             }
           ]
         },
@@ -67,9 +86,6 @@ export default defineConfig(({mode}) => {
         }
       })
     ],
-    define: {
-      'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-    },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),

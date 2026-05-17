@@ -1,45 +1,75 @@
 {
   "course_title": "Saikolojia ya Wateja",
-  "course_description": "Jifunze jinsi biashara zinavyotumia saikolojia kuwafanya watu kuamini, kupenda na kununua bidhaa zao.",
+  "course_description": "Fichua siri za kisaikolojia zinazofanya watu wanunue, waamini, na kupenda brand yako mtandaoni. Biashara sio bidhaa tu, ni saikolojia.",
   "language": "Swahili",
-  "level": "Beginner",
+  "level": "Intermediate",
   "category": "Marketing",
   "modules": [
     {
-      "title": "Watu Hununua Utambulisho, Sio Bidhaa Tu",
-      "summary": "Wateja hununua jinsi bidhaa inavyowafanya wajisikie kuhusu wao wenyewe.",
-      "example": "Kurasa mbili za TikTok zinauza viatu vilevile, lakini ile yenye branding nzuri inaonekana premium zaidi.",
-      "exercise": "Angalia biashara moja Instagram na eleza ni identity gani wanajaribu kuuza."
+      "title": "Soko la Utambulisho (Identity Market)",
+      "summary": "Watu hawanunui bidhaa, wananunua toleo bora la wao wenyewe.",
+      "steps": [
+        {
+          "type": "visual_choice",
+          "question": "Ni muonekano upi unaoleta picha ya 'hadhi ya juu' (premium) kwa kiatu kilekile?",
+          "options": [
+            { "id": "1", "image": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=800", "label": "Picha ya Kawaida", "isCorrect": false },
+            { "id": "2", "image": "https://images.unsplash.com/photo-1595950653106-6c9ebd614c3a?auto=format&fit=crop&q=80&w=800", "label": "Picha ya Kisasa", "isCorrect": true }
+          ]
+        },
+        {
+          "type": "smart_insight",
+          "text": "Watu hawanunui viatu tu. Wananunua hadhi. Upigaji picha msafi na mpangilio mzuri unafanya kiatu kilekile kionekane cha bei mbaya na chenye thamani.",
+          "companion_mood": "teaching"
+        },
+        {
+          "type": "fill_blank",
+          "text": "Wateja wengi hununua _____ kabla hawajanunua bidhaa zenyewe.",
+          "blankOptions": ["vipengele", "hisia", "punguzo"],
+          "correctAnswer": "hisia"
+        },
+        {
+          "type": "scenario_test",
+          "scenario": "Unauza soda sokoni. Ili kukuza biashara na kujenga uaminifu kwa wateja, unapaswa...",
+          "options": [
+            "Kushusha bei kabisa iwe rahisi kuliko wote.",
+            "Kuuza muonekano, nguvu ya ujana, na ushindi."
+          ],
+          "correctAnswerIndex": 1
+        }
+      ],
+      "example": "Wauzaji wa viatu TikTok wanaobrand vizuri wanaonekana premium.",
+      "exercise": "Tafuta page moja inayouza 'status' badala ya bidhaa tu, na ueleze kwanini."
     },
     {
       "title": "Flip the Status",
-      "summary": "Badilisha kitu cha kawaida kuonekana cha kisasa na cha thamani.",
-      "example": "Pepsi hawauzi soda tu. Wanauza lifestyle ya vijana wa kisasa, music, confidence na energy.",
-      "exercise": "Chukua bidhaa ya kawaida kama juice au chipsi na andika namna ungeifanya ionekane premium."
+      "summary": "Kubadilisha kitu cha kawaida (kama maji au juice) kuwa cha hadhi (status symbol).",
+      "example": "Brand ya kawaida inaweza kuuza vinywaji vyake kwa bei mbili zaidi kwa kubadili neno 'juice' kuwa 'detox blend'.",
+      "exercise": "Chukua bidhaa yako moja na ibadilishe jina au muonekano kuwa premium."
     },
     {
-      "title": "Hijack the Myth",
-      "summary": "Unganisha brand yako na story ambayo watu tayari wanaiamini.",
-      "example": "Brand nyingi za mavazi Afrika hutumia image ya 'young hustler' au 'street culture' kuwafanya vijana wajione sehemu ya movement.",
-      "exercise": "Eleza ni myth gani audience yako tayari wanaamini."
+      "title": "Mitego ya Story (Hijack the Myth)",
+      "summary": "Kujiunganisha na imani au stori ambayo watu tayari wanaiamini mtaani.",
+      "example": "Brand zinazotumia 'street culture' kuwaunganisha vijana wanao-hustle.",
+      "exercise": "Wateja wako wanaamini stori gani kuhusu maisha yao? Iunganishe na brand yako."
     },
     {
       "title": "Open the Hidden Door",
-      "summary": "Fundisha watu kitu ambacho kinawafanya wajisikie smart zaidi.",
-      "example": "Biashara ya skincare TikTok inaweza kufundisha tofauti ya fake products na original products ili audience wajione wana uelewa zaidi.",
-      "exercise": "Andika maarifa 3 ambayo beginners wengi hawajui kwenye industry yako."
+      "summary": "Mpe mteja siri ambayo inamfanya ajione ni mjanja zaidi mara tu baada ya kuisikia.",
+      "example": "TikTok account inayo-expose tofauti za viatu feki na og. Inaongeza uaminifu asilimia 100.",
+      "exercise": "Andika siri/tips tatu ambazo wateja wengi hawazijui."
     },
     {
-      "title": "Build the Ritual",
-      "summary": "Geuza experience ya kawaida kuwa memorable.",
-      "example": "Baadhi ya sellers wa WhatsApp hutuma voice note ya shukrani baada ya order. Hii hujenga emotional connection.",
-      "exercise": "Taja hatua moja kwenye customer journey yako ambayo unaweza kuifanya memorable."
+      "title": "Design the Ritual",
+      "summary": "Kufanya mchakato wa kawaida (kama kununua au kupokea mzigo) usahaulike.",
+      "example": "Kupokea mzigo wenye voice note ya the seller (WhatsApp) badala ya 'mzigo umetumwa'.",
+      "exercise": "Tengeneza 'ritual' ndogo ya kum-surprise mteja wako anapopokea bidhaa."
     },
     {
       "title": "Give Them a Superpower",
-      "summary": "Wateja wanapenda brand zinazowafanya wajione wana uwezo zaidi.",
-      "example": "Flutterwave na M-Pesa zimefanya biashara ndogo Afrika ziweze kupokea malipo kwa urahisi bila kuwa kampuni kubwa.",
-      "exercise": "Biashara yako inawapa watu uwezo gani ambao hawakuwa nao kabla?"
+      "summary": "Wape wateja nguvu ambayo hawakuwahi kuifikiria kuwa wanayo.",
+      "example": "Teknolojia mpya na huduma za delivery zinafanya mfanyabiashara mdogo kuwa na uwezo kama kampuni kubwa.",
+      "exercise": "Unapunguza maumivu gani ambayo yatamfanya mteja wako ahisi ana 'superpower'?"
     }
   ]
 }

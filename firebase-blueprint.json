@@ -1,0 +1,22 @@
+{
+  "entities": {
+    "UserProgress": {
+      "title": "User Progress",
+      "description": "Tracks completed lessons and streaks for a user.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "The UID of the user." },
+        "completedLessons": { "type": "array", "items": { "type": "string" }, "description": "Array of lesson IDs the user has completed." },
+        "streakDates": { "type": "array", "items": { "type": "string" }, "description": "Array of ISO date strings for the user's streak." },
+        "updatedAt": { "type": "string", "format": "timestamp" }
+      },
+      "required": ["userId", "completedLessons", "streakDates", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/user_progress/{userId}": {
+      "schema": { "$ref": "UserProgress" },
+      "description": "Stores user progress for each authenticated user."
+    }
+  }
+}

@@ -66,3 +66,15 @@ body {
 .markdown-body strong {
   font-weight: 600;
 }
+
+.bubble-tail::before {
+  content: "";
+  position: absolute;
+  top: 16px;
+  left: -8px;
+  width: 0;
+  height: 0;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-right: 8px solid #f3f4f6; /* matches bg-gray-100 */
+}

@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft, Sparkles, Send, Bot, Loader2, CheckCircle2, BookOpen, Database } from 'lucide-react';
 import { ScreenType } from '../App';
 import { chatWithTutor } from '../lib/ai';
+import { sanitizeInput } from '../lib/security';
+import { useAuth } from '../hooks/useAuth';
 import TypewriterMarkdown from '../components/TypewriterMarkdown';
 import courseData from '../data/saikolojia-ya-wateja.json';
 
@@ -65,8 +67,9 @@ const ThinkingIndicator = () => {
 };
 
 export default function AiTutorScreen({ onNavigate, onBack }: Props) {
+  const { user } = useAuth();
   const [messages, setMessages] = useState<{role: string, content: string}[]>([
-    { role: 'assistant', content: 'Habari Baraka! Mimi ni Mama Maarifa. Ungependa kujifunza nini leo kuhusu Biashara au Teknolojia?' }
+    { role: 'assistant', content: `Habari ${user?.displayName?.split(' ')[0] || 'Rafiki'}! Mimi ni Mama Maarifa. Ungependa kujifunza nini leo kuhusu Biashara au Teknolojia?` }
   ]);
   const [input, setInput] = useState('');
   const [isChatting, setIsChatting] = useState(false);
@@ -80,8 +83,10 @@ export default function AiTutorScreen({ onNavigate, onBack }: Props) {
   const handleSend = async () => {
     if (!input.trim() || isChatting) return;
     
-    const userMsg = input.trim();
+    const userMsg = sanitizeInput(input.trim());
     setInput('');
+    
+    if (!userMsg) return;
     
     const updatedHistory = [...messages, { role: 'user', content: userMsg }];
     setMessages(updatedHistory);
@@ -123,6 +128,7 @@ export default function AiTutorScreen({ onNavigate, onBack }: Props) {
         <button 
           onClick={() => onBack ? onBack() : onNavigate('home')}
           className="w-10 h-10 bg-black rounded-full flex items-center justify-center text-white"
+          aria-label="Rudi nyuma (Go back)"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
@@ -181,12 +187,13 @@ export default function AiTutorScreen({ onNavigate, onBack }: Props) {
 
       {/* Input Area */}
       <div className="p-4 bg-white border-t border-gray-200 shrink-0 mb-4 sm:mb-0">
-        <div className="flex gap-2 overflow-x-auto pb-4 no-scrollbar">
+        <div className="flex gap-2 overflow-x-auto pb-4 no-scrollbar" role="group" aria-label="Maswali ya haraka (Quick Prompts)">
           {prompts.map((prompt, i) => (
             <button 
               key={i}
               onClick={() => handleQuickPrompt(prompt)}
               className="px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-xs font-semibold shrink-0 hover:bg-gray-200 transition-colors border border-gray-200"
+              aria-label={`Uliza: ${prompt}`}
             >
               {prompt}
             </button>
@@ -201,6 +208,7 @@ export default function AiTutorScreen({ onNavigate, onBack }: Props) {
             disabled={isChatting}
             placeholder="Uliza swali lolote..."
             className="w-full bg-[#f4f4f6] text-black border-none rounded-full py-4 pl-6 pr-14 text-sm focus:ring-2 focus:ring-black outline-none"
+            aria-label="Andika swali lako (Type your question)"
           />
           <button 
             onClick={handleSend}
@@ -208,6 +216,7 @@ export default function AiTutorScreen({ onNavigate, onBack }: Props) {
             className={`absolute right-2 w-10 h-10 rounded-full flex items-center justify-center text-white transition-all ${
               isChatting || !input.trim() ? 'bg-gray-300' : 'bg-black hover:scale-105'
             }`}
+            aria-label="Tuma ujumbe (Send message)"
           >
             <Send className="w-4 h-4 ml-1" />
           </button>

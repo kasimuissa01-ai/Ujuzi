@@ -2,5 +2,7 @@
   "name": "Ujuzi",
   "description": "AI-powered structured learning app in Swahili for African users to learn digital and business skills.",
   "requestFramePermissions": [],
-  "majorCapabilities": []
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }

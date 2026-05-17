@@ -1,23 +1,28 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Bell, Search, LayoutGrid, Monitor, Briefcase, GraduationCap, ArrowRight, Sparkles, X } from 'lucide-react';
+import { Bell, Search, LayoutGrid, Monitor, Briefcase, GraduationCap, ArrowRight, Sparkles, X, Plus } from 'lucide-react';
 import { ScreenType } from '../App';
+import coursesData from '../data/courses.json';
+import { useProgress } from '../hooks/useProgress';
+import { useAuth } from '../hooks/useAuth';
+import { useNotifications } from '../hooks/useNotifications';
 
 interface Props {
-  onNavigate: (screen: ScreenType) => void;
+  onNavigate: (screen: ScreenType, params?: Record<string, any>) => void;
 }
 
 export default function HomeScreen({ onNavigate }: Props) {
+  const { user } = useAuth();
+  const { notifications, unreadCount } = useNotifications();
   const [isSearching, setIsSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showNotifications, setShowNotifications] = useState(false);
 
-  // Calculate Progress
-  const saved = localStorage.getItem('ujuzi_completed_lessons');
-  const completedLessons = saved ? JSON.parse(saved) : [];
-  // Hardcoding 5 lessons for now as per saikolojia-ya-wateja.json modules length
-  const totalLessons = 5; 
-  const progressPercent = Math.round((completedLessons.length / totalLessons) * 100) || 0;
+  const { completedLessons } = useProgress();
+  
+  // Hardcoded for old course data just so notifications don't break if no courses
+  const totalLessons = 0; 
+  const progressPercent = 0;
 
   return (
     <div className="flex-1 flex flex-col bg-[#ececf0] h-full overflow-y-auto pb-20 relative">
@@ -33,7 +38,7 @@ export default function HomeScreen({ onNavigate }: Props) {
               />
             </div>
             <div>
-              <p className="text-sm font-semibold text-black">Jambo, Baraka</p>
+              <p className="text-sm font-semibold text-black">Jambo, {user?.displayName?.split(' ')[0] || 'Rafiki'}</p>
               <p className="text-xs text-gray-500 font-medium tracking-wide">Progress: {progressPercent}%</p>
             </div>
           </div>
@@ -41,6 +46,7 @@ export default function HomeScreen({ onNavigate }: Props) {
             <button 
               onClick={() => setIsSearching(!isSearching)}
               className="w-10 h-10 bg-black rounded-full flex items-center justify-center text-white"
+              aria-label={isSearching ? "Funga Utafutaji" : "Tafuta (Search)"}
             >
               {isSearching ? <X className="w-4 h-4" /> : <Search className="w-4 h-4" />}
             </button>
@@ -48,9 +54,11 @@ export default function HomeScreen({ onNavigate }: Props) {
               <button 
                 onClick={() => setShowNotifications(!showNotifications)}
                 className="w-10 h-10 bg-black rounded-full flex items-center justify-center text-white relative"
+                aria-label="Notifikesheni (Notifications)"
+                aria-expanded={showNotifications}
               >
                 <Bell className="w-4 h-4" />
-                {progressPercent > 0 && <div className="absolute top-2 right-2 w-2 h-2 bg-white rounded-full" />}
+                {unreadCount > 0 && <div className="absolute top-2 right-2 w-2 h-2 bg-orange-500 rounded-full border border-black" />}
               </button>
               
               <AnimatePresence>
@@ -59,20 +67,36 @@ export default function HomeScreen({ onNavigate }: Props) {
                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                    className="absolute right-0 top-12 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 p-4 z-50"
+                    className="absolute right-0 top-12 w-72 bg-white rounded-2xl shadow-xl border border-gray-100 p-4 z-50 ring-1 ring-black/5"
                   >
-                    <h4 className="text-sm font-bold mb-2">Maendeleo Yako</h4>
-                    <div className="bg-gray-50 rounded-xl p-3">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-xs font-semibold text-gray-700">Sales Psychology</span>
-                        <span className="text-xs font-bold text-black">{progressPercent}%</span>
+                    <div className="flex justify-between items-center mb-3">
+                      <h4 className="text-sm font-bold">Taarifa (Notifications)</h4>
+                      {unreadCount > 0 && <span className="bg-orange-100 text-orange-600 text-[10px] px-2 py-0.5 rounded-full font-bold">{unreadCount} mpya</span>}
+                    </div>
+
+                    <div className="space-y-3 max-h-64 overflow-y-auto no-scrollbar">
+                      {notifications.length > 0 ? (
+                        notifications.map((notif) => (
+                          <div key={notif.id} className={`p-3 rounded-xl border ${notif.read ? 'bg-white border-gray-100' : 'bg-gray-50 border-gray-200'}`}>
+                            <p className="text-xs font-bold text-black mb-1">{notif.title}</p>
+                            <p className="text-[11px] text-gray-500 leading-tight">{notif.message}</p>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-center text-xs text-gray-400 py-4">Huna taarifa mpya kwa sasa.</p>
+                      )}
+                    </div>
+
+                    <div className="mt-4 pt-3 border-t border-gray-100">
+                      <div className="bg-gray-50 rounded-xl p-3">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-xs font-semibold text-gray-700">Maendeleo Yako</span>
+                          <span className="text-xs font-bold text-black">{progressPercent}%</span>
+                        </div>
+                        <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                           <div className="h-full bg-black rounded-full" style={{ width: `${progressPercent}%` }} />
+                        </div>
                       </div>
-                      <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                         <div className="h-full bg-black rounded-full" style={{ width: `${progressPercent}%` }} />
-                      </div>
-                      <p className="text-[10px] text-gray-500 mt-2">
-                        Umemaliza sura {completedLessons.length} kati ya {totalLessons}
-                      </p>
                     </div>
                   </motion.div>
                 )}
@@ -99,6 +123,7 @@ export default function HomeScreen({ onNavigate }: Props) {
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Tafuta kozi..."
                     className="w-full bg-white text-black border-none rounded-2xl py-4 pl-12 pr-4 text-base focus:ring-2 focus:ring-black outline-none shadow-sm"
+                    aria-label="Tafuta kozi (Search courses)"
                   />
                   <Search className="w-5 h-5 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2" />
                 </div>
@@ -125,83 +150,119 @@ export default function HomeScreen({ onNavigate }: Props) {
         </div>
 
         {/* Categories (Chips) */}
-        <div className="flex gap-3 overflow-x-auto pb-2 -mx-6 px-6 no-scrollbar mb-6">
-          <button className="bg-black text-white p-3 rounded-full shrink-0">
+        <div className="flex gap-3 overflow-x-auto pb-2 -mx-6 px-6 no-scrollbar mb-6" role="group" aria-label="Vikundi (Categories)">
+          <button className="bg-black text-white p-3 rounded-full shrink-0" aria-label="Kategoria zote (All categories)">
             <LayoutGrid className="w-5 h-5" />
           </button>
-          <button className="bg-black text-white px-5 py-3 rounded-full text-sm font-semibold shrink-0 flex items-center gap-2">
+          <button className="bg-black text-white px-5 py-3 rounded-full text-sm font-semibold shrink-0 flex items-center gap-2" aria-label="Masoko (Marketing)">
             <Briefcase className="w-4 h-4" /> Masoko (Marketing)
           </button>
-          <button className="bg-gray-200 text-gray-600 hover:bg-gray-300 transition-colors px-5 py-3 rounded-full text-sm font-semibold shrink-0 flex items-center gap-2">
+          <button className="bg-gray-200 text-gray-600 hover:bg-gray-300 transition-colors px-5 py-3 rounded-full text-sm font-semibold shrink-0 flex items-center gap-2" aria-label="Biashara (Biz)">
             <Monitor className="w-4 h-4" /> Biashara (Biz)
           </button>
-          <button className="bg-gray-200 text-gray-600 hover:bg-gray-300 transition-colors px-5 py-3 rounded-full text-sm font-semibold shrink-0 flex items-center gap-2">
+          <button className="bg-gray-200 text-gray-600 hover:bg-gray-300 transition-colors px-5 py-3 rounded-full text-sm font-semibold shrink-0 flex items-center gap-2" aria-label="Zana za AI (AI Tools)">
             <GraduationCap className="w-4 h-4" /> AI Tools
           </button>
         </div>
 
-        {/* Primary Class Card (now Sales Psychology) */}
-        {(!searchQuery || "sales psychology saikolojia wateja".includes(searchQuery.toLowerCase())) && (
+        {/* Courses List */}
+        {coursesData.length === 0 ? (
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            onClick={() => onNavigate('course')}
-            className="bg-black text-white rounded-[2rem] p-6 shadow-xl mb-4 relative overflow-hidden cursor-pointer group"
+            className="bg-white rounded-[2rem] p-8 mt-4 text-center border-2 border-dashed border-gray-300 flex flex-col items-center justify-center min-h-[250px]"
           >
-            {/* Card Bg Elements */}
-            <div className="absolute right-[-2rem] bottom-[-2rem] opacity-20 group-hover:scale-105 transition-transform duration-500">
-               <div className="w-40 h-40 border border-white/20 rounded-full flex items-center justify-center">
-                  <div className="w-24 h-24 border border-white/30 rounded-full" />
-               </div>
-            </div>
+             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                <Briefcase className="w-8 h-8 text-gray-400" />
+             </div>
+             <h3 className="font-display text-xl font-bold text-gray-800 mb-2">Hakuna Kozi Yoyote</h3>
+             <p className="text-sm text-gray-500 mb-6 max-w-[200px] leading-relaxed">
+               Umeanzisha ukurasa mpya. Anza kwa kuongeza kozi yako ya kwanza.
+             </p>
+             <button className="bg-[#121212] hover:bg-black transition-colors text-white px-6 py-3 rounded-full font-bold text-sm tracking-wide gap-2 flex items-center">
+                <Plus className="w-4 h-4" /> Anzisha Kozi
+             </button>
+          </motion.div>
+        ) : (
+          <motion.div 
+            initial="hidden"
+            animate="show"
+            variants={{
+              hidden: { opacity: 0 },
+              show: {
+                opacity: 1,
+                transition: { staggerChildren: 0.15 }
+              }
+            }}
+            className="grid grid-cols-1 md:grid-cols-2 gap-4"
+          >
+             {coursesData.map((course, index) => {
+               const totalLessons = course.units.reduce((acc, unit) => acc + unit.lessons.length, 0);
+               const isFirst = index === 0;
+               const bgColors = ["bg-[#121212]", "bg-[#1cb0f6]", "bg-[#ff4b4b]", "bg-[#ffc800]"];
+               const textColors = ["text-white", "text-white", "text-white", "text-[#121212]"];
+               const bgColor = bgColors[index % bgColors.length];
+               const textColor = textColors[index % textColors.length];
+               const borderClass = textColor === "text-white" ? "border-white/20" : "border-black/20";
+               const bgMutedClass = textColor === "text-white" ? "bg-white/10" : "bg-black/10";
+               
+               return (
+                  <motion.div 
+                    key={course.course_id}
+                    variants={{
+                      hidden: { opacity: 0, y: 30, scale: 0.95 },
+                      show: { 
+                        opacity: 1, 
+                        y: 0, 
+                        scale: 1,
+                        transition: { type: "spring", stiffness: 300, damping: 24 } 
+                      }
+                    }}
+                    onClick={() => onNavigate('course', { courseId: course.course_id })}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className={`${bgColor} ${textColor} rounded-[2rem] p-6 lg:p-8 shadow-xl relative overflow-hidden cursor-pointer group ${isFirst ? 'md:col-span-2 min-h-[240px]' : 'min-h-[260px]'}`}
+                    role="button"
+                  >
+                    <div className="absolute right-[-2rem] bottom-[-2rem] opacity-20 group-hover:scale-110 transition-transform duration-700 ease-out">
+                       <div className={`w-40 h-40 border ${borderClass} rounded-full flex items-center justify-center`}>
+                          <div className={`w-24 h-24 border ${borderClass} rounded-full`} />
+                       </div>
+                    </div>
 
-            <div className="flex justify-between items-center mb-10 relative z-10">
-              <div className="bg-white/10 px-3 py-1.5 rounded-full flex items-center gap-2 text-xs font-semibold backdrop-blur-md">
-                <Briefcase className="w-3 h-3" /> Masoko
-              </div>
-              <div className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center text-xs font-semibold">
-                {completedLessons.length}/{totalLessons}
-              </div>
-            </div>
+                    <div className="flex justify-between items-center mb-8 relative z-10">
+                      <div className={`${bgMutedClass} px-4 py-2 rounded-full flex items-center gap-2 text-xs font-bold uppercase tracking-wider backdrop-blur-md`}>
+                        <Briefcase className="w-3.5 h-3.5" /> {course.category}
+                      </div>
+                      <div className={`w-10 h-10 rounded-full border ${borderClass} flex items-center justify-center text-xs font-bold`}>
+                        ?/{totalLessons}
+                      </div>
+                    </div>
 
-            <div className="relative z-10">
-              <h2 className="font-display text-2xl font-bold mb-4 w-3/4 leading-tight">
-                Sales Psychology (Saikolojia ya Wateja)
-              </h2>
-              
-              {/* Progress Bar inside Card */}
-              <div className="mb-8">
-                <div className="flex justify-between text-xs font-semibold mb-2 text-gray-300">
-                  <span>Maendeleo: {progressPercent}%</span>
-                  <span>{completedLessons.length}/{totalLessons} Sura</span>
-                </div>
-                <div className="w-full bg-white/20 rounded-full h-1.5">
-                  <div 
-                    className="bg-white h-1.5 rounded-full transition-all duration-1000 ease-out" 
-                    style={{ width: `${progressPercent}%` }} 
-                  />
-                </div>
-              </div>
-
-              <div className="flex justify-between items-end">
-                <div>
-                  <button className="bg-white text-black px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider mb-2">
-                    {completedLessons.length > 0 ? "Endelea Kusoma" : "Anza Kozi"}
-                  </button>
-                  <div className="text-[10px] text-gray-400 font-medium">
-                    {completedLessons.length === totalLessons ? "Umemaliza kozi yote!" : `${totalLessons - completedLessons.length} Sura Zimebaki`}
-                  </div>
-                </div>
-                
-                {/* Graphic icon group */}
-                <div className="flex -space-x-2">
-                  <div className="w-8 h-8 rounded-full bg-orange-400 border-2 border-black z-30" />
-                  <div className="w-8 h-8 rounded-full bg-blue-400 border-2 border-black z-20" />
-                  <div className="w-8 h-8 rounded-full bg-purple-400 border-2 border-black z-10" />
-                </div>
-              </div>
-            </div>
+                    <div className="relative z-10 flex flex-col justify-end h-[calc(100%-4rem)]">
+                      <div>
+                        <h2 className={`font-display ${isFirst ? 'text-3xl md:text-4xl' : 'text-2xl'} font-extrabold mb-3 w-4/5 leading-tight`}>
+                          {course.course_title}
+                        </h2>
+                        <p className={`text-sm mb-6 w-4/5 font-medium ${textColor === "text-white" ? "text-gray-300" : "text-gray-700"}`}>
+                          {course.level} • {course.language}
+                        </p>
+                      </div>
+                      
+                      <div className="flex justify-between items-center mt-auto pt-2">
+                        <button className={`${textColor === "text-white" ? "bg-white text-black" : "bg-black text-white"} px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-md hover:shadow-lg transition-shadow`}>
+                          Anza Kozi
+                        </button>
+                        
+                        <div className="flex -space-x-3">
+                          <div className={`w-8 h-8 rounded-full bg-orange-400 border-2 ${bgColor === "bg-[#121212]" ? "border-[#121212]" : "border-transparent"} shadow-sm z-30`} />
+                          <div className={`w-8 h-8 rounded-full bg-blue-400 border-2 ${bgColor === "bg-[#1cb0f6]" ? "border-[#1cb0f6]" : "border-transparent"} shadow-sm z-20`} />
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+               );
+             })}
           </motion.div>
         )}
 
@@ -214,6 +275,7 @@ export default function HomeScreen({ onNavigate }: Props) {
             whileTap={{ scale: 0.98 }}
             onClick={() => onNavigate('ai-tutor')}
             className="w-full bg-[#121212] text-white py-4 px-6 rounded-full shadow-2xl flex items-center justify-between border border-gray-800"
+            aria-label="Uliza Mama Maarifa (Ask AI Tutor)"
          >
            <div className="flex items-center gap-3">
              <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">

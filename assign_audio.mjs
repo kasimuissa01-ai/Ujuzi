@@ -1,0 +1,41 @@
+import fs from 'fs';
+
+const courses = JSON.parse(fs.readFileSync('src/data/courses.json', 'utf-8'));
+
+const lessonAudioUrls = {
+  "101": "https://fhtnqhkxpvrfzxrwwtso.supabase.co/storage/v1/object/public/Ujuzi_pkus/Lesson_101.wav",
+  "102": "https://fhtnqhkxpvrfzxrwwtso.supabase.co/storage/v1/object/public/Ujuzi_pkus/lesson_102.wav",
+  "103": "https://fhtnqhkxpvrfzxrwwtso.supabase.co/storage/v1/object/public/Ujuzi_pkus/lesson_103.wav",
+  "201": "https://fhtnqhkxpvrfzxrwwtso.supabase.co/storage/v1/object/public/Ujuzi_pkus/lesson_201.wav",
+  "202": "https://fhtnqhkxpvrfzxrwwtso.supabase.co/storage/v1/object/public/Ujuzi_pkus/lesson_202.wav",
+  "203": "https://fhtnqhkxpvrfzxrwwtso.supabase.co/storage/v1/object/public/Ujuzi_pkus/lesson_203.wav",
+  "301": "https://fhtnqhkxpvrfzxrwwtso.supabase.co/storage/v1/object/public/Ujuzi_pkus/lesson_301.wav",
+  "302": "https://fhtnqhkxpvrfzxrwwtso.supabase.co/storage/v1/object/public/Ujuzi_pkus/lesson302.wav",
+  "303": "https://fhtnqhkxpvrfzxrwwtso.supabase.co/storage/v1/object/public/Ujuzi_pkus/lesson303.wav"
+};
+
+for (const course of courses) {
+  for (const unit of course.units) {
+    for (const lesson of unit.lessons) {
+      const lessonId = lesson.lesson_id.toString();
+      const audioUrl = lessonAudioUrls[lessonId];
+      
+      let isFirstText = true;
+
+      for (const block of lesson.blocks) {
+        // remove old placeholder audio everywhere
+        if (block.audio && block.audio.startsWith('http')) {
+          delete block.audio;
+        }
+
+        // Attach audio to the 'text' block instead of 'story'
+        if ((block.type === 'text') && isFirstText && audioUrl) {
+          block.audio = audioUrl;
+          isFirstText = false;
+        }
+      }
+    }
+  }
+}
+
+fs.writeFileSync('src/data/courses.json', JSON.stringify(courses, null, 2));

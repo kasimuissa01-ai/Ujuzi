@@ -65,6 +65,7 @@ export default function OnboardingScreen({ onNavigate }: Props) {
           transition={{ duration: 0.6, delay: 0.3 }}
           onClick={() => onNavigate('home')}
           className="w-full h-16 bg-[#d9d9de] text-black rounded-full flex items-center justify-between p-2 group hover:bg-[#d0d0d6] transition-colors"
+          aria-label="Anza kozi (Get Started)"
         >
           <div className="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center shrink-0">
             <BookOpen className="w-5 h-5" fill="currentColor" strokeWidth={1.5} />
