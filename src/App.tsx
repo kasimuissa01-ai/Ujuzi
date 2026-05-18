@@ -12,6 +12,7 @@ import InteractiveLesson from './screens/InteractiveLesson';
 import { trackEvent } from './lib/mixpanel';
 import { useAuth } from './hooks/useAuth';
 import { Loader2 } from 'lucide-react';
+import InstallPrompt from './components/InstallPrompt';
 
 export type ScreenType = 'onboarding' | 'home' | 'course' | 'ai-tutor' | 'lesson';
 
@@ -81,6 +82,8 @@ export default function App() {
         {currentScreen === 'course' && <CourseDetailScreen onNavigate={navigate} onBack={goBack} params={currentParams} />}
         {currentScreen === 'ai-tutor' && <AiTutorScreen onNavigate={navigate} onBack={goBack} />}
         {currentScreen === 'lesson' && <InteractiveLesson onNavigate={navigate} onBack={goBack} params={currentParams} />}
+        
+        <InstallPrompt />
       </div>
     </div>
   );

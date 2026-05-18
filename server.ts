@@ -22,15 +22,22 @@ async function startServer() {
         return res.status(500).json({ error: "GEMINI_API_KEY is not configured on the server." });
       }
 
-      const genAI = new GoogleGenAI(apiKey);
-      const model = genAI.getGenerativeModel({ 
-        model: "gemini-2.0-flash",
-        generationConfig: jsonMode ? { responseMimeType: "application/json" } : undefined
+      const ai = new GoogleGenAI({
+        apiKey,
+        httpOptions: {
+          headers: {
+            'User-Agent': 'aistudio-build',
+          }
+        }
       });
 
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      const text = response.text();
+      const result = await ai.models.generateContent({ 
+        model: "gemini-3-flash-preview",
+        contents: prompt,
+        config: jsonMode ? { responseMimeType: "application/json" } : undefined
+      });
+
+      const text = result.text;
 
       res.json({ text });
     } catch (error) {
