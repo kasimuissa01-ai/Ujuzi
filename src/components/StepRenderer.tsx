@@ -322,7 +322,7 @@ export default function StepRenderer({ step, onContinue, setCompanionFeedback, c
         playSound('wrong');
         if (typeof window !== 'undefined' && window.navigator.vibrate) window.navigator.vibrate([100, 50, 100]);
         setWrongIndices(prev => [...prev, index]);
-        setCompanionFeedback("Sio sahihi! Umechagua jibu ambalo si sahihi. Fikiria kwa makini kisha ujaribu tena.", "thinking");
+        setCompanionFeedback("Sio sahihi! Umechagua jibu ambalo si sahihi.", "thinking");
       }
     };
 
@@ -357,27 +357,36 @@ export default function StepRenderer({ step, onContinue, setCompanionFeedback, c
             const isWrong = wrongIndices.includes(idx);
             const isCorrectOption = idx === step.correct_index;
             
-            let baseStyles = 'border-[#37464f] border-b-[4px] hover:bg-white/5 text-white bg-[#131f24]';
+            let baseStyles = 'border-[#37464f] border-b-[4px] hover:bg-white/5 text-[#d1d5db] hover:text-white bg-[#131f24]';
+            let iconClass = 'border-2 border-[#37464f] text-[#d1d5db] group-hover:bg-[#37464f] group-hover:border-[#37464f] group-hover:text-white';
+            
             if (isSelected && isCorrectOption) {
                  baseStyles = 'border-[#58cc02] border-b-[3px] bg-[#58cc02]/10 text-[#58cc02]';
+                 iconClass = '!bg-[#58cc02] !border-[#58cc02] text-white';
             } else if (isWrong) {
                  baseStyles = 'border-[#ea2b2b] border-b-[3px] bg-[#ea2b2b]/10 text-[#ea2b2b]';
+                 iconClass = '!bg-[#ea2b2b] !border-[#ea2b2b] text-white';
             } else if (canContinue) {
-                 baseStyles = 'border-[#37464f] border-b-[3px] text-white bg-[#131f24] opacity-50';
+                 baseStyles = 'border-[#37464f] border-b-[3px] text-[#8a9296] bg-[#131f24] opacity-50';
+                 iconClass = 'border-2 border-[#37464f] text-[#8a9296]';
             }
 
             return (
               <motion.button
                 key={idx}
+                whileHover={!canContinue && !isWrong ? { scale: 1.01 } : undefined}
                 whileTap={!canContinue ? { scale: 0.98 } : undefined}
                 onClick={() => handleSelect(idx)}
                 disabled={canContinue}
-                className={`p-5 rounded-2xl border-[3px] text-left transition-all relative active:translate-y-[1px] ${baseStyles}`}
+                className={`p-4 rounded-xl border-[3px] text-left transition-colors relative active:translate-y-[1px] group ${baseStyles}`}
                 style={
                   (!canContinue && !isSelected && !isWrong) ? { borderBottomWidth: '4px' } : { borderBottomWidth: '3px' }
                 }
               >
-                <div className="flex items-center justify-between pr-8">
+                <div className="flex items-center gap-4">
+                  <div className={`w-8 h-8 rounded-lg shrink-0 flex items-center justify-center font-bold text-sm transition-colors ${iconClass}`}>
+                    {isSelected && isCorrectOption ? <Check className="w-5 h-5" strokeWidth={3} /> : isWrong ? <X className="w-5 h-5" strokeWidth={3} /> : String.fromCharCode(65 + idx)}
+                  </div>
                   <span className="text-[17px] font-bold leading-relaxed">{opt}</span>
                 </div>
               </motion.button>
@@ -561,38 +570,114 @@ export default function StepRenderer({ step, onContinue, setCompanionFeedback, c
 
   if (step.type === 'match') {
       const [matches, setMatches] = useState<{[key: string]: string}>({});
+      const [shuffledRights, setShuffledRights] = useState<string[]>([]);
+      const [selectedLeft, setSelectedLeft] = useState<string | null>(null);
+
+      useEffect(() => {
+          setShuffledRights([...step.pairs.map((p: any) => p.right)].sort(() => Math.random() - 0.5));
+      }, [step]);
       
-      const handlePair = (left: string, right: string) => {
+      const handleSelectLeft = (left: string) => {
           if (canContinue) return;
-          const newMatches = {...matches, [left]: right};
-          setMatches(newMatches);
+          setSelectedLeft(left === selectedLeft ? null : left);
+      };
+
+      const handleSelectRight = (right: string) => {
+          if (canContinue || !selectedLeft) return;
           
-          if (Object.keys(newMatches).length === step.pairs.length) {
-              // Simple check
-              const allCorrect = step.pairs.every(p => newMatches[p.left] === p.right);
-              if (allCorrect) {
+          const correctPair = step.pairs.find((p: any) => p.left === selectedLeft);
+          if (correctPair && correctPair.right === right) {
+              playSound('correct_voice');
+              if (typeof window !== 'undefined' && window.navigator.vibrate) window.navigator.vibrate(50);
+              const newMatches = {...matches, [selectedLeft]: right};
+              setMatches(newMatches);
+              setSelectedLeft(null);
+              
+              if (Object.keys(newMatches).length === step.pairs.length) {
                   playSound('correct_voice');
                   setCanContinue(true);
                   setCompanionFeedback(step.feedback, "celebrating");
               }
+          } else {
+              playSound('wrong');
+              if (typeof window !== 'undefined' && window.navigator.vibrate) window.navigator.vibrate([50, 50, 50]);
+              setCompanionFeedback("Sio yenyewe, jaribu tena!", "thinking");
+              setSelectedLeft(null);
           }
       };
 
       return (
-          <div className="flex flex-col gap-6 pt-6">
+          <div className="flex flex-col gap-6 pt-4 pb-8 h-full">
             <div className="flex items-start gap-4">
               <AudioButton />
-              <h2 className="text-white text-[20px] font-bold">{step.prompt}</h2>
+              <h2 className="text-white text-[20px] font-bold mt-1 tracking-tight">{step.prompt}</h2>
             </div>
-              {step.pairs.map(pair => (
-                  <div key={pair.left} className="flex gap-2">
-                      <div className="bg-[#202f36] p-3 rounded-lg text-white font-bold flex-1">{pair.left}</div>
-                      <div className="text-white">→</div>
-                      <button className="bg-[#1cb0f6] p-3 rounded-lg text-white font-bold flex-1" onClick={() => handlePair(pair.left, pair.right)}>
-                          {matches[pair.left] || "Select"}
-                      </button>
-                  </div>
-              ))}
+            
+            <div className="flex flex-col gap-4 mt-2">
+              <div className="grid grid-cols-2 gap-3 sm:gap-6">
+                {/* Left side items */}
+                <div className="flex flex-col gap-3">
+                  {step.pairs.map((pair: any) => {
+                    const isMatched = !!matches[pair.left];
+                    const isSelected = selectedLeft === pair.left;
+                    
+                    let bgClass = 'bg-[#131f24] hover:bg-white/5 border-[#37464f] text-[#d1d5db]';
+                    let borderW = 'border-b-[4px] border-[3px]';
+                    
+                    if (isMatched) {
+                        bgClass = 'bg-[#58cc02]/10 border-[#58cc02] text-[#58cc02] opacity-50';
+                        borderW = 'border-[3px]';
+                    } else if (isSelected) {
+                        bgClass = 'bg-[#1cb0f6]/10 border-[#1cb0f6] text-[#1cb0f6]';
+                        borderW = 'border-b-[3px] border-[3px] translate-y-[1px]';
+                    }
+
+                    return (
+                        <motion.button 
+                           key={pair.left} 
+                           whileTap={(!isMatched && !isSelected) ? { scale: 0.98 } : undefined}
+                           className={`p-4 rounded-xl font-bold leading-snug transition-all text-left flex items-center justify-center text-center ${borderW} ${bgClass}`}
+                           onClick={() => handleSelectLeft(pair.left)}
+                           disabled={isMatched || canContinue}
+                           style={isMatched ? { pointerEvents: 'none'} : {}}
+                        >
+                           {pair.left}
+                        </motion.button>
+                     )
+                  })}
+                </div>
+
+                {/* Right side items */}
+                <div className="flex flex-col gap-3">
+                  {shuffledRights.map((right: string) => {
+                     const isMatched = Object.values(matches).includes(right);
+                     
+                     let bgClass = 'bg-[#131f24] hover:bg-white/5 border-[#37464f] text-[#d1d5db]';
+                     let borderW = 'border-b-[4px] border-[3px]';
+                     
+                     if (isMatched) {
+                         bgClass = 'bg-[#58cc02]/10 border-[#58cc02] text-[#58cc02] opacity-50';
+                         borderW = 'border-[3px]';
+                     } else if (selectedLeft) {
+                         bgClass = 'bg-[#131f24] hover:bg-[#1cb0f6]/5 text-white border-[#1cb0f6] border-dashed';
+                     }
+                     
+                     return (
+                         <motion.button 
+                            key={right}
+                            whileTap={!isMatched ? { scale: 0.98 } : undefined}
+                            className={`p-4 rounded-xl font-bold leading-snug transition-all text-left flex items-center justify-center text-center ${borderW} ${bgClass}`}
+                            onClick={() => handleSelectRight(right)}
+                            disabled={isMatched || canContinue || !selectedLeft}
+                            style={isMatched ? { pointerEvents: 'none'} : {}}
+                         >
+                            {right}
+                         </motion.button>
+                     )
+                  })}
+                </div>
+              </div>
+            </div>
           </div>
       );
   }
