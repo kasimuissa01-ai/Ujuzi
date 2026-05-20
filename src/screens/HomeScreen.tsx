@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Bell, Search, LayoutGrid, Monitor, Briefcase, GraduationCap, ArrowRight, Sparkles, X, Plus } from 'lucide-react';
+import { Bell, Search, LayoutGrid, Monitor, Briefcase, GraduationCap, ArrowRight, Sparkles, X, Plus, Download, Share, PlusSquare, MoreVertical, Smartphone } from 'lucide-react';
 import { ScreenType } from '../App';
 import coursesData from '../data/courses.json';
 import { useProgress } from '../hooks/useProgress';
 import { useAuth } from '../hooks/useAuth';
 import { useNotifications } from '../hooks/useNotifications';
+import { usePWA } from '../hooks/usePWA';
 
 interface Props {
   onNavigate: (screen: ScreenType, params?: Record<string, any>) => void;
@@ -19,6 +20,37 @@ export default function HomeScreen({ onNavigate }: Props) {
   const [showNotifications, setShowNotifications] = useState(false);
 
   const { completedLessons } = useProgress();
+  
+  const { isInstallable, isInstalled, installApp } = usePWA();
+  const [isIOS, setIsIOS] = useState(false);
+  const [isInAppBrowser, setIsInAppBrowser] = useState(false);
+  const [actionExpandedState, setActionExpandedState] = useState<null | 'inapp' | 'ios' | 'manual_android'>(null);
+
+  useEffect(() => {
+    const userAgent = window.navigator.userAgent.toLowerCase();
+    
+    // Determine if iOS
+    const isIOSDevice = /iphone|ipad|ipod/.test(userAgent);
+    setIsIOS(isIOSDevice);
+
+    // Detect In-App Browsers (TikTok, Instagram, Facebook, Snapchat, etc.)
+    const inApp = /fban|fbav|instagram|instabridge|tiktok|musical_ly|snapchat|line|wv|webview/.test(userAgent) || 
+                  (userAgent.includes('android') && userAgent.includes('version/'));
+    setIsInAppBrowser(inApp);
+  }, []);
+
+  const handleInstallClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isInstallable) {
+      installApp();
+    } else if (isInAppBrowser) {
+      setActionExpandedState(prev => prev === 'inapp' ? null : 'inapp');
+    } else if (isIOS) {
+      setActionExpandedState(prev => prev === 'ios' ? null : 'ios');
+    } else {
+      setActionExpandedState(prev => prev === 'manual_android' ? null : 'manual_android');
+    }
+  };
   
   // Hardcoded for old course data just so notifications don't break if no courses
   const totalLessons = 0; 
@@ -268,23 +300,68 @@ export default function HomeScreen({ onNavigate }: Props) {
 
       </div>
 
-      {/* Floating Bottom Nav / Action (AI Tutor) */}
+      {/* Floating Bottom Nav / Action (Install App) */}
       <div className="fixed sm:absolute bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-3rem)] max-w-sm z-50">
-         <motion.button 
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => onNavigate('ai-tutor')}
-            className="w-full bg-[#121212] text-white py-4 px-6 rounded-full shadow-2xl flex items-center justify-between border border-gray-800"
-            aria-label="Uliza Mama Maarifa (Ask AI Tutor)"
+         <motion.div 
+            className="w-full bg-[#121212] flex flex-col rounded-[1.5rem] shadow-2xl border border-gray-800 overflow-hidden"
+            animate={actionExpandedState ? { y: 0 } : { y: 0 }}
          >
-           <div className="flex items-center gap-3">
-             <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-                <Sparkles className="w-4 h-4 text-white" />
+           <button 
+              onClick={handleInstallClick}
+              className="w-full text-white py-4 px-6 flex items-center justify-between"
+              aria-label="Install App"
+           >
+             <div className="flex items-center gap-3">
+               <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                  <Download className="w-4 h-4 text-white" />
+               </div>
+               <span className="font-semibold text-sm">Install App</span>
              </div>
-             <span className="font-semibold text-sm">Uliza Mama Maarifa</span>
-           </div>
-           <ArrowRight className="w-5 h-5 text-gray-400" />
-         </motion.button>
+             <ArrowRight className={`w-5 h-5 text-gray-400 transition-transform ${actionExpandedState ? 'rotate-90' : ''}`} />
+           </button>
+
+           {/* Expanded instructions */}
+           <AnimatePresence>
+              {actionExpandedState && (
+                <motion.div 
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="px-6 pb-4 border-t border-white/10 text-white"
+                >
+                  <div className="mt-4 text-[12px] text-gray-300 space-y-2 text-left">
+                    {actionExpandedState === 'inapp' && (
+                      <div className="space-y-1.5">
+                        <span className="font-bold text-[#ff4b4b] uppercase text-[10px] tracking-wider block mb-1">Tik Tok & Instagram blockage!</span>
+                        <p className="flex items-center flex-wrap leading-tight">
+                          1. Gusa vitone vitatu <MoreVertical className="w-3.5 h-3.5 inline mx-0.5 text-[#ff4b4b]" /> juu kulia.
+                        </p>
+                        <p className="leading-tight">2. Chagua <b>Fungua kwenye Browser (Open in Browser)</b> kisha sakinisha.</p>
+                      </div>
+                    )}
+                    {actionExpandedState === 'ios' && (
+                      <div className="space-y-1.5">
+                        <span className="font-bold text-[#1cb0f6] uppercase text-[10px] tracking-wider block mb-1">iOS Safari Instructions:</span>
+                        <p className="flex items-center leading-tight">
+                          1. Gusa alama ya <Share className="w-3.5 h-3.5 inline mx-1 text-[#1cb0f6]" /> chini ya Safari.
+                        </p>
+                        <p className="flex items-center leading-tight">
+                          2. Shuka na chagua <PlusSquare className="w-3.5 h-3.5 inline mx-1 text-[#1cb0f6]" /> <b>Add to Home Screen</b>.
+                        </p>
+                      </div>
+                    )}
+                    {actionExpandedState === 'manual_android' && (
+                      <div className="space-y-1.5">
+                        <span className="font-bold text-[#ffcd1f] uppercase text-[10px] tracking-wider block mb-1">Manually Install / Add:</span>
+                        <p className="leading-tight">1. Gusa alama ya vitone vitatu juu kulia mwa browser.</p>
+                        <p className="leading-tight">2. Chagua <b>Install app</b> au <b>Add to Home Screen</b>.</p>
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+           </AnimatePresence>
+         </motion.div>
       </div>
 
       {/* Overlay to catch clicks and close notifications */}

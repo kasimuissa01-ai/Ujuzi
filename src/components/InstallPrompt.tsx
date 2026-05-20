@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { Download, X, Share, PlusSquare, MoreVertical } from 'lucide-react';
 import { usePWA } from '../hooks/usePWA';
@@ -8,6 +9,7 @@ export default function InstallPrompt() {
   const [isVisible, setIsVisible] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
   const [isInAppBrowser, setIsInAppBrowser] = useState(false);
+  const [expandedState, setExpandedState] = useState<null | 'inapp' | 'ios' | 'manual_android'>(null);
 
   useEffect(() => {
     const userAgent = window.navigator.userAgent.toLowerCase();
@@ -23,110 +25,135 @@ export default function InstallPrompt() {
 
     // Only show if not installed
     if (!isInstalled) {
-      // Show after a short delay for better UX
-      const timer = setTimeout(() => {
-        // Show if iOS (manual instructions), if installable (Android Chrome), or if trapped in an in-app browser
-        if (isIOSDevice || isInstallable || inApp) {
-          setIsVisible(true);
+      // Check if dismissed recently (e.g., last 2 hours)
+      const dismissedTime = localStorage.getItem('ujuzi_install_dismissed2');
+      let shouldShow = true;
+      if (dismissedTime) {
+        const diff = Date.now() - parseInt(dismissedTime, 10);
+        if (diff < 1000 * 60 * 60 * 2) {
+          shouldShow = false;
         }
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [isInstalled, isInstallable]);
+      }
 
-  const handleClose = () => {
+      if (shouldShow) {
+        // Show after a short delay for better UX
+        const timer = setTimeout(() => {
+          setIsVisible(true);
+        }, 2000);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [isInstalled]);
+
+  const handleClose = (e: React.MouseEvent) => {
+    e.stopPropagation();
     setIsVisible(false);
-    // Optional: store in localStorage to not show again for a while
-    localStorage.setItem('ujuzi_install_dismissed', Date.now().toString());
+    localStorage.setItem('ujuzi_install_dismissed2', Date.now().toString());
+  };
+
+  const handleActionButtonClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isInstallable) {
+      installApp();
+    } else if (isInAppBrowser) {
+      setExpandedState(prev => prev === 'inapp' ? null : 'inapp');
+    } else if (isIOS) {
+      setExpandedState(prev => prev === 'ios' ? null : 'ios');
+    } else {
+      setExpandedState(prev => prev === 'manual_android' ? null : 'manual_android');
+    }
   };
 
   if (isInstalled || !isVisible) return null;
 
-  return (
+  const content = (
     <AnimatePresence>
       {isVisible && (
         <motion.div
-          initial={{ opacity: 0, y: 100, scale: 0.9 }}
+          initial={{ opacity: 0, y: 50, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 100, scale: 0.9 }}
-          transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-          className="fixed bottom-6 left-6 right-6 z-[100] flex justify-center"
+          exit={{ opacity: 0, y: 50, scale: 0.95 }}
+          transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+          className="fixed bottom-24 left-4 right-4 z-[99999999] md:max-w-md md:mx-auto"
         >
-          <div className="bg-black text-white rounded-[2rem] p-6 shadow-2xl border border-white/10 w-full max-w-[340px] relative overflow-hidden">
-            {/* Logo background pattern (subtle) */}
-            <div className="absolute -right-8 -bottom-8 opacity-5">
-               <img src="https://i.postimg.cc/J0CyqrKM/IMG-20260510-235338.jpg" alt="" className="w-40 h-40 rotate-12" />
-            </div>
+          {/* Main Mini Sleek Card */}
+          <div className="bg-neutral-950 border-2 border-white/20 rounded-2xl p-4 shadow-[0_20px_60px_rgba(0,0,0,0.8)] backdrop-blur-xl text-white flex flex-col gap-2 relative overflow-hidden">
+            {/* Background Light Spill */}
+            <div className="absolute right-0 top-0 w-20 h-20 bg-[#58cc02]/20 rounded-full blur-2xl pointer-events-none" />
 
-            <button 
-              onClick={handleClose}
-              className="absolute top-4 right-4 p-1 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
-            >
-              <X className="w-4 h-4" />
-            </button>
-
-            <div className="flex flex-col items-center text-center">
-              <div className="w-16 h-16 bg-white rounded-2xl p-0.5 mb-4 shadow-lg overflow-hidden flex items-center justify-center">
-                <img 
-                  src="https://i.postimg.cc/J0CyqrKM/IMG-20260510-235338.jpg" 
-                  alt="Ujuzi Logo" 
-                  className="w-full h-full object-cover rounded-[14px]"
-                />
+            <div className="flex items-center justify-between gap-3 relative z-10">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-white rounded-[10px] p-0.5 shrink-0 overflow-hidden flex items-center justify-center">
+                  <img
+                    src="https://i.postimg.cc/J0CyqrKM/IMG-20260510-235338.jpg"
+                    alt="Ujuzi"
+                    className="w-full h-full object-cover rounded-[8px]"
+                  />
+                </div>
+                <div className="flex flex-col text-left">
+                  <h4 className="text-[14px] font-black tracking-wide text-white uppercase leading-none mb-1">Ujuzi App</h4>
+                  <p className="text-[11px] text-white/70 font-medium leading-none">Sakinisha Sasa</p>
+                </div>
               </div>
 
-              <h3 className="text-xl font-bold mb-1">Install Ujuzi App</h3>
-              <p className="text-white/60 text-sm mb-6 px-4">
-                Pata ufikiaji wa haraka na ujifunze popote ulipo, hata bila internet.
-              </p>
-
-              {isInAppBrowser ? (
-                <div className="space-y-4 w-full">
-                  <div className="bg-white/5 rounded-2xl p-4 text-left border border-white/5">
-                    <p className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-3">FUNGUA KWENYE BROWSER</p>
-                    <p className="text-sm mb-3">TikTok/Instagram inazuia ku-install App. Tafadhali fungua kwenye browser:</p>
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-6 h-6 rounded-full bg-white text-black flex items-center justify-center text-[10px] font-bold">1</div>
-                        <p className="text-sm flex items-center flex-wrap">
-                          Bonyeza vidoti vitatu <MoreVertical className="w-4 h-4 mx-1" /> juu kulia.
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <div className="w-6 h-6 rounded-full bg-white text-black flex items-center justify-center text-[10px] font-bold">2</div>
-                        <p className="text-sm">Chagua <b>Open in Browser</b> au Safari/Chrome.</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ) : isIOS ? (
-                <div className="space-y-4 w-full">
-                  <div className="bg-white/5 rounded-2xl p-4 text-left border border-white/5">
-                    <p className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-3">JINSI YA KUINSTALL</p>
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-6 h-6 rounded-full bg-white text-black flex items-center justify-center text-[10px] font-bold">1</div>
-                        <p className="text-sm">Bonyeza <Share className="w-4 h-4 inline-block mx-1 mb-1" /> chini ya browser yako.</p>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <div className="w-6 h-6 rounded-full bg-white text-black flex items-center justify-center text-[10px] font-bold">2</div>
-                        <p className="text-sm">Chagua <PlusSquare className="w-4 h-4 inline-block mx-1 mb-1" /> <b>Add to Home Screen</b>.</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ) : (
+              <div className="flex items-center gap-2">
                 <button
-                  onClick={installApp}
-                  className="w-full bg-white text-black font-bold py-4 rounded-2xl flex items-center justify-center gap-2 hover:bg-neutral-200 transition-all active:scale-95"
+                  onClick={handleActionButtonClick}
+                  className="bg-[#58cc02] hover:bg-[#46a302] text-white font-black text-[13px] px-4 py-2.5 rounded-full flex items-center gap-1.5 transition-all active:scale-95 shadow-lg shadow-[#58cc02]/30 cursor-pointer shrink-0"
                 >
-                  <Download className="w-5 h-5" />
-                  Install App Now
+                  <Download className="w-4 h-4" strokeWidth={2.5} />
+                  Sakinisha
                 </button>
-              )}
+                <button
+                  onClick={handleClose}
+                  className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white transition-colors cursor-pointer shrink-0"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
             </div>
+
+            {/* Micro Instruction Drawer inside the prompt */}
+            {expandedState && (
+              <motion.div 
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                className="mt-2 pt-3 border-t border-white/10 text-[12px] text-white/90 space-y-2 text-left relative z-10"
+              >
+                {expandedState === 'inapp' && (
+                  <div className="space-y-1.5 p-1">
+                    <span className="font-bold text-[#ff4b4b] uppercase text-[10px] tracking-wider block mb-1">Kizuizi (Tik Tok / Instagram)</span>
+                    <p className="flex items-center flex-wrap leading-relaxed">
+                      1. Gusa vitone vitatu <MoreVertical className="w-4 h-4 inline mx-0.5 text-[#ff4b4b]" /> juu kulia.
+                    </p>
+                    <p className="leading-relaxed">2. Chagua <b>Fungua kwenye Browser (Open in Browser)</b> kisha sakinisha.</p>
+                  </div>
+                )}
+                {expandedState === 'ios' && (
+                  <div className="space-y-1.5 p-1">
+                    <span className="font-bold text-[#1cb0f6] uppercase text-[10px] tracking-wider block mb-1">Jinsi ya Kuweka (iOS Safari):</span>
+                    <p className="flex items-center leading-relaxed">
+                      1. Gusa alama ya <Share className="w-4 h-4 inline mx-1 text-[#1cb0f6]" /> chini.
+                    </p>
+                    <p className="flex items-center leading-relaxed">
+                      2. Shuka na chagua <PlusSquare className="w-4 h-4 inline mx-1 text-[#1cb0f6]" /> <b>Add to Home Screen</b>.
+                    </p>
+                  </div>
+                )}
+                {expandedState === 'manual_android' && (
+                  <div className="space-y-1.5 p-1">
+                    <span className="font-bold text-[#ffcd1f] uppercase text-[10px] tracking-wider block mb-1">Kuweka (Manually):</span>
+                    <p className="leading-relaxed">1. Gusa alama ya vitone vitatu juu kulia.</p>
+                    <p className="leading-relaxed">2. Chagua <b>Install app</b> au <b>Add to Home Screen</b>.</p>
+                  </div>
+                )}
+              </motion.div>
+            )}
           </div>
         </motion.div>
       )}
     </AnimatePresence>
   );
+
+  return typeof document !== 'undefined' ? createPortal(content, document.body) : null;
 }

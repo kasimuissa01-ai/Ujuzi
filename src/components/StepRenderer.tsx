@@ -194,26 +194,49 @@ export default function StepRenderer({ step, onContinue, setCompanionFeedback, c
                  baseBorder = 'border-[#37464f] border-b-[3px] bg-[#131f24] opacity-50';
             }
 
+            const isPlaceholder = !data.src || data.src.includes('example.com');
+
             return (
               <motion.button
                 key={opt}
                 whileTap={!canContinue ? { scale: 0.98 } : undefined}
                 onClick={() => handleSelect(opt)}
                 disabled={canContinue}
-                className={`relative flex flex-col overflow-hidden rounded-2xl border-[3px] transition-all p-3 active:translate-y-[1px] active:border-b-[3px] ${baseBorder}`}
+                className={`relative flex flex-col overflow-hidden rounded-2xl border-[3px] transition-all active:translate-y-[1px] ${baseBorder} ${isPlaceholder ? 'p-6 justify-center items-center text-center min-h-[160px]' : 'p-3'}`}
                 style={
                   (!canContinue && !isSelected && !isWrong) ? { borderBottomWidth: '4px' } : { borderBottomWidth: '3px' }
                 }
               >
-                <div className="w-full aspect-[4/5] sm:aspect-[3/4] shrink-0 rounded-xl overflow-hidden bg-white relative mb-3">
-                  <img src={data.src} alt={data.label} className="w-full h-full object-contain absolute inset-0" />
-                </div>
-                <div className="w-full text-center flex items-center justify-center">
-                  <span className={`text-[17px] font-bold ${textClass}`}>
-                    {hasCheck ? '✓ ' : hasWrong ? '✗ ' : ''}
-                    {data.label}
-                  </span>
-                </div>
+                {isPlaceholder ? (
+                  <div className="flex flex-col items-center justify-center w-full h-full">
+                    <div className={`w-12 h-12 rounded-xl mb-4 border-2 flex items-center justify-center font-bold text-lg transition-colors ${
+                      hasCheck 
+                        ? 'bg-[#58cc02] border-[#58cc02] text-white' 
+                        : hasWrong 
+                          ? 'bg-[#ea2b2b] border-[#ea2b2b] text-white' 
+                          : isSelected 
+                            ? 'bg-[#1cb0f6] border-[#1cb0f6] text-white'
+                            : 'bg-transparent border-[#37464f] text-[#8a9296]'
+                    }`}>
+                      {hasCheck ? <Check className="w-6 h-6" strokeWidth={3} /> : hasWrong ? <X className="w-6 h-6" strokeWidth={3} /> : opt}
+                    </div>
+                    <span className={`text-[17px] font-bold leading-relaxed ${textClass}`}>
+                      {data.label}
+                    </span>
+                  </div>
+                ) : (
+                  <>
+                    <div className="w-full aspect-[4/5] sm:aspect-[3/4] shrink-0 rounded-xl overflow-hidden bg-white relative mb-3">
+                      <img src={data.src} alt={data.label} className="w-full h-full object-contain absolute inset-0" />
+                    </div>
+                    <div className="w-full text-center flex items-center justify-center">
+                      <span className={`text-[17px] font-bold ${textClass}`}>
+                        {hasCheck ? '✓ ' : hasWrong ? '✗ ' : ''}
+                        {data.label}
+                      </span>
+                    </div>
+                  </>
+                )}
               </motion.button>
             )
           })}

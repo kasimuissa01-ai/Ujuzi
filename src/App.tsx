@@ -7,14 +7,13 @@ import { useState, useEffect } from 'react';
 import OnboardingScreen from './screens/OnboardingScreen';
 import HomeScreen from './screens/HomeScreen';
 import CourseDetailScreen from './screens/CourseDetailScreen';
-import AiTutorScreen from './screens/AiTutorScreen';
 import InteractiveLesson from './screens/InteractiveLesson';
 import { trackEvent } from './lib/mixpanel';
 import { useAuth } from './hooks/useAuth';
 import { Loader2 } from 'lucide-react';
 import InstallPrompt from './components/InstallPrompt';
 
-export type ScreenType = 'onboarding' | 'home' | 'course' | 'ai-tutor' | 'lesson';
+export type ScreenType = 'onboarding' | 'home' | 'course' | 'lesson';
 
 export type HistoryState = {
   screen: ScreenType;
@@ -80,7 +79,6 @@ export default function App() {
         {currentScreen === 'onboarding' && <OnboardingScreen onNavigate={navigate} />}
         {currentScreen === 'home' && <HomeScreen onNavigate={navigate} />}
         {currentScreen === 'course' && <CourseDetailScreen onNavigate={navigate} onBack={goBack} params={currentParams} />}
-        {currentScreen === 'ai-tutor' && <AiTutorScreen onNavigate={navigate} onBack={goBack} />}
         {currentScreen === 'lesson' && <InteractiveLesson onNavigate={navigate} onBack={goBack} params={currentParams} />}
         
         <InstallPrompt />

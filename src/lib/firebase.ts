@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getFirestore, initializeFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
+import { getFirestore, initializeFirestore, doc, getDoc, setDoc, enableMultiTabIndexedDbPersistence, enableIndexedDbPersistence } from 'firebase/firestore';
 import { getAuth, GoogleAuthProvider, signInAnonymously, signInWithPopup, linkWithPopup, onAuthStateChanged, User } from 'firebase/auth';
 import firebaseConfig from '../../firebase-applet-config.json'; // relative to src/lib/
 
@@ -7,6 +7,25 @@ const app = initializeApp(firebaseConfig);
 export const db = initializeFirestore(app, {
   experimentalForceLongPolling: true,
 }, firebaseConfig.firestoreDatabaseId);
+
+// Enable offline IndexedDB persistence for Firestore
+if (typeof window !== 'undefined') {
+  enableMultiTabIndexedDbPersistence(db)
+    .catch((err) => {
+      if (err.code === 'failed-precondition') {
+        // Multiple tabs open, persistence can only be enabled in one tab at a time.
+        console.warn('Firestore persistence failed-precondition: multiple tabs open.');
+      } else if (err.code === 'unimplemented') {
+        // The current browser does not support all of the features required to enable persistence
+        enableIndexedDbPersistence(db).catch((e) => {
+          console.warn('Firestore single-tab persistence failed:', e);
+        });
+      } else {
+        console.error('Firestore persistence error:', err);
+      }
+    });
+}
+
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
 
