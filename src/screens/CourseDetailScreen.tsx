@@ -76,7 +76,7 @@ export default function CourseDetailScreen({ onNavigate, onBack, params }: Props
             {course.units.map((unit, unitIdx) => (
               <div key={unit.unit_id} className="mb-8">
                   <div className="flex items-center gap-4 mb-8 bg-[#ececf0] py-2 relative z-10">
-                    <div className="w-[60px] h-[60px] rounded-2xl bg-white border-2 border-gray-200 flex flex-shrink-0 items-center justify-center text-3xl shadow-sm z-10">
+                    <div className="w-[60px] h-[60px] rounded-2xl bg-white border-2 border-gray-200 flex flex-shrink-0 items-center justify-center text-3xl shadow-sm z-10 overflow-hidden">
                         {unit.unit_icon}
                     </div>
                     <div className="flex-1">

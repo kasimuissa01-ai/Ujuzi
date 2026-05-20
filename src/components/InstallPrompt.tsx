@@ -1,26 +1,32 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Download, X, Share, PlusSquare } from 'lucide-react';
+import { Download, X, Share, PlusSquare, MoreVertical } from 'lucide-react';
 import { usePWA } from '../hooks/usePWA';
 
 export default function InstallPrompt() {
   const { isInstallable, isInstalled, installApp } = usePWA();
   const [isVisible, setIsVisible] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
+  const [isInAppBrowser, setIsInAppBrowser] = useState(false);
 
   useEffect(() => {
-    // Determine if iOS
     const userAgent = window.navigator.userAgent.toLowerCase();
+    
+    // Determine if iOS
     const isIOSDevice = /iphone|ipad|ipod/.test(userAgent);
     setIsIOS(isIOSDevice);
+
+    // Detect In-App Browsers (TikTok, Instagram, Facebook, Snapchat, etc.)
+    const inApp = /fban|fbav|instagram|instabridge|tiktok|musical_ly|snapchat|line|wv|webview/.test(userAgent) || 
+                  (userAgent.includes('android') && userAgent.includes('version/'));
+    setIsInAppBrowser(inApp);
 
     // Only show if not installed
     if (!isInstalled) {
       // Show after a short delay for better UX
       const timer = setTimeout(() => {
-        // On Android we use isInstallable (beforeinstallprompt)
-        // On iOS we show manually because beforeinstallprompt isn't supported
-        if (isIOSDevice || isInstallable) {
+        // Show if iOS (manual instructions), if installable (Android Chrome), or if trapped in an in-app browser
+        if (isIOSDevice || isInstallable || inApp) {
           setIsVisible(true);
         }
       }, 3000);
@@ -73,7 +79,26 @@ export default function InstallPrompt() {
                 Pata ufikiaji wa haraka na ujifunze popote ulipo, hata bila internet.
               </p>
 
-              {isIOS ? (
+              {isInAppBrowser ? (
+                <div className="space-y-4 w-full">
+                  <div className="bg-white/5 rounded-2xl p-4 text-left border border-white/5">
+                    <p className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-3">FUNGUA KWENYE BROWSER</p>
+                    <p className="text-sm mb-3">TikTok/Instagram inazuia ku-install App. Tafadhali fungua kwenye browser:</p>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-6 h-6 rounded-full bg-white text-black flex items-center justify-center text-[10px] font-bold">1</div>
+                        <p className="text-sm flex items-center flex-wrap">
+                          Bonyeza vidoti vitatu <MoreVertical className="w-4 h-4 mx-1" /> juu kulia.
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-6 h-6 rounded-full bg-white text-black flex items-center justify-center text-[10px] font-bold">2</div>
+                        <p className="text-sm">Chagua <b>Open in Browser</b> au Safari/Chrome.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : isIOS ? (
                 <div className="space-y-4 w-full">
                   <div className="bg-white/5 rounded-2xl p-4 text-left border border-white/5">
                     <p className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-3">JINSI YA KUINSTALL</p>
