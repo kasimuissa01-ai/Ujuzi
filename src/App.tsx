@@ -58,20 +58,6 @@ export default function App() {
     }
   };
 
-  if (authLoading) {
-    return (
-      <div className="h-[100dvh] w-full bg-[#ececf0] flex justify-center items-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-12 w-auto flex items-center justify-center overflow-hidden border-[3px] border-white shadow-md bg-white rounded-full px-4 mb-4">
-            <img src="https://i.postimg.cc/J0CyqrKM/IMG-20260510-235338.jpg" alt="Logo" className="h-[22px] w-auto object-contain" />
-          </div>
-          <Loader2 className="w-8 h-8 animate-spin text-black" />
-          <p className="text-sm font-medium text-gray-500">Inatayarisha maarifa...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="h-[100dvh] w-full bg-[#ececf0] sm:bg-neutral-900 flex justify-center items-center overflow-hidden">
       {/* Mobile Device Constraint for Desktop, full screen on mobile */}

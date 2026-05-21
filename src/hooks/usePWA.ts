@@ -20,10 +20,23 @@ export function usePWA() {
       setIsInstalled(true);
     }
 
+    const checkGlobalPrompt = () => {
+      if ((window as any).deferredPrompt) {
+        setDeferredPrompt((window as any).deferredPrompt);
+        setIsInstallable(true);
+      }
+    };
+
+    // Check immediately and also poll a few times just in case
+    checkGlobalPrompt();
+    const interval = setInterval(checkGlobalPrompt, 500);
+    setTimeout(() => { clearInterval(interval); }, 5000);
+
     const handler = (e: Event) => {
       // Prevent the mini-infobar from appearing on mobile
       e.preventDefault();
       // Stash the event so it can be triggered later.
+      (window as any).deferredPrompt = e;
       setDeferredPrompt(e as BeforeInstallPromptEvent);
       setIsInstallable(true);
     };
@@ -34,21 +47,24 @@ export function usePWA() {
       setIsInstalled(true);
       setIsInstallable(false);
       setDeferredPrompt(null);
+      (window as any).deferredPrompt = null;
     });
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handler);
+      clearInterval(interval);
     };
   }, []);
 
   const installApp = async () => {
-    if (!deferredPrompt) return;
+    const promptEvent = deferredPrompt || (window as any).deferredPrompt;
+    if (!promptEvent) return;
 
     // Show the install prompt
-    deferredPrompt.prompt();
+    promptEvent.prompt();
 
     // Wait for the user to respond to the prompt
-    const { outcome } = await deferredPrompt.userChoice;
+    const { outcome } = await promptEvent.userChoice;
     
     if (outcome === 'accepted') {
       console.log('User accepted the install prompt');
@@ -59,6 +75,7 @@ export function usePWA() {
     // We've used the prompt, and can't use it again, throw it away
     setDeferredPrompt(null);
     setIsInstallable(false);
+    (window as any).deferredPrompt = null;
   };
 
   return { isInstallable, isInstalled, installApp };
