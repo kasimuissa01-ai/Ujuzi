@@ -1,162 +1,536 @@
 [
   {
-    "course_id": "mteja_wa_kwanza_001",
-    "course_title": "Mteja wa Kwanza: Shinda Mauzo Mtandaoni",
-    "category": "Marketing & Sales",
+    "course_id": "biashara_mtandaoni_001_v5",
+    "course_title": "Biashara Mtandaoni kwa SMEs Tanzania",
+    "category": "Digital Skills",
     "language": "Swahili",
     "level": "beginner",
-    "xp_total": 550,
-    "estimated_minutes": 55,
+    "version": "5.0",
+    "xp_total": 15000,
+    "estimated_minutes": 640,
+    "estimated_days": 14,
+    "course_goal": "Kumsaidia SME kujenga, kusimamia, na kukuza biashara mtandaoni kutoka mwanzo hadi kuanza kupata mauzo ya kweli ya kila siku.",
+    "gamification": {
+      "daily_streak_enabled": true,
+      "daily_missions_enabled": true,
+      "badges_enabled": true,
+      "leaderboard_enabled": false,
+      "challenge_rewards_enabled": true,
+      "micro_commitment_tracking": true,
+      "pain_calculator_enabled": true,
+      "identity_declaration_required": true
+    },
     "units": [
       {
         "unit_id": 1,
-        "unit_title": "Jenga Imani (Trust)",
-        "unit_icon": "🤝",
-        "description": "Fanya wateja wakuamini kabla hawajaingia dukani",
+        "unit_title": "Mindset na Misingi ya Biashara",
+        "unit_icon": "🧠",
+        "description": "Jifunza msingi wa biashara mtandaoni, namna wateja wa kisasa wanavyonunua, na makosa ya kuepuka.",
+        "estimated_minutes": 150,
+        "unlock_requirement": "Start",
+        "unit_reward_xp": 1200,
+        "badge": {
+          "new_label": "Mjasiriamali Mwenye Jicho la Kichina",
+          "icon": "👁️",
+          "description": "Unajua kuona fursa za kibiashara ambazo wengine hawazione — hiyo ndiyo nguvu ya kweli ya mjasiriamali wa kisasa."
+        },
         "lessons": [
           {
             "lesson_id": 101,
-            "title": "Bio Yako Ni Signboard Yako",
-            "xp": 50,
-            "duration_min": 5,
-            "mission": "Leo badilisha Bio yako ya Instagram au WhatsApp. Taja unauza nini, upo wapi, na namba yako. Piga screenshot ushiriki kwenye group.",
+            "title": "Biashara Mtandaoni Ni Nini?",
+            "xp": 250,
+            "duration_min": 15,
+            "mission": "Eleza biashara yako kwa sentensi moja rahisi.",
+            "daily_mission": {
+              "tracking_id": "dm_101_user_interview",
+              "task": "Muulize mtu mmoja karibu nawe kama amewahi kununua bidhaa yoyote mtandaoni leo, kisha andika jibu lake.",
+              "xp_reward": 50
+            },
             "blocks": [
               {
-                "type": "story",
-                "character": "Amina, Dar es Salaam",
-                "content": "Amina aliuza viatu miaka 2 kwenye **Instagram**. Hakupata hata **mauzo** 10 kwa mwezi. Alibadilisha **Bio** yake wiki moja — **wateja** 23 wapya waliingia ndani ya siku 7."
-              },
-              {
-                "type": "text",
-                "content": "Biashara mtandaoni huanza na **Bio**. Kama **Bio** haina maelezo ya wazi, mteja anahisi kama ni udanganyifu — na anaenda."
-              },
-              {
-                "type": "text",
-                "content": "Jenga **imani** kwa **kuonyesha unayoyafanya**. Sio tu maneno! **Wateja** wanataka kuona **picha** za bidhaa halisi, video fupi za jinsi unavyofunga oda, na ushahidi kwamba unajali."
-              },
-              {
-                "type": "tip",
-                "content": "Siri ndogo: Watu wanaamini watu, hawamini nembo (logos). Bio yako ikiwa na jina lako halisi (mfano: 'Amina wa Viatu') inajenga imani zaidi kuliko jina la biashara tu."
-              },
-              {
-                "type": "tip",
-                "content": "Fomula ya Bio inayofanya kazi: [Unauza nini] + [Upo wapi] + [Jinsi ya kukupata]. Mfano: 'Tunatengeneza mikate Arusha 🍞 Order WhatsApp 0755-000-000'"
-              },
-              {
-                "type": "image_ab",
-                "label": "Gusa picha inayofanya kazi zaidi:",
-                "option_a": {
-                  "src": "https://fhtnqhkxpvrfzxrwwtso.supabase.co/storage/v1/object/public/Ujuzi_pkus/IMG_20260513_134555.png",
-                  "label": "A"
-                },
-                "option_b": {
-                  "src": "https://fhtnqhkxpvrfzxrwwtso.supabase.co/storage/v1/object/public/Ujuzi_pkus/IMG_20260513_134444.jpg",
-                  "label": "B"
-                },
-                "correct": "B",
-                "feedback_correct": "Safi kabisa! Bio B inafanya kazi kwa sababu: ✅ Inasema unauza nini (viatu) ✅ Inasema uko wapi (Dar es Salaam) ✅ Inasema mteja akupateje (WhatsApp + namba). Mteja anajua kila kitu bila hata kuuliza.",
-                "feedback_wrong": "Karibu! Angalia tena — Bio A haisemi unauza nini, uko wapi, wala jinsi ya kukupata. Mteja anakimbia. Jaribu tena 💪"
-              },
-              {
-                "type": "cloze",
-                "prompt": "Ili wateja wakuamini, picha yako ya wasifu inapaswa kuwa...",
-                "sentence_with_blank": "Ili wateja wakuamini, picha yako ya wasifu inapaswa kuwa {blank}.",
-                "options": [
-                  "Safi na ya kiprofeshonal",
-                  "Picha isiyo wazi",
-                  "Meme ya kuchekesha"
-                ],
-                "correct": "Safi na ya kiprofeshonal",
-                "feedback": "Safi sana! Picha safi inajenga imani mara moja."
-              },
-              {
-                "type": "match",
-                "prompt": "Oanisha zana na manufaa yake:",
-                "pairs": [
+                "type": "pain_calculator",
+                "prompt": "Kabla hatujaanza — jua haswa unachopoteza kila mwezi kwa kutotumia mifumo ya kisasa:",
+                "inputs": [
                   {
-                    "left": "Instagram",
-                    "right": "Katalogi ya Picha"
+                    "key": "average_item_price",
+                    "label": "Bei ya wastani ya bidhaa yako moja (TZS):",
+                    "placeholder": "Mfano: 20000"
                   },
                   {
-                    "left": "WhatsApp",
-                    "right": "Kufunga Mauzo"
+                    "key": "missed_daily_customers",
+                    "label": "Ni wateja wangapi wanakuuliza bei kisha wanatoweka kila siku?",
+                    "placeholder": "Mfano: 3"
                   }
                 ],
-                "feedback": "Vizuri! Kila zana ina kazi yake maalum."
+                "calculation_formula": "average_item_price * missed_daily_customers * 30",
+                "result_template": "Inamaanisha kila mwezi unaruhusu TZS {result} ziondoke mkononi mwako na kwenda kwa wapinzani wako kwa sababu ya kukosa mbinu za kisasa za kufunga mauzo.",
+                "call_to_action": "Bofya hapa chini kuanza kujifunza jinsi ya kuzuia upotevu huu leo!"
+              },
+              {
+                "type": "story",
+                "character": "Neema, Muuzaji wa Nguo Kariakoo",
+                "content": "Neema alianza kwa kuweka picha za nguo WhatsApp Status. Baada ya wiki mbili alianza kupata wateja kutoka maeneo ambayo hajawahi kufika. Wiki ya kwanza: orders 3. Mwezi wa kwanza: orders 31. Sasa anapata mapato ya ziada ya TZS 450,000 kwa mwezi — bila kutoka nyumbani."
+              },
+              {
+                "type": "text",
+                "content": "**Misingi ya Biashara Mtandaoni:** Biashara mtandaoni si lazima iwe na mfumo mgumu au gharama kubwa. Ni kutumia mtandao wa internet kufikia na kuuza bidhaa au huduma zako kupitia WhatsApp, Instagram, au Facebook."
               },
               {
                 "type": "cloze",
-                "prompt": "Maelezo yako ya biashara (Bio) yanapaswa kuwa...",
-                "sentence_with_blank": "Maelezo yako ya biashara (Bio) yanapaswa kuwa {blank}.",
+                "prompt": "Biashara mtandaoni hutumia ________ kufikia wateja wa mbali.",
+                "sentence_with_blank": "Biashara mtandaoni hutumia {blank} kufikia wateja kila mahali.",
                 "options": [
-                  "Mafupi na yanayoeleweka",
-                  "Marefu sana",
-                  "Hayana maelezo"
+                  "Internet",
+                  "Barabara pekee",
+                  "Karatasi"
                 ],
-                "correct": "Mafupi na yanayoeleweka",
-                "feedback": "Hiyo ni kweli! Wateja hawapendi kusoma mambo marefu."
+                "correct": "Internet",
+                "feedback": "Internet ndio daraja linalokuunganisha na wateja wa mbali — hata wakiwa Mwanza au Arusha wakati wewe uko Dar."
               },
               {
-                "type": "insta_bio",
-                "prompt": "Tengeneza Bio inayouza kwa kujaza nafasi zilizo wazi:",
-                "blanks": 3,
+                "type": "mistake_example",
+                "bad_example": "Nauza vitu mbalimbali, karibu inbox kuuliza bei.",
+                "good_example": "Viatu vya kike vya kisasa DSM 👠 Delivery ipo nchi nzima. Agiza: 0712-XXX-XXX",
+                "question": "Ni maelezo gani yanayoonyesha biashara ya kuaminika na inayoeleweka haraka?",
+                "correct": "good_example",
+                "feedback": "Wateja wanaamini biashara inayoweka wazi inauza nini na inafikisha vipi bidhaa. Jibu la pili linasema kila kitu kwa sekunde 1."
+              },
+              {
+                "type": "scenario",
+                "label": "Chagua hatua sahihi",
+                "setup": "Amina anataka kuanza biashara mtandaoni lakini hana mtaji wa kutengeneza website ya gharama.",
                 "options": [
-                  "Kiume",
-                  "Kike",
-                  "Kariakoo",
-                  "Mlimani City",
-                  "Watoto"
+                  "Asiendeshe biashara mpaka apate hela ya website",
+                  "Aanze na akaunti za bure za WhatsApp Business na Instagram",
+                  "Aasubiri miezi sita mambo yabadilike"
                 ],
-                "correct": [
-                  "Kiume",
-                  "Kike",
-                  "Kariakoo"
-                ],
-                "feedback": "Umefanya vizuri! Hii ni Bio kamilifu (Unauza nini + Upo wapi)."
+                "correct_index": 1,
+                "feedback": "Unaweza kuanza kuuza leo kwa kutumia mitandao ya kijamii ya bure kabisa! Neema hakuanza na website — alianza na WhatsApp Status."
+              },
+              {
+                "type": "unit_reflection",
+                "title": "Tafakari ya Somo la Kwanza",
+                "questions": [
+                  {
+                    "key": "u1_l101_insight",
+                    "prompt": "Baada ya kuona 'Pain Calculator', unajisikiaje kuhusu pesa unazozipoteza kwa kutotumia mbinu za kitaalamu za kufunga mauzo?",
+                    "placeholder": "Andika hisia zako hapa..."
+                  }
+                ]
               }
             ]
           },
           {
             "lesson_id": 102,
-            "title": "Picha Inayouza (Visuals)",
-            "xp": 50,
-            "duration_min": 5,
-            "mission": "Piga picha moja ya bidhaa yako karibu na dirisha leo. Linganisha na picha ya zamani — tofauti itakushangaza.",
+            "title": "Kwanini Watu Wananunua Mtandaoni?",
+            "xp": 250,
+            "duration_min": 15,
+            "mission": "Taja sababu kuu mbili zinazomfanya mteja wako apende kununua online badala ya kwenda sokoni.",
+            "daily_mission": {
+              "tracking_id": "dm_102_fast_reply",
+              "task": "Angalia WhatsApp yako leo — jibu kila ujumbe wa mteja ndani ya dakika 5 kwa kutumia salamu ya ukarimu.",
+              "xp_reward": 50
+            },
             "blocks": [
               {
                 "type": "story",
-                "character": "Hassan, Mwanza",
-                "content": "Hassan alipiga **picha** za nguo gizani kwa muda mrefu. **Mauzo** karibu zero. Baada ya kujua siri ya mwanga wa asili, **picha** zake zilipata maoni 10x zaidi — bila kununua kitu chochote kipya."
+                "character": "Hassan, Mnunuzi wa Viatu",
+                "content": "Hassan alikuwa anatafuta viatu vya ofisini. Alituma ujumbe kwa kurasa 3 tofauti za Instagram. Kurasa ya kwanza ilijibu siku iliyofuata, ya pili haikujibu kabisa, lakini ya tatu ilimjibu ndani ya dakika 3 ikimtumia picha za rangi zilizopo na bei. Hassan alinunua kwa kurasa ya tatu papo hapo."
               },
               {
                 "type": "text",
-                "content": "Usipige **picha** gizani. Mwanga wa jua (Natural Light) hufanya bidhaa ionekane ya thamani kubwa bila gharama yoyote."
+                "content": "**Fomula ya Maamuzi ya Mteja:** Wateja wa kisasa wanathamini vitu vitatu vikubwa: Urahisi (kuokoa muda), Kasi (kupata majibu haraka), na Machaguo mengi kupitia simu zao — bila kuhitaji kusafiri."
+              },
+              {
+                "type": "match",
+                "prompt": "Oanisha mahitaji ya mteja na maana yake sahihi:",
+                "pairs": [
+                  {
+                    "left": "Urahisi",
+                    "right": "Mteja kununua akiwa kitandani au ofisini kwake bila kusafiri."
+                  },
+                  {
+                    "left": "Kasi",
+                    "right": "Kupata bei na kujibiwa maswali ndani ya dakika chache."
+                  }
+                ],
+                "feedback": "Kuelewa hili kunakusaidia kuwapa huduma bora inayowafanya warudi tena na tena."
+              },
+              {
+                "type": "mistake_example",
+                "bad_example": "Mteja anauliza bei, unamjibu baada ya masaa 6 umechoka.",
+                "good_example": "Mteja anauliza bei, unamjibu kwa ukarimu ndani ya dakika 5 ukiwa na tabasamu.",
+                "question": "Ni tabia ipi inayoongeza mauzo ya mtandaoni kwa asilimia kubwa?",
+                "correct": "good_example",
+                "feedback": "Kasi ya kujibu ndio inayofunga mauzo mtandaoni kabla mteja hajaenda kwa mwingine. Utafiti unaonyesha: wateja wanaojibiwa ndani ya dakika 5 wana uwezekano wa kununua mara tatu zaidi."
+              },
+              {
+                "type": "scenario",
+                "label": "Tathmini Tabia ya Kasi",
+                "setup": "Mteja anakuuliza bei ya begi la nguo saa 2 usiku. Unajua duka lako limefungwa lakini una picha za duka kwenye simu yako.",
+                "options": [
+                  "Subiri hadi kesho asubuhi ukiingia dukani ndio ujibu",
+                  "Mshukuru kwa ujumbe, mtumie bei na picha ulizonazo, na umwambie utamshughulikia asubuhi mapema pindi usafiri ukianza",
+                  "Mueleze kwa kifupi duka limefungwa"
+                ],
+                "correct_index": 1,
+                "feedback": "Kasi na ukarimu hata nyakati za usiku huzuia mteja kwenda kutafuta kwingine."
+              },
+              {
+                "type": "unit_reflection",
+                "title": "Tafakari ya Somo la Saikolojia",
+                "questions": [
+                  {
+                    "key": "u1_l102_insight",
+                    "prompt": "Ni jambo gani la kweli utakalolifanya kuanzia leo kuhakikisha unajibu wateja wako kwa kasi zaidi?",
+                    "placeholder": "Andika mpango wako hapa..."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "lesson_id": 103,
+            "title": "Ahadi Yako ya Biashara — Msingi wa Kila Kitu",
+            "xp": 300,
+            "duration_min": 15,
+            "mission_type": "internal_commitment",
+            "mission": "Andika ahadi ya biashara yako na weka sahihi yako kwenye simu — hii ni mkataba kati yako na mustakabali wako.",
+            "mission_risk_level": "zero_social_risk",
+            "mission_note": "Ahadi hii ni yako binafsi — hauitumii kwa mtu yeyote nje. Ni mkataba wako na wewe mwenyewe tu.",
+            "daily_mission": {
+              "tracking_id": "dm_103_promise_read",
+              "task": "Soma ahadi yako mara mbili leo — asubuhi na jioni — ili ujenge nidhamu ya kibiashara.",
+              "xp_reward": 50
+            },
+            "blocks": [
+              {
+                "type": "text",
+                "content": "SMEs wengi wanashindwa kupata wateja mtandaoni kwa sababu ya: profile zisizoeleweka, picha mbaya za bidhaa, na kutokuwa na muendelezo (consistency) wa kupost. Lakini makosa yote haya yana chanzo kimoja — kukosa azimio la kweli na imara."
+              },
+              {
+                "type": "drag_drop",
+                "prompt": "Panga tabia hizi kuanzia ile inayofukuza wateja haraka zaidi hadi polepole zaidi:",
+                "items": [
+                  {
+                    "id": "1",
+                    "text": "Kutopost bidhaa kabisa kwa wiki nzima"
+                  },
+                  {
+                    "id": "2",
+                    "text": "Kuweka picha za bidhaa zenye giza au zisizoonekana vizuri"
+                  },
+                  {
+                    "id": "3",
+                    "text": "Kutojibu ujumbe wa wateja kwa wakati"
+                  }
+                ],
+                "correct_order": ["3", "2", "1"],
+                "feedback": "Kutojibu wateja haraka ndio kosa kubwa linaloua biashara nyingi online. Kumbuka: kila dakika ya kuchelewa ni nafasi ya mshindani wako."
+              },
+              {
+                "type": "commitment_contract",
+                "title": "📝 Mkataba Wako wa Biashara",
+                "instruction": "Andika ahadi yako ya biashara kwa maneno yako mwenyewe. Hii ni ya siri — ni kati yako na simu yako tu.",
+                "prompt_fields": [
+                  {
+                    "key": "business_name",
+                    "label": "Jina la biashara yangu:",
+                    "placeholder": "Mfano: Nguo za Amina"
+                  },
+                  {
+                    "key": "what_i_sell",
+                    "label": "Ninauza:",
+                    "placeholder": "Mfano: Nguo za wanawake za kisasa"
+                  },
+                  {
+                    "key": "my_promise",
+                    "label": "Ahadi yangu kwa wateja wangu:",
+                    "placeholder": "Mfano: Nitatoa huduma ya haraka na bidhaa za ubora kila wakati"
+                  },
+                  {
+                    "key": "start_date",
+                    "label": "Ninaanza leo:",
+                    "type": "date_auto_fill"
+                  }
+                ],
+                "signature_required": true,
+                "signature_label": "Weka alama yako ya mkono (au initials zako) hapa kwenye screen:",
+                "completion_message": "Hongera! Umeweka msingi wa kweli. Mjasiriamali wa kweli anaanza kwa kujiahidi mwenyewe kwanza.",
+                "xp_reward": 50
+              },
+              {
+                "type": "unit_reflection",
+                "title": "Tafakari ya Mwisho ya Unit 1",
+                "questions": [
+                  {
+                    "key": "u1_l103_insight",
+                    "prompt": "Kitu gani kikubwa ulichojifunza kwenye Unit 1 ambacho kitaenda kubadilisha mtazamo wako wa biashara?",
+                    "placeholder": "Andika hapa..."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "unit_id": 2,
+        "unit_title": "Kujenga \"Duka\" Lako la Kidijitali",
+        "unit_icon": "📱",
+        "description": "Fungua na uandae wasifu (profile) ya biashara inayovutia na kuaminika kupitia Instagram na WhatsApp Business.",
+        "estimated_minutes": 140,
+        "unlock_requirement": "Complete Unit 1",
+        "unit_reward_xp": 1400,
+        "badge": {
+          "new_label": "Mmiliki wa Duka la Kisasa",
+          "icon": "🏪",
+          "description": "Una duka linalofanya kazi saa 24/7 — wateja wanaweza kukupata na kununua hata wewe ukilala."
+        },
+        "identity_gate": {
+          "type": "identity_declaration",
+          "title": "Azimio la Ujasiriamali wa Kisasa",
+          "subtitle": "Kabla ya kujenga duka lako la kidijitali, tambua utambulisho wako mpya:",
+          "prompt": "Weka alama ya Ndio [✓] kukubali utambulisho wako mpya:",
+          "declarations": [
+            {
+              "id": "dec_1",
+              "text": "Mimi sio tu mtu anayejaribu kuuza; mimi ni Mjasiriamali wa Kisasa wa Tanzania ninayejenga biashara inayofanya kazi kiprofessional."
+            },
+            {
+              "id": "dec_2",
+              "text": "Nipo tayari kujenga duka langu la kidijitali hatua kwa hatua kwa uaminifu na kasi."
+            }
+          ],
+          "required_to_unlock": true,
+          "unlock_button_label": "Nimekubali, nionyeshe jinsi ya kujenga duka langu 🚀",
+          "skip_allowed": false,
+          "psychology_note": "Identity declaration leverages James Clear's Identity Loop — declaring who you are increases follow-through by 42%."
+        },
+        "lessons": [
+          {
+            "lesson_id": 201,
+            "title": "Instagram Business Setup",
+            "xp": 250,
+            "duration_min": 15,
+            "mission": "Badilisha akaunti yako ya Instagram kuwa ya Kibiashara (Business Account) na upige screenshot kama uthibitisho.",
+            "daily_mission": {
+              "tracking_id": "dm_201_competitor_audit",
+              "task": "Angalia akaunti moja ya biashara unayoipenda Instagram na uandike mambo matatu unayoyapenda kuhusu profile yao.",
+              "xp_reward": 50
+            },
+            "blocks": [
+              {
+                "type": "text",
+                "content": "Akaunti ya Biashara inakupa ripoti (insights) za wateja wako, inakuwezesha kuweka namba ya simu ya kubonyeza moja kwa moja, na inaleta uaminifu mkubwa zaidi machoni mwa wateja wapya."
+              },
+              {
+                "type": "scenario",
+                "label": "Chagua jina sahihi la kibiashara",
+                "setup": "Amina anauza nguo za watoto. Ni jina gani litasaidia wateja kumtafuta kwa urahisi zaidi kwenye Instagram?",
+                "options": [
+                  "amina_baby_shop_dsm",
+                  "cutie_pie_99",
+                  "amina_wa_kariakoo"
+                ],
+                "correct_index": 0,
+                "feedback": "Jina la biashara linapaswa kueleza wazi unauza nini na upo wapi. 'amina_baby_shop_dsm' inasema: mtu (Amina), bidhaa (baby shop), eneo (DSM). Hii inasaidia wateja kukupata kwa kutafuta."
+              },
+              {
+                "type": "cloze",
+                "prompt": "Business Account ya Instagram inakupa faida kubwa ya kuona ________ za wateja wako.",
+                "sentence_with_blank": "Akaunti ya biashara inakupa fursa ya kuona {blank} ya wateja wako.",
+                "options": [
+                  "Ripoti na takwimu (Insights)",
+                  "Picha zao binafsi",
+                  "Salio lao la m-pesa"
+                ],
+                "correct": "Ripoti na takwimu (Insights)",
+                "feedback": "Sahihi! Insights hukusaidia kujua wateja wako wanaangalia akaunti yako saa ngapi zaidi."
+              },
+              {
+                "type": "unit_reflection",
+                "title": "Tafakari ya Somo la Instagram",
+                "questions": [
+                  {
+                    "key": "u2_l201_insight",
+                    "prompt": "Kwa nini ni makosa makubwa kuendesha biashara ukitumia akaunti binafsi (Personal Account) kwenye Instagram?",
+                    "placeholder": "Andika maoni yako..."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "lesson_id": 202,
+            "title": "Andika Bio Inayouza na Kuvutia",
+            "xp": 300,
+            "duration_min": 18,
+            "mission": "Andika upya wasifu (Bio) wa Instagram au WhatsApp yako kwa kufuata kanuni ya ujasiriamali uliyojifunza.",
+            "daily_mission": {
+              "tracking_id": "dm_202_bio_share",
+              "task": "Soma Bio yako mpya kwa sauti mara tatu na uhakikishe hakuna makosa ya kisarufi au namba iliyokosekana.",
+              "xp_reward": 50
+            },
+            "blocks": [
+              {
+                "type": "story",
+                "character": "Juma, Muuzaji wa Pilau DSM",
+                "content": "Juma alikuwa ameandika Bio yake 'Juma wa Pilau'. Alipata orders 2 kwa wiki. Baada ya kubadili na kuandika 'Pilau Tamu za Kiswahili DSM 🍛 Delivery Kariakoo-Kinondoni | Agiza sasa: 07XX-XXX-XXX', orders zake ziliruka hadi 11 kwa wiki ndani ya siku 10. Nambari moja iliyobadilika: Bio yake."
               },
               {
                 "type": "text",
-                "content": "Kumbuka: Simu zetu zina 'Portrait Mode'. Itumie kwa busara lakini usizidishe background isiwe blur sana mpaka bidhaa isionekane. Mwanga wa asili bado ni bora kuliko mwanga wowote wa bandia."
+                "content": "**Fomula ya Bio Nzuri (Nguvu ya MVUTO):** Bio yako inapaswa kujibu maswali matatu ya mteja ndani ya sekunde 2: (1) Unauza nini? (2) Uko wapi? (3) Nitakupata vipi sasa hivi? Epuka maneno marefu yasiyo na tija."
               },
               {
-                "type": "tip",
-                "content": "Jaribu kupiga picha kutoka pembe (angles) tofauti. Picha ya juu (tazama chini), picha ya usawa wa bidhaa, na picha ya chini (bidhaa inaonekana kubwa). Kila pembe inatoa hadithi tofauti."
+                "type": "insta_bio",
+                "prompt": "Panga maneno yafuatayo kutengeneza Bio nzuri ya duka la keki:",
+                "blanks": 3,
+                "options": [
+                  "Keki za Sherehe na Harusi 🎂",
+                  "Tunapatikana Sinza, Dar",
+                  "Agiza WhatsApp: 0712-345-678",
+                  "Mimi ni mpishi mzuri",
+                  "Karibu ukurasa wangu"
+                ],
+                "correct": [
+                  "Keki za Sherehe na Harusi 🎂",
+                  "Tunapatikana Sinza, Dar",
+                  "Agiza WhatsApp: 0712-345-678"
+                ],
+                "feedback": "Bio yako lazima ionyeshe: Unauza nini, Uko wapi, na Mteja anakupata vipi kwa urahisi. Vitu vingine kama 'mimi ni mpishi mzuri' ni vizuri lakini sio vya kwanza — mteja anataka kujua anaweza kupata nini, wapi, na jinsi gani."
               },
               {
-                "type": "tip",
-                "content": "Hatua 3 za picha nzuri: (1) Safisha lenzi ya simu kwa nguo laini. (2) Panga bidhaa karibu na dirisha. (3) Piga horizontal — macho ya binadamu yanapenda landscape."
+                "type": "mistake_example",
+                "bad_example": "Karibu sana kwenye duka langu kuuliza bei na bidhaa.",
+                "good_example": "Nguo za Kike za Kisasa DSM 👗 | Delivery Ipo | Order: 0712-XXX-XXX",
+                "question": "Ni Bio ipi inayofupisha maelezo na kuokoa muda wa mteja?",
+                "correct": "good_example",
+                "feedback": "Jibu la pili linaonyesha ubora, uwepo wa usafiri, na namba ya mawasiliano kwa haraka."
+              },
+              {
+                "type": "unit_reflection",
+                "title": "Tafakari ya Somo la Bio",
+                "questions": [
+                  {
+                    "key": "u2_l202_insight",
+                    "prompt": "Je, Bio yako ya sasa mtandaoni inajibu maswali yote matatu muhimu ya mteja kwa haraka?",
+                    "placeholder": "Andika uchambuzi wako wa sasa..."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "lesson_id": 203,
+            "title": "WhatsApp Business, Catalog, na Hatua Yako ya Kwanza ya Nje",
+            "xp": 300,
+            "duration_min": 15,
+            "mission_type": "safe_group_share",
+            "mission": "Baada ya kutengeneza Catalog yako — tuma link yako kwa mtu MMOJA TU wa karibu unayemwamini sana na umwombe maoni yake ya kweli.",
+            "mission_risk_level": "low_social_risk",
+            "mission_note": "Si lazima iwe kamili — lengo ni kupata maoni ya kwanza kutoka kwa mtu anayekupenda na kukusaidia. Mtu mmoja tu, sio orodha nzima.",
+            "mission_safety_tip": "Chagua mtu ambaye: (1) Anakuamini, (2) Atakuambia ukweli kwa upole, (3) Sio mshindani wako. Huyu anaweza kuwa mwanafamilia, rafiki wa karibu, au jirani unayemwamini.",
+            "daily_mission": {
+              "tracking_id": "dm_203_catalog_build",
+              "task": "Tengeneza Katalogi ya bidhaa zako tatu ukiwa na bei na picha nzuri zaidi unazoweza kupiga leo kwenye WhatsApp Business.",
+              "xp_reward": 50
+            },
+            "blocks": [
+              {
+                "type": "text",
+                "content": "Katalogi kwenye WhatsApp Business inakusaidia kumpa mteja orodha ya bidhaa zako zote bila yeye kuhitaji kukuuliza bei kila wakati. Hii inaokoa muda wako na inafanya mauzo yafanyike haraka zaidi."
               },
               {
                 "type": "quiz",
-                "question": "Ni ipi siri kuu ya picha nzuri kwa simu yoyote?",
+                "question": "Kwanini ni muhimu kuweka bei kwenye Katalogi ya WhatsApp?",
                 "options": [
-                  "Kununua iPhone ya gharama kubwa au kamera ya studio",
-                  "Kusafisha lenzi ya simu na kutumia mwanga wa asili wa dirisha"
+                  "Inamfanya mteja aamue kununua haraka bila kupoteza muda kuuliza bei",
+                  "Inapunguza storage ya simu yako",
+                  "Inaficha maelezo yako"
                 ],
-                "correct_index": 1,
-                "feedback": "Kweli kabisa! Usafi wa lenzi na mwanga ndiyo kila kitu. iPhone sio lazima."
+                "correct_index": 0,
+                "feedback": "Ukweli wa bei unajenga uaminifu na unaokoa muda wako na wa mteja. Mteja asiyehitaji kuuliza bei ana uwezekano mkubwa zaidi wa kununua mara moja."
+              },
+              {
+                "type": "safe_share_prep",
+                "title": "🤝 Maandalizi ya Hatua Yako ya Kwanza ya Nje",
+                "instruction": "Kabla ya kutuma link, jibu hili kwa uaminifu:",
+                "prompt_fields": [
+                  {
+                    "key": "trusted_person",
+                    "label": "Ntatuma link kwa (jina la mtu mmoja wa karibu):",
+                    "placeholder": "Mfano: Dada yangu Amina"
+                  },
+                  {
+                    "key": "what_feedback_i_want",
+                    "label": "Ninataka maoni kuhusu:",
+                    "placeholder": "Mfano: Je, bio yangu inaeleweka? Je, picha za bidhaa zinaonekana vizuri?"
+                  }
+                ],
+                "reassurance_message": "Kumbuka: mtu mmoja tu. Hakuna mtu anayeanza bila wasiwasi — lakini wale wanaoendelea ndio wanaofanikiwa.",
+                "xp_reward": 50
+              },
+              {
+                "type": "unit_reflection",
+                "title": "Tafakari ya Mwisho ya Unit 2",
+                "questions": [
+                  {
+                    "key": "u2_l203_insight",
+                    "prompt": "Inaleta hisia gani kutuma link yako ya kwanza kwa mtu unayemwamini? Kwa nini hatua hii ni muhimu?",
+                    "placeholder": "Andika tafakari yako hapa..."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "unit_id": 3,
+        "unit_title": "Kutengeneza Content ya Kuvutia",
+        "unit_icon": "🎥",
+        "description": "Jifunze picha, video na mbinu za algorithms zinazovuta wateja wapya kwenye duka lako.",
+        "estimated_minutes": 150,
+        "unlock_requirement": "Complete Unit 2",
+        "unit_reward_xp": 1500,
+        "badge": {
+          "new_label": "Mvuto wa Kidijitali",
+          "icon": "🧲",
+          "description": "Una nguvu ya kuvuta wateja wapya kila siku bila kulipa pesa za matangazo — kwa nguvu ya content yako tu."
+        },
+        "fear_removal_gate": {
+          "type": "fear_address",
+          "title": "Kabla Hujaendelea — Ukweli Muhimu",
+          "message": "Watu wengi wanahofia kutengeneza content kwa sababu wanafikiri: 'Sijui kupiga picha nzuri', 'Sauti yangu haisikiki vizuri', au 'Hakuna atakayetaka kuona content yangu.' Hizi ni hofu za kawaida. Wafanyabiashara wote walioanza walikuwa na hofu hizo hizo — na walifanikiwa bila kumaliza hofu kwanza. Siri: Huhitaji kuwa mkamilifu. Unahitaji kuwa wa kweli.",
+          "required_acknowledgment": true,
+          "acknowledgment_label": "Naelewa — naendelea bila kusubiri niwe mkamilifu ✓"
+        },
+        "lessons": [
+          {
+            "lesson_id": 301,
+            "title": "Picha na Video Zinazouza",
+            "xp": 300,
+            "duration_min": 20,
+            "mission": "Piga picha moja ya bidhaa yako sasa hivi kwa kutumia mwanga wa jua au karibu na dirisha.",
+            "daily_mission": {
+              "tracking_id": "dm_301_photo_shoot",
+              "task": "Tazama picha za bidhaa za biashara 3 tofauti kwenye Instagram — andika kwa nini picha moja inakuvutia zaidi kuliko nyingine.",
+              "xp_reward": 50
+            },
+            "blocks": [
+              {
+                "type": "story",
+                "character": "Amina, Muuzaji wa Mabegi",
+                "content": "Amina alikuwa anapiga picha za mabegi yake chumbani kwake usiku akitumia flash ya simu. Picha zilionekana zenye giza na hazikuvutia. Baada ya kuamua kupiga mabegi hayo mchana karibu na dirisha la sebule lenye mwanga mweupe wa asili, alipata wateja 4 wapya ndani ya siku mbili waliosifu ubora wa picha zake."
+              },
+              {
+                "type": "text",
+                "content": "**Siri ya Picha Safi (Nguvu ya Mwanga wa Asili):** Huhitaji camera ya gharama. Unahitaji tu: (1) Kusafisha lensi ya simu yako kwanza, (2) Kupiga picha mchana ukitumia mwanga wa jua usio wa moja kwa moja (shadowed natural light), (3) Kupiga picha kutoka pembe (angles) tofauti."
               },
               {
                 "type": "image_ab",
-                "label": "Gusa picha inayoonekana ya thamani zaidi:",
+                "label": "Ni picha ipi itamshawishi mteja kununua viatu?",
                 "option_a": {
                   "src": "https://fhtnqhkxpvrfzxrwwtso.supabase.co/storage/v1/object/public/Ujuzi_pkus/a-product-photo-of-shoes-or-a-bag-taken-in-a-dark-.png",
                   "label": "A"
@@ -166,1019 +540,383 @@
                   "label": "B"
                 },
                 "correct": "B",
-                "feedback_correct": "Sahihi kabisa! Picha B inashinda kwa sababu: ✅ Mwanga wa asili unafanya rangi ionekane ya kweli ✅ Bidhaa inaonekana ya thamani na ya kuvutia ✅ Mteja anahisi bidhaa ni ya ubora — na hii yote bila kutumia pesa hata moja.",
-                "feedback_wrong": "Angalia tena — picha A inapigwa gizani. Rangi inakufa, bidhaa inaonekana ya bei ndogo. Mteja haamini ubora. Jaribu tena 💪"
+                "feedback_correct": "Picha safi yenye mwanga wa asili inaonyesha ubora halisi wa bidhaa. Wateja wanunua kwa macho kwanza.",
+                "feedback_wrong": "Picha zenye giza hufanya bidhaa ionekane ya kiwango cha chini na yenye kutiliwa shaka — hata kama bidhaa yenyewe ni nzuri sana."
               },
               {
-                "type": "cloze",
-                "prompt": "Ili kuwavutia wateja zaidi, unapaswa kutumia caption inayotoa...",
-                "sentence_with_blank": "Ili kuwavutia wateja zaidi, unapaswa kutumia caption inayotoa {blank}.",
-                "options": [
-                  "Faida na wito wa kuchukua hatua",
-                  "Bei tu",
-                  "Emoji nyingi"
-                ],
-                "correct": "Faida na wito wa kuchukua hatua",
-                "feedback": "Kweli kabisa! Mteja anahitaji kujua anapata nini."
-              }
-            ]
-          },
-          {
-            "lesson_id": 103,
-            "title": "Maelezo ya Bidhaa Yanayouza",
-            "xp": 50,
-            "duration_min": 5,
-            "mission": "Chukua bidhaa moja unayouza sasa hivi. Andika maelezo yake kwa fomula: Nini + Inasaidia nini + Gharama + Hatua inayofuata.",
-            "blocks": [
-              {
-                "type": "story",
-                "character": "Grace, Arusha",
-                "content": "Grace aliandika 'Cream nzuri. Bei rahisi. DM.' kwa miezi 6. Hakupata **mauzo**. Alipoandika maelezo kamili ya cream — tatizo inalotatua, jinsi inavyofanya kazi, na bei — **mauzo** yake yaliingia mara tatu."
-              },
-              {
-                "type": "text",
-                "content": "**Picha** inavutia jicho — lakini maelezo yanafunga **mauzo**. Mteja anahitaji kujua: bidhaa hii inasaidia nini hasa, na mimi ninapata nini?"
-              },
-              {
-                "type": "tip",
-                "content": "Fomula rahisi: '[Bidhaa] ya [sifa kuu] 🌿 Inasaidia [tatizo linalotatuliwa]. TSh [bei]. [Wito wa kuchukua hatua] 👇'. Andika hivi kwa kila bidhaa yako."
-              },
-              {
-                "type": "fill_blank",
-                "prompt": "Kamilisha fomula ya maelezo yanayouza:",
-                "sentence": "___ + Inasaidia nini + ___ + Hatua inayofuata",
-                "blanks": 2,
-                "options": [
-                  "Nini",
-                  "Rangi",
-                  "Bei",
-                  "Jina la duka"
-                ],
-                "correct": [
-                  "Nini",
-                  "Bei"
-                ],
-                "feedback": "Vizuri! Bidhaa + Faida + Bei + Wito wa kuchukua hatua ndiyo fomula kamili."
-              },
-              {
-                "type": "image_ab",
-                "label": "Gusa maelezo yanayofanya kazi zaidi:",
-                "option_a": {
-                  "src": "https://fhtnqhkxpvrfzxrwwtso.supabase.co/storage/v1/object/public/Ujuzi_pkus/a-mobile-phone-screenshot-mockup-of-an-instagram-p.png",
-                  "label": "A"
-                },
-                "option_b": {
-                  "src": "https://fhtnqhkxpvrfzxrwwtso.supabase.co/storage/v1/object/public/Ujuzi_pkus/a-mobile-phone-screenshot-mockup-showing-a-bright-%20(1).png",
-                  "label": "B"
-                },
-                "correct": "B",
-                "feedback_correct": "Ndiyo kabisa! Maelezo B yanafanya kazi kwa sababu: ✅ Yanasema bidhaa ni nini ✅ Yanasema inasaidia nini ✅ Yanasema bei ngapi ✅ Yanasema mteja afanye nini sasa. Maelezo A ni mafupi sana — hayasemi chochote cha kuvutia.",
-                "feedback_wrong": "Angalia tena — maelezo A ni mafupi sana. 'Sabuni nzuri. Bei rahisi. DM.' haisemi chochote kinachomfanya mteja asimame. Maelezo B yana kila kitu mteja anahitaji kujua. Jaribu tena 💪"
-              },
-              {
-                "type": "quiz",
-                "question": "Maelezo yapi yanafanya kazi zaidi?",
-                "options": [
-                  "Sabuni nzuri. Bei rahisi. DM.",
-                  "Sabuni ya asili ya mafuta ya nazi 🥥 Inafuta uchafu wa ngozi bila kuikaushia. TSh 8,000 tu. Order WhatsApp sasa 👇"
-                ],
-                "correct_index": 1,
-                "feedback": "Ndiyo! Maelezo mazuri yanasema nini bidhaa ni, inasaidia nini, bei ngapi, na mteja afanye nini sasa."
-              },
-              {
-                "type": "cloze",
-                "prompt": "Ili kuwavuta wateja kununua, maelezo yako ya bidhaa yanapaswa kueleza nini zaidi?",
-                "sentence_with_blank": "Maelezo ya bidhaa inayouza sana kwanza kabisa huelezea {blank}.",
-                "options": [
-                  "Faida kwa mteja",
-                  "Tarehe ya kutengenezwa",
-                  "Jina la duka"
-                ],
-                "correct": "Faida kwa mteja",
-                "feedback": "Umejibu vizuri sana! Wateja hununua jinsi bidhaa inavyotatua shida yao au inavyowabana, na si tu sifa za bidhaa yenyewe."
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "unit_id": 2,
-        "unit_title": "Tafuta Wateja (Traffic)",
-        "unit_icon": "📡",
-        "description": "Fikia watu wengi zaidi bila kutumia pesa nyingi",
-        "lessons": [
-          {
-            "lesson_id": 201,
-            "title": "Nguvu ya WhatsApp Status",
-            "xp": 60,
-            "duration_min": 6,
-            "mission": "Leo posta Status moja ya elimu kuhusu bidhaa yako — sio bei, bali tatizo linalotatuliwa. Angalia ni nani atakaoyaona.",
-            "blocks": [
-              {
-                "type": "story",
-                "character": "Fatuma, Dodoma",
-                "content": "Fatuma alipost **picha** 30 za bei mfululizo kwenye Status. Watu wote waliskip. Alipobadilisha mkakati — post 1 ya elimu, kisha 1 ya bidhaa — **mauzo** yake yaliongezeka maradufu ndani ya mwezi mmoja."
-              },
-              {
-                "type": "text",
-                "content": "Status yako ni TV yako bure. Sheria moja muhimu: usitangaze tu — fundisha kwanza, kisha uza. Watu wanafuata wanaowafundisha."
-              },
-              {
-                "type": "image",
-                "src": "https://fhtnqhkxpvrfzxrwwtso.supabase.co/storage/v1/object/public/Ujuzi_pkus/flat-illustration-showing-three-whatsapp-status-ca.png",
-                "caption": "Formula ya 2:1 — elimu mbili kisha bidhaa moja"
-              },
-              {
-                "type": "tip",
-                "content": "Formula ya Status inayouza: Post 2 za elimu kwa kila 1 ya bidhaa. Mfano: 'Jinsi ya kutunza viatu vya ngozi' → 'Viatu fake vs original' → 'Viatu vyetu — TSh 45,000 👟 Order sasa'"
-              },
-              {
-                "type": "scenario",
-                "label": "Wateja wanaangalia WhatsApp Status yako lakini hawanunui. Nini unapaswa kufanya badala ya kuweka tu picha mfululizo?",
-                "setup": "Mfululizo wa Status hivi sasa:",
-                "chat": [
+                "type": "drag_drop",
+                "prompt": "Panga hatua hizi za kuandaa picha ya kibiashara kwa mpangilio sahihi:",
+                "items": [
                   {
-                    "speaker": "We",
-                    "text": "Viatu vizuri sana",
-                    "side": "right"
+                    "id": "1",
+                    "text": "Futa vumbi au safisha bidhaa yako kwanza kwa kitambaa safi"
                   },
                   {
-                    "speaker": "We",
-                    "text": "Tsh 45,000 tu",
-                    "side": "right"
-                  }
-                ],
-                "options": [
-                  "Weka picha zaidi 10 za viatu haraka",
-                  "Weka picha ya mteja aliyevaa (ushahidi/elimu) kabla ya kupost bei",
-                  "Andika \"Nunua sasa au nitafunga\""
-                ],
-                "correct_index": 1,
-                "feedback": "Safi sana! Kutoa elimu au kuonesha ushuhuda kunajenga imani kwanza kabla ya kumuuzia."
-              },
-              {
-                "type": "cloze",
-                "prompt": "Ili WhatsApp Status yako iwe na nguvu, sheria inasema...",
-                "sentence_with_blank": "Changanya post zinatoa thamani/elimu na zile zinazo {blank}.",
-                "options": [
-                  "Kuuza",
-                  "Kulalamika",
-                  "Kuficha bei"
-                ],
-                "correct": "Kuuza",
-                "feedback": "Umepatia! Post za kutoa thamani zinawavuta wateja uweze kuwauzia."
-              },
-              {
-                "type": "match",
-                "prompt": "Gawanya aina za Status unapojaribu kuuza:",
-                "pairs": [
-                  {
-                    "left": "Picha ya bidhaa",
-                    "right": "Kuuza Moja kwa Moja"
+                    "id": "2",
+                    "text": "Sogea karibu na dirisha au nenda nje kupata mwanga mweupe wa asili"
                   },
                   {
-                    "left": "Ushuhuda wa Mteja aliyeitumia",
-                    "right": "Kujenga Imani (Elimu/Ushahidi)"
+                    "id": "3",
+                    "text": "Piga picha kutoka pembe tofauti (front, side, close-up)"
                   }
                 ],
-                "feedback": "Sawa kabisa! Usisahau fomula ni 2 za kutoa thamani/ushahidi, inafuata 1 ya kuuza."
+                "correct_order": ["1", "2", "3"],
+                "feedback": "Kufuata hatua hizi kutabadilisha picha za simu yako kuonekana kama zimepigwa na mtaalamu."
               },
               {
-                "type": "quiz",
-                "question": "Kosa gani wauzaji wengi hufanya kwenye WhatsApp Status?",
-                "options": [
-                  "Kuweka Status zaidi ya 10 ambazo zote ni bidhaa mbili tatu tofauti tu kila siku na kuwapa wateja uchovu wa kutazama",
-                  "Kuweka mzaha japo kidogo kabla ya kupost bidhaa",
-                  "Kujibu reply za Status haraka"
-                ],
-                "correct_index": 0,
-                "feedback": "Hakika! Status ndefu yenye bidhaa tupu inachosha macho, na wateja wana'mute'. Changanya na ushahidi, faida za bidhaa, na hata maisha yako asilia."
-              }
-            ]
-          },
-          {
-            "lesson_id": 202,
-            "title": "Instagram na Facebook Stories Zinazovutia",
-            "xp": 60,
-            "duration_min": 6,
-            "mission": "Tengeneza Story moja leo ukitumia muundo huu: Swali kwa wateja wako juu, jibu au bidhaa chini. Angalia ni watu wangapi wanaobonyeza.",
-            "blocks": [
-              {
-                "type": "story",
-                "character": "Baraka, Moshi",
-                "content": "Baraka alipost **picha** za bidhaa tu kwenye Stories kwa muda mrefu. Views chache sana. Alipoanza kutumia swali juu ya kila Story — 'Je, unajua tofauti ya ngozi ya kweli na fake?' — watu walianza kujibu na kununua."
-              },
-              {
-                "type": "text",
-                "content": "Story inayouliza swali inashinda Story inayotangaza tu. Ubongo wa binadamu hauwezi kupinga swali — lazima ufikirie jibu. Hapo ndipo mteja anakaa nawe."
-              },
-              {
-                "type": "image",
-                "src": "https://fhtnqhkxpvrfzxrwwtso.supabase.co/storage/v1/object/public/Ujuzi_pkus/a-flat-illustration-of-a-smartphone-showing-an-ins.png",
-                "caption": "Muundo wa Story inayovutia majibu — Swali juu, Bidhaa chini"
-              },
-              {
-                "type": "tip",
-                "content": "Aina 3 za maswali yanayofanya kazi kwenye Stories: (1) 'Je, unajua...' (2) 'Ni ipi unayopenda zaidi — A au B?' (3) 'Tatizo lako kubwa la [mada] ni nini?' Kila jibu ni mteja anayejitambulisha."
-              },
-              {
-                "type": "fill_blank",
-                "prompt": "Kamilisha mbinu ya kuvutia kwenye Instagram/Facebook Stories:",
-                "sentence": "Badala ya kupost bidhaa tu, uliza ___ ili wateja waweze ___. Hii inaongeza mauzo mara mbili.",
-                "blanks": 2,
-                "options": [
-                  "swali",
-                  "kujibu",
-                  "jina",
-                  "kukimbia"
-                ],
-                "correct": [
-                  "swali",
-                  "kujibu"
-                ],
-                "feedback": "Hakika! Maswali na polls zinafanya wateja washiriki katika Story yako na sio tu kutazama wakiwa kimya."
-              },
-              {
-                "type": "match",
-                "prompt": "Oanisha aina ya Story na kazi yake kuu:",
-                "pairs": [
+                "type": "unit_reflection",
+                "title": "Tafakari ya Somo la Picha",
+                "questions": [
                   {
-                    "left": "Video ukitengeneza ofisini/dukani",
-                    "right": "Kuonyesha Uhalisi"
-                  },
-                  {
-                    "left": "Swali: 'Je, unapendelea rangi gani?'",
-                    "right": "Utangamano na wateja"
+                    "key": "u3_l301_insight",
+                    "prompt": "Ni makosa gani uliyokuwa unayafanya hapo awali wakati wa kupiga picha za bidhaa zako?",
+                    "placeholder": "Andika makosa hapa..."
                   }
-                ],
-                "feedback": "Sawa kabisa! Kuchanganya uhalisi na utangamano huongeza hamasa ya kununua."
-              },
-              {
-                "type": "cloze",
-                "prompt": "Ili watu wachangie kwenye Story yako fanya hivi...",
-                "sentence_with_blank": "Tumia {blank} ili kuwawezesha wateja kutoa maoni kwa wepesi bila kuandika ujumbe.",
-                "options": [
-                  "Polls na Stickers",
-                  "Maelezo marefu sana",
-                  "Namba yako ya simu tu"
-                ],
-                "correct": "Polls na Stickers",
-                "feedback": "Safi! Watu wanapenda vitu visivyo wa-umiza kichwa (k.m., 'Nyekundu au Nyeusi?'). Hii inaongeza utangamano."
-              },
-              {
-                "type": "quiz",
-                "question": "Tofauti kubwa kati ya Feed (Post za kawaida) na Story ni ipi kimikakati?",
-                "options": [
-                  "Feed ni kwa ajili ya kufunga mauzo, Story ni picha za utani",
-                  "Feed inajenga duka/alama (branding) inayobaki, Story ni nzuri zaidi kwa matangazo ya papo hapo na ukaribu (Behind the scenes)",
-                  "Hazina tofauti yoyote."
-                ],
-                "correct_index": 1,
-                "feedback": "Uko vizuri! Story zinaleta hisia zenye ukaribu zaidi kwa mteja anayeishia kukujenga."
-              }
-            ]
-          },
-          {
-            "lesson_id": 203,
-            "title": "Caption Inayosimamisha Thumb",
-            "xp": 60,
-            "duration_min": 6,
-            "mission": "Andika caption mpya kwa picha moja ya bidhaa yako kwa fomula ya Hook + Tatizo + Suluhisho + Wito. Itumie leo kwenye post yako.",
-            "blocks": [
-              {
-                "type": "story",
-                "character": "Neema, Tanga",
-                "content": "Neema aliandika **caption** kama vile 'Available. DM.' kwa kila post. Watu walipita bila kusimama. Alipojifunza kuandika hook ya kwanza ya maneno 5 inayoshika — likes zake zilienda juu 400% na **mauzo** yalianza kufuata."
-              },
-              {
-                "type": "text",
-                "content": "Sekunde 2 — hilo ndilo muda unaopata kabla mtu hajapita kwenye post yako. **Caption** ya kwanza lazima isimamishe thumb. Hook ndiyo silaha yako ya kwanza."
-              },
-              {
-                "type": "tip",
-                "content": "Fomula ya Caption inayouza: Hook (swali au kauli ya kushangaza) + Tatizo (wanalopitia wateja wako) + Suluhisho (bidhaa yako) + Bei + Wito ('Order sasa', 'DM leo', 'Bonyeza link'). Maneno 50-80 yanatosha."
-              },
-              {
-                "type": "cloze",
-                "prompt": "Kitu muhimu zaidi kwenye maelezo (Caption) kuwafanya watu wasimame na kusoma ni...",
-                "sentence_with_blank": "Sehemu muhimu zaidi ya caption inayo wasimamisha wateja wasipite inaitwa {blank}.",
-                "options": [
-                  "Ndoano (Hook)",
-                  "Bei tu",
-                  "Hashtags nyingi"
-                ],
-                "correct": "Ndoano (Hook)",
-                "feedback": "Sahihi! Ndoano, kama swali gumu au kauli ya kusisimua kwenye mistari miwili ya kwanza ndiyo hufanya ukurasa utizamwe zaidi."
-              },
-              {
-                "type": "scenario",
-                "label": "Ni Ndoano (Hook) ipi bora kwa andiko la kuuza saa za mkononi?",
-                "setup": "Mistari ya kwanza mteja akisoma:",
-                "chat": [],
-                "options": [
-                  "Tunauza saa za mkono Original.",
-                  "Ushawahi kukosa kazi kisa umechelewa kwenye Interview? Usikubali hii ikupate.",
-                  "Bei ni elfu 30, karibuni sana"
-                ],
-                "correct_index": 1,
-                "feedback": "Kuzungumzia tatizo la mteja ni Ndoano (Hook) madhubuti inayoibua hisia."
-              },
-              {
-                "type": "fill_blank",
-                "prompt": "Fomula ya kumfanya asome mpaka mwisho:",
-                "sentence": "Anza na Ndoano (Hook) inayovutia kwenye mistari ___ ya kwanza kwa sababu Instragram itaficha maelezo kwenye neno ___.",
-                "blanks": 2,
-                "options": [
-                  "miwili",
-                  "Soma zaidi (Read more)",
-                  "yote",
-                  "Comment"
-                ],
-                "correct": [
-                  "miwili",
-                  "Soma zaidi (Read more)"
-                ],
-                "feedback": "Vizuri sana! Ikiwa mistari yako miwili ya mwanzo inaboa, hakuna atakaye gusa kusoma zaidi."
-              },
-              {
-                "type": "match",
-                "prompt": "Tofautisha aina za Hooks (Ndoano):",
-                "pairs": [
-                  {
-                    "left": "\"Tumeleta mzigo mpya, 10,000 tu\"",
-                    "right": "Ndoano hafifu (inayopotewa haraka)"
-                  },
-                  {
-                    "left": "\"Kitu kimoja kimenistua sana kuhusu saa hii tunayouza leo...\"",
-                    "right": "Ndoano inayotengeneza Shauku (Curiosity)"
-                  }
-                ],
-                "feedback": "Umeipata! Shauku (Curiosity) inamlazimisha msomaji kubonyeza 'Read more' ili arejeshe ufahamu."
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "unit_id": 3,
-        "unit_title": "Funga Mauzo (Closing)",
-        "unit_icon": "💰",
-        "description": "Geuza mazungumzo kuwa pesa halisi",
-        "lessons": [
-          {
-            "lesson_id": 301,
-            "title": "Jibu la 'Bei Gani?'",
-            "xp": 75,
-            "duration_min": 6,
-            "mission": "Andika script yako ya 'Bei Gani' — bei + thamani + ofa + swali. Ihifadhi kwenye Notes yako uitumie leo ukipata mteja.",
-            "blocks": [
-              {
-                "type": "story",
-                "character": "Juma, Mbeya",
-                "content": "Juma alijibu 'Bei gani?' kwa namba peke yake kwa miaka 2. **Wateja** walisema 'Asante' na kwenda. Alipojifunza kujibu na thamani + ofa, closing rate yake iliongezeka kutoka 10% hadi 40% ndani ya miezi 2."
-              },
-              {
-                "type": "text",
-                "content": "Mteja akiuliza bei, usijibu namba peke yake. Kwanza taja thamani, kisha bei, kisha ofa ndogo, kisha swali. Fomula hii inafunga milango ya kukataa."
-              },
-              {
-                "type": "tip",
-                "content": "Script ya 'Bei Gani' inayofanya kazi: 'Ni [BEI] — [THAMANI MOJA MUHIMU]. Leo tuna [OFA NDOGO]. Unaweza kulipa [NJIA YA MALIPO]. Unapatikana [SWALI]?'"
-              },
-              {
-                "type": "image_ab",
-                "label": "Gusa jibu linalofunga mauzo:",
-                "option_a": {
-                  "src": "https://fhtnqhkxpvrfzxrwwtso.supabase.co/storage/v1/object/public/Ujuzi_pkus/a-whatsapp-chat-screenshot-mockup--customer-bubble.png",
-                  "label": "A"
-                },
-                "option_b": {
-                  "src": "https://fhtnqhkxpvrfzxrwwtso.supabase.co/storage/v1/object/public/Ujuzi_pkus/a-whatsapp-chat-screenshot-mockup--customer-bubble%20(1).png",
-                  "label": "B"
-                },
-                "correct": "B",
-                "feedback_correct": "Bingo! Jibu B linafanya kazi kwa sababu: ✅ Linataja bei ✅ Linataja thamani ya bidhaa ✅ Lina ofa ya leo ✅ Linaisha na swali linaloelekeza hatua inayofuata. Mazungumzo yanabaki hai.",
-                "feedback_wrong": "Angalia tena — jibu A ni namba peke yake. Mteja anasema 'Asante' na kwenda. Jibu B linamwonyesha thamani, ofa, na linampa sababu ya kuendelea. Jaribu tena 💪"
-              },
-              {
-                "type": "scenario",
-                "label": "Mteja kauliza WhatsApp: 'Bei Gani?' — Wengi hukosea kujibu hapa. Lipi ni jibu zuri lenye ushawishi?",
-                "setup": "Sogea na uuze kama mtaalamu:",
-                "chat": [
-                  {
-                    "speaker": "Mteja",
-                    "text": "Habari, hilo gauni bei gani?",
-                    "side": "left"
-                  }
-                ],
-                "options": [
-                  "Tsh 45,000",
-                  "Tsh 45,000 — ni nzuri sana kwa sherehe kwasababu haina joto, nikufungie rangi gani leo?",
-                  "Inategemea, unataka la mchina au mtumba?"
-                ],
-                "correct_index": 1,
-                "feedback": "Shabash! Kutaja bei kisha kueleza thamani na kumaliza kwa swali ni siri ya kufunga mauzo."
-              },
-              {
-                "type": "fill_blank",
-                "prompt": "Kamilisha fomula ya kujibu \"Bei Gani\":",
-                "sentence": "Unapoulizwa bei taja ___, eleza ___ kisha maliza na ___ ili mteja asikae kimya.",
-                "blanks": 3,
-                "options": [
-                  "bei",
-                  "thamani",
-                  "swali",
-                  "kimya",
-                  "kukataa"
-                ],
-                "correct": [
-                  "bei",
-                  "thamani",
-                  "swali"
-                ],
-                "feedback": "Umeipata! Hii ndiyo fomula inayowarudisha wateja wengi kutaka kununua."
-              },
-              {
-                "type": "quiz",
-                "question": "Ikiwa mteja ameuliza bei na ukamjibu, kisha akakaa kimya (seen), kosa kubwa hapo linaweza kuwa lipi?",
-                "options": [
-                  "Kutaja bei bila kufafanua thamani au kuuliza swali mwishoni",
-                  "Kutaja bei kubwa sana ambayo hawezi kumudu",
-                  "Kutumia namba nyingi kwenye ujumbe moja"
-                ],
-                "correct_index": 0,
-                "feedback": "Sahihi! Ukijibu namba peke yake (mfano '45,000'), mazungumzo yanafungwa. Maliza na swali ili aendelee kuongea."
-              },
-              {
-                "type": "cloze",
-                "prompt": "Siri kuu ya kujibu 'Bei Gani?'",
-                "sentence_with_blank": "Baada ya kuweka bei, lazima uunganishe thamani ya bidhaa na kumaliza kwa {blank} ili kuendeleza mazungumzo.",
-                "options": [
-                  "swali",
-                  "ahsante",
-                  "kumuaga"
-                ],
-                "correct": "swali",
-                "feedback": "Inapendeza! Swali linarudisha jukumu kwa mteja la kujibu (k.m. 'Tukufungie rangi ipi?')."
-              },
-              {
-                "type": "match",
-                "prompt": "Oanisha njia za kujibu wateja na matokeo yake:",
-                "pairs": [
-                  {
-                    "left": "Kujibu 'Tsh 45,000' tu",
-                    "right": "Mteja anakaa kimya (Seen)"
-                  },
-                  {
-                    "left": "Kujibu bei + Thamani + Swali",
-                    "right": "Mteja anaendeleza mazungumzo"
-                  }
-                ],
-                "feedback": "Hakika! Kutengeneza mazungumzo kunakuweka hatua moja karibu kufunga mauzo."
+                ]
               }
             ]
           },
           {
             "lesson_id": 302,
-            "title": "Mteja Anayesita — Nini Kifanyike?",
-            "xp": 75,
-            "duration_min": 6,
-            "mission": "Andika majibu 2 mapya kwa 'Nitafikiri' na 'Nitarudi' ukitumia fomula ya leo. Yaandike kwenye Notes yako tayari kutumia.",
+            "title": "Mbinu za Hooks (TikTok na Reels)",
+            "xp": 300,
+            "duration_min": 20,
+            "mission": "Andika vichwa vya habari (Hooks) vitatu vya kuvutia kwa ajili ya bidhaa zako tofauti.",
+            "daily_mission": {
+              "tracking_id": "dm_302_hook_test",
+              "task": "Tazama video 5 za TikTok au Reels leo — andika Hook (maneno ya sekunde 3 za mwanzo) ya kila moja.",
+              "xp_reward": 50
+            },
             "blocks": [
               {
-                "type": "story",
-                "character": "Salma, Zanzibar",
-                "content": "Salma alipoteza **wateja** 15 kwa wiki kwa sababu ya 'Sawa, nitarudi' na 'Nitafikiri kwanza.' Alijifunza majibu mawili tu ya kusita — **mauzo** yake yaliongezeka 35% bila **wateja** wapya hata mmoja."
-              },
-              {
                 "type": "text",
-                "content": "'Nitafikiri' karibu kila wakati inamaanisha 'Sijaamini bado' au 'Ninaogopa kupoteza pesa.' Kazi yako si kumsukuma — ni kumpa sababu moja ya ziada ya kuamini sasa hivi."
-              },
-              {
-                "type": "tip",
-                "content": "Majibu 2 ya 'Nitafikiri' yanayofanya kazi: (1) 'Sawa — nikuambie, ofa hii inaisha [leo/kesho]. Unataka nikuhifadhie?' (2) 'Sawa kabisa! Wateja wetu wengi walisema hivyo kwanza — lakini baada ya kupokea walifurahi sana. Nataka uhisi hivyo pia 😊'"
-              },
-              {
-                "type": "scenario",
-                "label": "Mteja anaposema 'Sawa, nitafikiri' anataka kutoweka. Jinsi nzuri ya kujibu ni ipi?",
-                "setup": "Mjadala kwenye DM/WhatsApp:",
-                "chat": [
-                  {
-                    "speaker": "Mteja",
-                    "text": "Asante kwa maelezo. Nitafikiri kisha nitakutafuta.",
-                    "side": "left"
-                  }
-                ],
-                "options": [
-                  "Sawa, karibu tena.",
-                  "Usijali. Ili nikusaidie vizuri zaidi, huwa unapendelea bei iwe chini au ubora ndio tatizo kulingana na faida nilizokupa?",
-                  "Uongo, huna hela wewe."
-                ],
-                "correct_index": 1,
-                "feedback": "Bora kabisa! Ukichimba kwa kuuliza maswali unajua tatizo la msingi lililomfanya asite (mara nyingi ni pesa, muda au hajiamini nalo)."
+                "content": "Kwenye video za TikTok na Instagram Reels, una sekunde 3 tu za kwanza kumfanya mtu asiswipe video yako. Hicho kinachosemwa mwanzoni kabisa ndio 'Hook' — chambo cha kuvutia. Hook nzuri inaweza kubadilisha video ya kawaida kuwa mtandaoni inayofika watu elfu."
               },
               {
                 "type": "quiz",
-                "question": "Mteja anapokwambia 'Nitaifikiria kisha nitarudi', hii inamaanisha nini hasa kwa asilimia kubwa?",
+                "question": "Ni hook ipi itakayofanya wafanyabiashara wadogo waangalie video yako hadi mwisho?",
                 "options": [
-                  "Anakwenda benki kutoa pesa",
-                  "Sijashawishika vizuri au nina tatizo (kama bei/muda) ambalo sijasema wazi",
-                  "Atafikiria na atarudi kesho kununua hakika"
+                  "Habari za leo, naitwa Asha na leo nataka kuonyesha bidhaa zangu...",
+                  "Usipost bidhaa yoyote mtandaoni kabla ya kujua siri hii — iliyonisaidia kupata orders 20 kwa wiki moja...",
+                  "Leo nataka kuongea kuhusu masoko ya kisasa Tanzania..."
                 ],
                 "correct_index": 1,
-                "feedback": "Ndiyo! Usikubali 'Nitafikiri' kama jibu la mwisho, chimba kujua ni nini hasa kinamzuia ili umsaidie vizuri."
+                "feedback": "Kuanza na changamoto au siri kunamfanya mtu awe na shauku ya kuendelea kuangalia. Pia inasema matokeo halisi (orders 20, wiki moja) — hii ni social proof ndani ya hook yenyewe."
               },
               {
                 "type": "cloze",
-                "prompt": "Nini wateja wanahitaji kabla ya kufanya maamuzi?",
-                "sentence_with_blank": "Kuuliza maswali zaidi baada ya 'Nitafikiri' inakusaidia kugundua {blank} kinachomkwamisha mteja.",
+                "prompt": "Sekunde ________ za kwanza za video ya Reels au TikTok ndizo zinazoamua kama mteja atabaki au ataswipe.",
+                "sentence_with_blank": "Sekunde {blank} za mwanzo ndizo muhimu zaidi kwa video yako ya mtandaoni.",
                 "options": [
-                  "kikwazo (pingamizi)",
-                  "kujifurahisha",
-                  "kutoweka"
+                  "Tatu (3)",
+                  "Tisini (90)",
+                  "Sita (60)"
                 ],
-                "correct": "kikwazo (pingamizi)",
-                "feedback": "Vizuri! Huenda ni ukosefu wa bajeti kwa sasa, au labda hajui kama bidhaa itamfaa vizuri. Kujua kikwazo kunaongeza nafasi yako ya kutatua hilo tatizo na kuuza."
+                "correct": "Tatu (3)",
+                "feedback": "Sahihi kabisa! Ubongo wa binadamu unaamua haraka sana. Usipomvuta ndani ya sekunde 3, umempoteza."
               },
               {
-                "type": "fill_blank",
-                "prompt": "Kamilisha kauli ya kumrudisha mteja mchezoni:",
-                "sentence": "Mteja akisema 'Nitafikiri', mjibu 'Sawa, ili niweze kukusaidia vizuri zaidi, huwa unapendelea ___ au ___ ndio tatizo kulingana na faida nilizokupa?'",
-                "blanks": 2,
-                "options": [
-                  "bei iwe chini",
-                  "ubora",
-                  "kimya",
-                  "kwenda"
-                ],
-                "correct": [
-                  "bei iwe chini",
-                  "ubora"
-                ],
-                "feedback": "Chap sana! Hasa katika maduka madogo, kumruhusu aseme ukweli inamhakikishia akujibu kuliko kupotea kimya."
+                "type": "unit_reflection",
+                "title": "Tafakari ya Somo la Hooks",
+                "questions": [
+                  {
+                    "key": "u3_l302_insight",
+                    "prompt": "Unafikiri ni kwa nini kuanza video kwa kusema 'Habari zenu naitwa...' si njia nzuri mtandaoni?",
+                    "placeholder": "Andika maoni yako..."
+                  }
+                ]
               }
             ]
           },
           {
             "lesson_id": 303,
-            "title": "Funga Mauzo kwa M-Pesa Haraka",
-            "xp": 75,
-            "duration_min": 6,
-            "mission": "Andika template yako ya malipo ya M-Pesa leo — namba, jina, na maelekezo mazuri. Itumie mara itakapohitajika badala ya kuandika upya kila wakati.",
-            "blocks": [
-              {
-                "type": "story",
-                "character": "Peter, Morogoro",
-                "content": "Peter alipoteza **mauzo** mengi kwa sababu ya hatua nyingi za malipo. Mteja alitaka kununua lakini hatua ilikuwa ngumu — aliondoka. Peter alitengeneza template moja rahisi ya M-Pesa — **wateja** walianza kulipa haraka bila kuuliza maswali."
-              },
-              {
-                "type": "text",
-                "content": "Mteja aliyeamua kununua anaweza kubadilika akili kama hatua ya malipo ni ngumu au inamchukua muda mrefu. Fanya malipo kuwa rahisi — **mauzo** yatafuata."
-              },
-              {
-                "type": "tip",
-                "content": "Template ya M-Pesa inayofanya kazi: 'Tuma M-Pesa ya TSh [BEI] kwa [NAMBA] — Jina: [JINA LAKO]. Baada ya kutuma, nipelekee screenshot. Nitakuthibitishia mara moja na kukuambia delivery itafika lini 🙏'"
-              },
-              {
-                "type": "fill_blank",
-                "prompt": "Kamilisha Mbinu Haraka ya M-Pesa",
-                "sentence": "Kamwe usimwache mteja atafute pesa bila kumpa ___. Mpe ___ na umwambie atume muamala fasta.",
-                "blanks": 2,
-                "options": [
-                  "mwongozo (call to action)",
-                  "namba yako ya Malipo",
-                  "picha mpya",
-                  "nafasi aende akapumzike"
-                ],
-                "correct": [
-                  "mwongozo (call to action)",
-                  "namba yako ya Malipo"
-                ],
-                "feedback": "Ndiyo! Onyesha njia iliyonyooka ya kufanya malipo na ukishamtumia namba mkumbushe 'Nitajulishe baada ya kuweka oda yako'."
-              },
-              {
-                "type": "scenario",
-                "label": "Ni lipi ni hitimisho bora kwa kufunga mauzo?",
-                "setup": "Mwisho kabisa mwa maelezo, utamwambia nini mteja kufunga ahadi?",
-                "chat": [
-                  {
-                    "speaker": "Mteja",
-                    "text": "Sawa nimeamua kuchukua rangi nyekundu.",
-                    "side": "left"
-                  }
-                ],
-                "options": [
-                  "Sawa asante.",
-                  "Tuma pesa M-Pesa namba 075X XXX XXX (Jina lako), na nitume picha ya risiti nikuanzie safari yako sahihi hivi.",
-                  "Tutaongea kesho ukiweka pesa."
-                ],
-                "correct_index": 1,
-                "feedback": "Safi! 'Call to Action' wazi huondoa uvivu kwa wateja walio na uhakika."
-              },
-              {
-                "type": "quiz",
-                "question": "Kwa nini ni hatari kumwacha mteja peke yake mpaka aamue yeye kutafuta pesa na kutuma?",
-                "options": [
-                  "Sio hatari, atatuma tu maana kanuia",
-                  "Nia inaweza kupotea, akiingia mitandaoni atapata kuvutiwa na vitu vingine au kusahaulia kule",
-                  "Sababu mitandao ipo na kasi ndogo"
-                ],
-                "correct_index": 1,
-                "feedback": "Haswa! Mnunuzi mtandaoni anahitaji msukumo na njia iliyo wazi wakati huo huo wa hisia kali anapohitaji mzigo."
-              },
-              {
-                "type": "cloze",
-                "prompt": "Malizia kauli kuu unayoitoa sekunde ya mwisho:",
-                "sentence_with_blank": "Ili ufunge haraka, mwambie mteja kwa ujasiri, 'Tuma malipo kupitia {blank} namba 07...' kisha mfafanulie hatua inayo fuata.",
-                "options": [
-                  "M-Pesa / TigoPesa",
-                  "muda utakao kuwa nao",
-                  "subira mpaka kesho"
-                ],
-                "correct": "M-Pesa / TigoPesa",
-                "feedback": "Vizuri! Hii inatoa Mwongozo Maalumu (Call to Action). Unamtengenezea mazingira ya kuwa akituma malipo usafiri unaanza mara moja."
-              },
-              {
-                "type": "match",
-                "prompt": "Oanisha kauli inayoachia mteja hiyari na inayoleta M-Pesa mapema:",
-                "pairs": [
-                  {
-                    "left": "\"Tutaongea kesho ukiwa tayari\"",
-                    "right": "Inapoteza hisia ya kununua haraka"
-                  },
-                  {
-                    "left": "\"Kamilisha M-Pesa hii [namba], mzigo uanze safari sasa hivi\"",
-                    "right": "Mwongozo kamili (Call to Action)"
-                  }
-                ],
-                "feedback": "Hakuna mjadala hapo! Ujasiri katika kufunga mauzo unaonyesha wewe ni mtaalamu."
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "course_id": "biashara_mtandaoni_001",
-    "course_title": "Biashara Mtandaoni kwa SMEs Tanzania",
-    "category": "Digital Skills",
-    "language": "Swahili",
-    "level": "beginner",
-    "xp_total": 1500,
-    "estimated_minutes": 150,
-    "units": [
-      {
-        "unit_id": 1,
-        "unit_title": "Jenga Msingi Imara",
-        "unit_icon": "🏗️",
-        "description": "Jifunze misingi muhimu ya kuanzisha na kuendesha biashara yako mtandaoni kwa mafanikio.",
-        "lessons": [
-          {
-            "lesson_id": 101,
-            "title": "Biashara Yako Mtandaoni Ni Nini?",
-            "xp": 50,
-            "duration_min": 5,
-            "mission": "Eleza biashara yako mtandaoni kwa sentensi moja.",
-            "blocks": [
-              {
-                "type": "story",
-                "character": "Neema, Mjasiriamali wa Nguo",
-                "content": "Neema alikuwa anauza nguo dukani kwake Kariakoo. Aliamua kuweka picha za nguo zake WhatsApp na Instagram. Ghafla, wateja walianza kumuuliza bei na jinsi ya kununua. Hiyo ndio ilikuwa mwanzo wa biashara yake mtandaoni!"
-              },
-              {
-                "type": "text",
-                "content": "**Biashara mtandaoni** ni kuuza bidhaa au huduma zako kwa kutumia intaneti. Hii inaweza kuwa kupitia mitandao ya kijamii, tovuti, au hata WhatsApp."
-              },
-              {
-                "type": "tip",
-                "content": "Sio lazima uwe na tovuti kubwa kuanza. Unaweza kuanza na ukurasa wa Instagram au WhatsApp Business!"
-              },
-              {
-                "type": "cloze",
-                "prompt": "Biashara mtandaoni inahusisha kuuza bidhaa au huduma kwa kutumia ________.",
-                "sentence_with_blank": "Biashara mtandaoni inahusisha kuuza bidhaa au huduma kwa kutumia {blank}.",
-                "options": [
-                  "Duka la kawaida",
-                  "Intaneti",
-                  "Simu ya mkononi tu"
-                ],
-                "correct": "Intaneti",
-                "feedback": "Sahihi! Intaneti ndio uwanja mkuu wa biashara mtandaoni."
-              },
-              {
-                "type": "quiz",
-                "question": "Ni ipi SIYO njia ya kufanya biashara mtandaoni?",
-                "options": [
-                  "Kuuza kupitia Instagram",
-                  "Kuuza bidhaa sokoni kila siku",
-                  "Kutumia WhatsApp Business"
-                ],
-                "correct_index": 1,
-                "feedback": "Kuuza bidhaa sokoni kila siku ni biashara ya kawaida, sio mtandaoni."
-              }
-            ]
-          },
-          {
-            "lesson_id": 102,
-            "title": "Kwanini Biashara Yako Inahitaji Kuwa Mtandaoni?",
-            "xp": 50,
-            "duration_min": 5,
-            "mission": "Taja faida mbili za kuwa na biashara mtandaoni.",
+            "title": "Consistency na Algorithm",
+            "xp": 250,
+            "duration_min": 15,
+            "mission": "Tengeneza ratiba rahisi na inayowezekana ya kupost bidhaa zako angalau mara 3 kwa wiki — sio kila siku, mara 3 tu.",
+            "daily_mission": {
+              "tracking_id": "dm_303_post_action",
+              "task": "Post bidhaa moja leo kwenye WhatsApp Status au Instagram — hata kama si kamili, kuanza ndio siri.",
+              "xp_reward": 50
+            },
             "blocks": [
               {
                 "type": "text",
-                "content": "Ulimwengu unabadilika, na wateja wako wengi wapo mtandaoni. Kuwa na biashara mtandaoni kunakupa fursa ya kufikia wateja wengi zaidi na kuongeza mauzo."
-              },
-              {
-                "type": "image_ab",
-                "label": "Ni picha ipi inaonyesha faida ya biashara mtandaoni?",
-                "option_a": {
-                  "src": "https://example.com/image_duka_ndogo.png",
-                  "label": "Duka dogo la mtaani"
-                },
-                "option_b": {
-                  "src": "https://example.com/image_mtandaoni_wateja_wengi.png",
-                  "label": "Wateja wengi kutoka sehemu mbalimbali"
-                },
-                "correct": "B",
-                "feedback_correct": "Kabisa! Biashara mtandaoni inakufungulia milango ya kufikia wateja wengi zaidi bila mipaka ya kijiografia.",
-                "feedback_wrong": "Fikiria tena. Duka la mtaani linafika wateja wachache kuliko biashara mtandaoni."
-              },
-              {
-                "type": "tip",
-                "content": "Biashara mtandaoni haina mipaka ya saa wala eneo. Mteja anaweza kununua bidhaa zako hata usiku wa manane!"
-              },
-              {
-                "type": "match",
-                "prompt": "Oanisha faida na maelezo yake:",
-                "pairs": [
-                  {
-                    "left": "Fikia Wateja Wengi",
-                    "right": "Uza bidhaa zako nchi nzima au hata nje ya nchi."
-                  },
-                  {
-                    "left": "Gharama Nafuu",
-                    "right": "Punguza kodi ya pango na gharama za wafanyakazi wengi."
-                  }
-                ],
-                "feedback": "Vizuri sana! Hizi ndizo faida kuu za biashara mtandaoni."
+                "content": "Mifumo ya mitandao (Algorithms) inapenda sana akaunti zinazopost mara kwa mara (Consistency). Ukipost leo kisha ukapotea kwa wiki mbili, mtandao utaficha akaunti yako isionekane kwa wateja wapya. Lakini hii si lazima iwe ngumu — ratiba rahisi ya mara tatu kwa wiki inafanya kazi vizuri kuliko kupost kila siku kwa wiki moja kisha kukaa kimya."
               },
               {
                 "type": "quiz",
-                "question": "Ni ipi kati ya hizi SIYO faida ya biashara mtandaoni?",
+                "question": "Njia bora ya kukua mtandaoni bila kuchoka ni ipi?",
                 "options": [
-                  "Kufikia wateja wengi zaidi",
-                  "Kupunguza gharama za uendeshaji",
-                  "Kuhitaji duka kubwa la kifahari"
+                  "Kupost video 20 kwa siku moja kisha kukaa kimya mwezi mzima",
+                  "Kupost kwa ratiba rahisi inayowezekana — mfano Jumatatu, Jumatano, na Ijumaa — na kushikamana nayo kila wiki",
+                  "Kupost pale tu unapojisikia na bidhaa nzuri ya kuonyesha"
                 ],
-                "correct_index": 2,
-                "feedback": "Biashara mtandaoni haihitaji duka kubwa la kifahari, inakusaidia kupunguza gharama."
+                "correct_index": 1,
+                "feedback": "Kupost kwa muendelezo ndio siri kubwa inayowaweka juu wafanyabiashara wakubwa. Na ratiba rahisi inayowezekana ni bora kuliko ratiba nzuri ambayo huwezi kushikamana nayo."
+              },
+              {
+                "type": "unit_reflection",
+                "title": "Tafakari ya Mwisho ya Unit 3",
+                "questions": [
+                  {
+                    "key": "u3_l303_insight",
+                    "prompt": "Ni changamoto gani unayoiona mbeleni kuhusu consistency ya kupost, na utaikabili vipi?",
+                    "placeholder": "Andika tafakari yako hapa..."
+                  }
+                ]
               }
             ]
           }
         ]
       },
       {
-        "unit_id": 2,
-        "unit_title": "Kuvutia Wateja Kwenye Mtandao",
-        "unit_icon": "🧲",
-        "description": "Jifunze mbinu za kuvutia wateja wapya na kuwafanya wanunue bidhaa zako mtandaoni.",
+        "unit_id": 4,
+        "unit_title": "Huduma kwa Wateja, Kufunga Mauzo na Uzinduzi",
+        "unit_icon": "🤝",
+        "description": "Jifunze kisaikolojia jinsi ya kujibu wateja, kufunga mauzo kwa mbinu za kisasa, na uzindue biashara yako rasmi.",
+        "estimated_minutes": 150,
+        "unlock_requirement": "Complete Unit 3",
+        "unit_reward_xp": 1800,
+        "badge": {
+          "new_label": "Fundi wa Mauzo na Mahusiano",
+          "icon": "🏆",
+          "description": "Unajua siri ya kufunga mauzo huku ukijenga mahusiano ya kweli — wateja wanakurudi na kuleta wengine."
+        },
         "lessons": [
           {
-            "lesson_id": 201,
-            "title": "Bio Yako Ni Sumaku ya Wateja",
-            "xp": 70,
-            "duration_min": 5,
-            "mission": "Boresha Bio yako ya Instagram/WhatsApp ili ivutie wateja wapya.",
+            "lesson_id": 401,
+            "title": "Kujibu kwa Professional na Usalama wa Malipo",
+            "xp": 300,
+            "duration_min": 18,
+            "mission": "Andika ujumbe wa kujibu bei (Pricing template) ambao utautumia kuanzia leo kwenye biashara yako halisi.",
+            "daily_mission": {
+              "tracking_id": "dm_401_reply_use",
+              "task": "Jibu ujumbe mmoja wa mteja leo kwa kutumia template uliyoiandika na upime kama mazungumzo yameendelea.",
+              "xp_reward": 50
+            },
             "blocks": [
               {
                 "type": "story",
-                "character": "Juma, Mjasiriamali wa Vyakula",
-                "content": "Juma alikuwa anauza pilau mtandaoni. Bio yake ilikuwa 'Juma's Pilau'. Baada ya kujifunza, aliibadilisha kuwa 'Pilau Tamu za Kiswahili Dar es Salaam 🍛 Agiza WhatsApp 07XX-XXX-XXX'. Mauzo yake yaliongezeka mara mbili!"
+                "character": "Amina, Muuzaji wa Vitenge",
+                "content": "Amina alikuwa anapata wateja 10 kwa siku WhatsApp. Alikuwa anajibu kwa kuandika namba tu: '25,000'. Kati ya wateja 10, ni mmoja tu aliyenunua. Wengine 9 walitoweka (seen) na hakuwasikia tena. Aliamua kubadilisha namna ya kujibu kwa ukarimu."
               },
               {
                 "type": "text",
-                "content": "**Bio** yako kwenye mitandao ya kijamii ni kama kibao cha tangazo cha duka lako. Inapaswa kuwa wazi, fupi, na kuvutia. Mteja akiona Bio yako, ajue unauza nini, uko wapi, na jinsi ya kukupata."
+                "content": "**Kanuni ya Kasi na Ukarimu:** Mteja wa mtandaoni ana haraka sana. Ukimjibu kwa namba pekee, anahisi unampuuza. Ukimjibu kwa ukarimu na kuongeza swali moja la kirafiki mwishoni, unamvuta kubaki na kuongeza nafasi ya mauzo."
               },
               {
-                "type": "tip",
-                "content": "Tumia emoji zinazohusiana na biashara yako. Zinafanya Bio yako ionekane hai na rahisi kusoma."
-              },
-              {
-                "type": "insta_bio",
-                "prompt": "Jaza Bio hii ili ivutie wateja kwa biashara ya kuuza keki:",
-                "blanks": 3,
+                "type": "scenario",
+                "label": "Chagua jibu bora la kibiashara",
+                "setup": "Mteja anauliza kwenye WhatsApp: 'Bei ya keki hii ni ngapi?'",
                 "options": [
-                  "Keki Tamu za Harusi na Sherehe",
-                  "Tunapatikana Mbezi Beach",
-                  "Agiza WhatsApp 07XX-XXX-XXX",
-                  "Mimi ni mpishi",
-                  "Keki tu"
-                ],
-                "correct": [
-                  "Keki Tamu za Harusi na Sherehe",
-                  "Tunapatikana Mbezi Beach",
-                  "Agiza WhatsApp 07XX-XXX-XXX"
-                ],
-                "feedback": "Hongera! Bio hii inatoa taarifa zote muhimu kwa mteja anayetaka keki."
-              },
-              {
-                "type": "quiz",
-                "question": "Ni taarifa gani muhimu inapaswa kuwepo kwenye Bio yako?",
-                "options": [
-                  "Jina la rafiki yako",
-                  "Unauza nini, uko wapi, na namba ya simu",
-                  "Historia ndefu ya biashara yako"
+                  "35k.",
+                  "Habari! 😊 Keki yetu nzuri ya Chocolate ni TZS 35,000 tu na tunakuletea popote DSM. Je, ni kwa ajili ya sherehe gani au tukio gani rafiki yangu? Nitakusaidia upate keki inayofaa kabisa!",
+                  "Ipo, bei 35,000."
                 ],
                 "correct_index": 1,
-                "feedback": "Sahihi! Wateja wanahitaji kujua unauza nini, uko wapi, na jinsi ya kukuwasiliana."
-              }
-            ]
-          },
-          {
-            "lesson_id": 202,
-            "title": "Picha na Video Zinazouza",
-            "xp": 70,
-            "duration_min": 5,
-            "mission": "Piga picha 3 za bidhaa zako zinazovutia na uziweke mtandaoni.",
-            "blocks": [
-              {
-                "type": "text",
-                "content": "Picha na video ni 'macho' ya biashara yako mtandaoni. Picha nzuri huvutia wateja, picha mbaya huwafukuza. Hakikisha bidhaa zako zinaonekana vizuri na kuvutia."
+                "feedback": "Jibu hili linafanya mambo manne kwa wakati mmoja: linaonyesha ukarimu (Habari! 😊), linasema bei wazi (35,000), linatoa thamani ya ziada (delivery), na linauliza swali la kuendelea mazungumzo. Hii ndiyo fomula ya kufunga mauzo."
               },
               {
-                "type": "image_ab",
-                "label": "Ni picha ipi itavutia wateja zaidi kununua keki?",
-                "option_a": {
-                  "src": "https://example.com/keki_mbaya.png",
-                  "label": "Keki iliyopigwa picha gizani na simu ya zamani."
-                },
-                "option_b": {
-                  "src": "https://example.com/keki_nzuri.png",
-                  "label": "Keki iliyopigwa picha mwangani na mapambo mazuri."
-                },
-                "correct": "B",
-                "feedback_correct": "Picha B inaonyesha keki kwa uzuri wake wote! Wateja hununua kwa macho kwanza.",
-                "feedback_wrong": "Picha A haionyeshi ubora wa keki. Hakikisha picha zako zinavutia."
-              },
-              {
-                "type": "tip",
-                "content": "Tumia mwanga wa asili (jua) kupiga picha. Epuka flash ya simu, inaweza kuharibu picha."
+                "type": "mistake_example",
+                "bad_example": "Mteja ametuma screenshot ya muamala akidai amelipa.",
+                "good_example": "Mteja ametuma screenshot lakini unasubiri ujumbe kwenye namba yako kuthibitisha.",
+                "question": "Ni njia ipi salama kuthibitisha malipo mtandaoni?",
+                "correct": "good_example",
+                "feedback": "Matapeli hutengeneza screenshot feki za malipo au hata message feki za M-Pesa/TigoPesa. Daima hakikisha umeona salio kwenye akaunti yako halisi."
               },
               {
                 "type": "drag_drop",
-                "prompt": "Panga hatua za kupiga picha nzuri ya bidhaa:",
+                "prompt": "Panga vipengele hivi vya ujumbe wa bei kwa mpangilio sahihi wa kisaikolojia unaovuta wateja:",
                 "items": [
                   {
                     "id": "1",
-                    "text": "Andaa bidhaa vizuri"
+                    "text": "Salamu ya ukarimu na tabasamu (mfano: Habari! 😊)"
                   },
                   {
                     "id": "2",
-                    "text": "Tafuta sehemu yenye mwanga mzuri"
+                    "text": "Bei na Thamani ya ziada (mfano: Ni 25,000 tu na tunakuletea popote)"
                   },
                   {
                     "id": "3",
-                    "text": "Piga picha kutoka pembe tofauti"
-                  },
-                  {
-                    "id": "4",
-                    "text": "Hariri picha kidogo (contrast, brightness)"
+                    "text": "Swali la Kufunga la kuendeleza mazungumzo (mfano: Ungependa nikuandalie rangi gani leo?)"
                   }
                 ],
-                "correct_order": [
-                  "1",
-                  "2",
-                  "3",
-                  "4"
-                ],
-                "feedback": "Hatua sahihi! Kufuata hatua hizi kutakupa picha bora."
+                "correct_order": ["1", "2", "3"],
+                "feedback": "Fomula hii (Salamu + Bei/Thamani + Swali) ni injini yako kuu ya kufunga mauzo mtandaoni kiprofessional."
               },
               {
-                "type": "quiz",
-                "question": "Kwanini video fupi ni muhimu kwa biashara mtandaoni?",
-                "options": [
-                  "Hazitumii data nyingi",
-                  "Zinaonyesha bidhaa ikitumika na kujenga uhusiano",
-                  "Ni rahisi kutengeneza"
-                ],
-                "correct_index": 1,
-                "feedback": "Video zinaonyesha uhai wa bidhaa na husaidia wateja kuelewa zaidi."
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "unit_id": 3,
-        "unit_title": "Kufunga Mauzo na Kudumisha Wateja",
-        "unit_icon": "🤝",
-        "description": "Jifunze jinsi ya kubadili wateja wanaovutiwa kuwa wanunuzi na kuwafanya warudi tena.",
-        "lessons": [
-          {
-            "lesson_id": 301,
-            "title": "Jinsi ya Kujibu Ujumbe wa Mteja",
-            "xp": 80,
-            "duration_min": 5,
-            "mission": "Andika majibu mawili tofauti kwa mteja anayeuliza bei ya bidhaa yako.",
-            "blocks": [
-              {
-                "type": "story",
-                "character": "Aisha, Muuzaji wa Vitenge",
-                "content": "Aisha alikuwa anapoteza wateja wengi WhatsApp kwa sababu alikuwa anajibu 'Bei ni 20,000'. Baada ya kujifunza kujibu kwa ukarimu na kutoa maelezo zaidi, wateja wake walianza kununua zaidi na hata kurejea!"
-              },
-              {
-                "type": "text",
-                "content": "Kujibu ujumbe wa mteja haraka na kwa ukarimu ni muhimu sana. Usijibu tu bei, toa maelezo zaidi, muulize maswali, na msaidie kufanya uamuzi."
-              },
-              {
-                "type": "tip",
-                "content": "Jibu maswali yote ya mteja kwa uvumilivu. Hata kama ameuliza swali lilelile mara nyingi, kumbuka yeye ndiye mfalme!"
-              },
-              {
-                "type": "scenario",
-                "label": "Chagua jibu bora kwa mteja anayeuliza 'Bei ya keki ni ngapi?'",
-                "setup": "Mteja: 'Habari, bei ya keki ni ngapi?'",
-                "chat": [
+                "type": "unit_reflection",
+                "title": "Tafakari ya Somo la Majibu",
+                "questions": [
                   {
-                    "side": "right",
-                    "speaker": "Mteja",
-                    "text": "Habari, bei ya keki ni ngapi?"
+                    "key": "u4_l401_insight",
+                    "prompt": "Umejifunza nini kuhusu hatari ya SMS feki za malipo? Utaepuka vipi kutapeliwa kuanzia leo?",
+                    "placeholder": "Andika hapa..."
                   }
-                ],
-                "options": [
-                  "Bei ni 30,000.",
-                  "Habari! Keki zetu zinaanzia 30,000 kutegemea na ukubwa na muundo. Ungependa keki ya aina gani au kwa tukio gani?"
-                ],
-                "correct_index": 1,
-                "feedback": "Jibu la pili linajenga mazungumzo na kumsaidia mteja kupata kile anachotaka. Safi!"
-              },
-              {
-                "type": "quiz",
-                "question": "Kwanini ni muhimu kujibu ujumbe wa mteja haraka?",
-                "options": [
-                  "Ili asikimbilie kwa mshindani wako",
-                  "Ili umalize kazi haraka",
-                  "Ili aone una simu nzuri"
-                ],
-                "correct_index": 0,
-                "feedback": "Wateja wa mtandaoni wanapenda huduma ya haraka. Usipojibu, anaenda kwingine."
+                ]
               }
             ]
           },
           {
-            "lesson_id": 302,
-            "title": "Kufunga Mauzo na Kufanya Mteja Arudi",
-            "xp": 80,
-            "duration_min": 5,
-            "mission": "Taja njia mbili za kumfanya mteja arudi kununua kwako.",
+            "lesson_id": 402,
+            "title": "Kushughulikia Malalamiko kwa Empathy",
+            "xp": 300,
+            "duration_min": 15,
+            "mission": "Andika ujumbe mmoja wa kuomba msamaha ambao utautumia mteja wako akipata changamoto yoyote — uhifadhi kama template.",
+            "daily_mission": {
+              "tracking_id": "dm_402_empathy_action",
+              "task": "Fikiria wakati mtu alikushughulikia vizuri ukiwa na tatizo dukani — ulijisikiaje? Tumia hisia hiyo hiyo kwa wateja wako leo.",
+              "xp_reward": 50
+            },
             "blocks": [
               {
                 "type": "text",
-                "content": "Baada ya mteja kuonyesha nia, unahitaji kumsaidia kufanya uamuzi wa kununua. Na baada ya kununua, unataka arudi tena!"
+                "content": "Malalamiko ya wateja si uadui — ni zawadi. Mteja anapolalamika akasikilizwa vizuri na kwa ukarimu (Empathy), anakuwa mteja mwaminifu zaidi kuliko hata kabla ya tatizo. Watafiti wanasema: 70% ya wateja wanaobaki waaminifu baada ya tatizo ni kwa sababu walishughulikiwa vizuri — sio kwa sababu tatizo halikutokea."
               },
               {
-                "type": "tip",
-                "content": "Toa ofa ndogo au punguzo kwa wateja wako waaminifu. Watasikia wanathaminiwa na watarudi!"
-              },
-              {
-                "type": "cloze",
-                "prompt": "Baada ya mteja kununua, ni muhimu kumwomba ________.",
-                "sentence_with_blank": "Baada ya mteja kununua, ni muhimu kumwomba {blank}.",
+                "type": "scenario",
+                "label": "Mteja anapiga simu akilalamika bidhaa imechelewa kufika:",
+                "setup": "Mteja: 'Mzigo wangu umechelewa sana, mnanipotezea muda wangu!'",
                 "options": [
-                  "Pesa zaidi",
-                  "Maoni (feedback)",
-                  "Asikusumbue tena"
+                  "Pole sana kwa usumbufu huo. Nakucheki hapa na rider sasa hivi na nakupa jibu ndani ya dakika 2 rafiki yangu. Asante kwa uvumilivu wako.",
+                  "Hata mimi namsubiri, boda boda ndio wanasumbua si kosa langu.",
+                  "Sawa tutakuletea baadaye."
                 ],
-                "correct": "Maoni (feedback)",
-                "feedback": "Maoni ya mteja yanakusaidia kuboresha huduma na bidhaa zako."
+                "correct_index": 0,
+                "feedback": "Jibu la kwanza linabeba mambo matatu muhimu: (1) Kukubali hisia za mteja bila kujibu udhalimu (pole sana), (2) Kuchukua hatua ya haraka (nakucheki sasa hivi), (3) Kutoa muda halisi wa jibu (dakika 2). Hii inabadilisha hasira kuwa uaminifu."
               },
               {
-                "type": "match",
-                "prompt": "Oanisha mbinu za kufunga mauzo na maelezo yake:",
-                "pairs": [
+                "type": "unit_reflection",
+                "title": "Tafakari ya Somo la Empathy",
+                "questions": [
                   {
-                    "left": "Toa ofa maalum",
-                    "right": "Mteja anahisi anapata kitu cha ziada."
-                  },
-                  {
-                    "left": "Jibu maswali yote",
-                    "right": "Ondoa mashaka yote ya mteja."
+                    "key": "u4_l402_insight",
+                    "prompt": "Kwa nini ni vigumu kwa ubinadamu kukubali kosa na kuomba radhi kwa mteja? Utafanya nini kudhibiti hisia zako mteja akilalamika?",
+                    "placeholder": "Andika tafakari yako hapa..."
                   }
-                ],
-                "feedback": "Hizi ni mbinu muhimu za kufunga mauzo kwa ufanisi."
+                ]
+              }
+            ]
+          },
+          {
+            "lesson_id": 403,
+            "title": "Mbinu za Kufunga Mauzo (Sales Psychology)",
+            "xp": 300,
+            "duration_min": 15,
+            "mission": "Andika ofa moja ya bidhaa yako inayotumia uhaba (Scarcity) au haraka (Urgency) — itume kwenye WhatsApp Status yako leo.",
+            "daily_mission": {
+              "tracking_id": "dm_403_scarcity_post",
+              "task": "Angalia tangazo moja lolote mtandaoni leo na uandike kama linatumia mbinu ya Uhaba (Scarcity) au Haraka (Urgency) kukuvutia.",
+              "xp_reward": 50
+            },
+            "blocks": [
+              {
+                "type": "text",
+                "content": "Wateja wengi wanapenda kuahirisha ununuzi — sio kwa sababu hawataki bidhaa yako, bali kwa sababu ubongo wao unaogopa kufanya uamuzi mbaya. Kazi yako ni kuwasaidia kuamua leo kwa kuwaonyesha kwa nini kusubiri kuna gharama. Hii inaitwa Sales Psychology — sio udanganyifu, bali kusaidia wateja wanaotaka kununua wafanye uamuzi haraka."
               },
               {
                 "type": "quiz",
-                "question": "Ni ipi njia bora ya kumfanya mteja arudi kununua kwako?",
+                "question": "Ni tangazo gani linalomsukuma mteja kufanya uamuzi wa kununua leo badala ya kesho?",
                 "options": [
-                  "Kumpuuza baada ya mauzo ya kwanza",
-                  "Kumpa huduma bora na kumfuatilia kwa ofa mpya",
-                  "Kumuongezea bei kila anaporudi"
+                  "Karibuni sana kununua vitenge vyetu bado vipo.",
+                  "Tumebakiza doti 3 tu za vitenge hivi vya kipekee. Ofa ya punguzo la 20% inaisha leo saa sita usiku! Agiza chako sasa kabla haijakwisha.",
+                  "Tunauza vitenge vizuri siku zote, karibu sana."
                 ],
                 "correct_index": 1,
-                "feedback": "Huduma bora na ofa maalum huwafanya wateja kuwa waaminifu na kurejea."
+                "feedback": "Tangazo hili linatumia nguvu mbili kwa pamoja: Uhaba wa bidhaa (doti 3 zilizobaki) na Muda unaoisha (saa sita usiku). Hizi mbili pamoja zinajenga hamu ya haraka — ubongo unasema 'lazima nifanye uamuzi SASA.'"
+              },
+              {
+                "type": "unit_reflection",
+                "title": "Tafakari ya Somo la Saikolojia ya Mauzo",
+                "questions": [
+                  {
+                    "key": "u4_l403_insight",
+                    "prompt": "Uhaba wa bidhaa unamsaidia vipi mteja wako kufanya uamuzi kwa ujasiri bila kujisikia kulazimishwa?",
+                    "placeholder": "Andika maoni yako..."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "lesson_id": 404,
+            "title": "🚀 Uzinduzi Rasmi wa Biashara Yako",
+            "xp": 500,
+            "duration_min": 30,
+            "mission_type": "full_public_launch",
+            "mission_risk_level": "calculated_social_risk",
+            "mission_readiness_check": {
+              "enabled": true,
+              "title": "Kabla ya Kuzindua — Angalia Orodha Hii",
+              "checklist": [
+                {
+                  "id": "check_1",
+                  "text": "Bio yangu imekaa vizuri — inasema ninauza nini, niko wapi, na jinsi ya kunipata",
+                  "required": true
+                },
+                {
+                  "id": "check_2",
+                  "text": "Nina picha angalau 3 za bidhaa zangu zilizopigwa mwangani na zinaonekana vizuri",
+                  "required": true
+                },
+                {
+                  "id": "check_3",
+                  "text": "WhatsApp Business au Instagram my akaunti imewekwa vizuri na iko tayari kupokea wateja",
+                  "required": true
+                },
+                {
+                  "id": "check_4",
+                  "text": "Nimeshapata maoni ya mtu mmoja wa karibu na nimeyafanyia kazi (kutoka Lesson 203)",
+                  "required": true
+                }
+              ],
+              "minimum_checks_required": 4,
+              "not_ready_message": "Ukaguzi huu unaonyesha bado kuna vitu vichache vya kukamilisha. Rudi na ukamilishe — uzinduzi wako utakuwa na nguvu zaidi ukiwa tayari.",
+              "ready_message": "Biashara yako iko tayari kwa uzinduzi! Umefanya kazi ngumu — sasa ni wakati wa kuonyesha ulimwengu. 🎉"
+            },
+            "mission": "Zindua rasmi duka lako kwa kutuma link ya WhatsApp Business Catalog au Instagram Bio yako kwa watu WATANO ambao wanaweza kuwa wateja wako au wanaweza kukuunganisha na wateja.",
+            "mission_framing": "Huu sio 'kujaribu' — huu ni uzinduzi rasmi. Umeshajiandaa kwa wiki kadhaa. Duka lako liko tayari. Wateja wanakusubiri.",
+            "daily_mission": {
+              "tracking_id": "dm_404_daily_consist",
+              "task": "Kila siku kwa wiki ijayo — tuma bidhaa moja mpya mwangani, jibu ujumbe wote wa wateja ndani ya dakika 30, na uandike jambo moja ulichojifunza leo.",
+              "xp_reward": 100
+            },
+            "blocks": [
+              {
+                "type": "challenge",
+                "title": "🏆 The Final Launch Challenge",
+                "task": "Hatua za uzinduzi wako rasmi wa leo:\n\n1️⃣ Thibitisha Bio yako iko tayari na inasema unauza nini, uko wapi, na jinsi ya kukupata.\n\n2️⃣ Weka picha angalau 3 nzuri za bidhaa zako — zilizopigwa mwangani.\n\n3️⃣ Tuma link yako kwa watu 5 wanaoweza kuwa wateja wako au kukuunganisha na wateja. Unaweza kusema: 'Nimezindua duka langu la kidijitali — ningependa uone na unisaidie kusambaza.'",
+                "confidence_builder": "Kumbuka: Neema alianza hapa hapa. Juma alianza hapa hapa. Hassan alianza hapa hapa. Sasa ni zamu yako.",
+                "reward_xp": 500
+              },
+              {
+                "type": "reflection_moment",
+                "title": "🪞 Tafakari ya Mwisho",
+                "questions": [
+                  {
+                    "key": "learned",
+                    "prompt": "Kitu kikubwa kimoja nilichojifunza katika course hii ambacho kitabadilisha biashara ngumu ya kiasili kuwa rahisi ya kidijitali ni:",
+                    "placeholder": "Andika kwa uaminifu..."
+                  },
+                  {
+                    "key": "action_tomorrow",
+                    "prompt": "Hatua moja ya kweli nitakayofanya KESHO asubuhi kuendeleza kasi ni:",
+                    "placeholder": "Iwe ndogo au kubwa — iwe ya kweli..."
+                  },
+                  {
+                    "key": "feeling",
+                    "prompt": "Ninajihisi vipi sasa nikilinganisha na siku ya kwanza nilipoingia kwenye mafunzo haya?",
+                    "placeholder": "Hisia zako za kweli..."
+                  }
+                ],
+                "completion_message": "Tafakari hizi ni sehemu ya mafunzo — ubongo wako unafanya kazi kuimarisha na kukumbuka kila ulichojifunza."
+              },
+              {
+                "type": "certificate_unlock",
+                "title": "🎓 Sehemu ya 1 Imekamilika!",
+                "badge_earned": "Fundi wa Mauzo na Mahusiano",
+                "message": "Hongera sana! 🎉 Umekamilisha mafunzo ya misingi ya kuanzisha na kuendesha Biashara Mtandaoni kwa mafanikio nchini Tanzania. Wewe sio tena mwanafunzi — wewe ni Mjasiriamali wa Kisasa wa Tanzania anayejua jinsi ya kujenga, kuvutia, na kufunga mauzo mtandaoni. Safari yako ya kweli inaanza sasa."
               }
             ]
           }

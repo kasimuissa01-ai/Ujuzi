@@ -64,9 +64,9 @@ export default function InteractiveLesson({ onNavigate, onBack, params }: Props)
     setIsPlayingAudio(false);
     
     // Automatically allow continuing for non-interactive steps
-    if (['story', 'text', 'tip', 'image'].includes(currentStep?.type)) {
+    if (['story', 'text', 'tip', 'image', 'certificate_unlock'].includes(currentStep?.type)) {
       setCompanionMood('teaching');
-      setCompanionMessage(currentStep?.type === 'tip' ? "Chukua dokezo hili!" : null);
+      setCompanionMessage(currentStep?.type === 'tip' ? "Chukua dokezo hili!" : (currentStep?.type === 'certificate_unlock' ? "Hongera sana kwa kufika hapa! 🎉" : null));
       setCanContinue(true);
     } else {
       setCompanionMood('idle');

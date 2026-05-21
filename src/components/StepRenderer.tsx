@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
 import Markdown from 'react-markdown';
 import { LessonBlock } from '../types/lesson';
@@ -743,6 +743,530 @@ export default function StepRenderer({ step, onContinue, setCompanionFeedback, c
             />
           </div>
       );
+  }
+
+  if (step.type === 'pain_calculator') {
+    const [values, setValues] = useState<Record<string, string>>({});
+    const [result, setResult] = useState<string | null>(null);
+
+    const handleCalculate = () => {
+      const price = parseFloat(values['average_item_price'] || '0');
+      const count = parseFloat(values['missed_daily_customers'] || '0');
+      if (price > 0 && count > 0) {
+        const formulaResult = price * count * 30;
+        const formattedResult = new Intl.NumberFormat('en-US').format(formulaResult);
+        setResult(formattedResult);
+        playSound('correct_voice');
+        setCanContinue(true);
+        setCompanionFeedback("Huu ndio upotevu halisi wa kifedha uliopo. Sasa ni wakati wa kuanza kujifunza jinsi ya kuuzuia!", "thinking");
+      }
+    };
+
+    return (
+      <div className="flex flex-col gap-6 pt-4 pb-8 h-full text-white">
+        <div className="flex items-start gap-4">
+          <AudioButton />
+          <h2 className="text-[20px] font-bold mt-1 tracking-tight">{step.prompt}</h2>
+        </div>
+        <div className="flex flex-col gap-4 bg-[#202f36] p-6 rounded-2xl border-2 border-[#37464f]">
+          {step.inputs.map((input) => (
+            <div key={input.key} className="flex flex-col gap-2">
+              <label className="text-[14px] font-bold text-gray-300">{input.label}</label>
+              <input
+                type="number"
+                value={values[input.key] || ''}
+                onChange={(e) => {
+                  setValues({ ...values, [input.key]: e.target.value });
+                  setCanContinue(false);
+                  setResult(null);
+                }}
+                placeholder={input.placeholder}
+                className="bg-[#131f24] border-2 border-[#37464f] p-4 rounded-xl text-white text-[16px] focus:border-[#1cb0f6] focus:outline-none w-full"
+              />
+            </div>
+          ))}
+          {!result ? (
+            <motion.button
+              whileTap={{ scale: 0.98 }}
+              onClick={handleCalculate}
+              disabled={!values['average_item_price'] || !values['missed_daily_customers']}
+              className="mt-2 w-full bg-[#1cb0f6] border-b-4 border-[#1899d6] hover:bg-[#20b8fe] text-white font-bold py-4 px-6 rounded-xl text-[17px] active:border-b-0 active:translate-y-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Kokotoa Upotevu Wako 🧮
+            </motion.button>
+          ) : (
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="mt-2 p-5 bg-[#ea2b2b]/10 border-2 border-[#ea2b2b]/40 rounded-xl text-center"
+            >
+              <p className="text-[22px] font-extrabold text-[#ea2b2b] mb-2">
+                TSH {result} /=
+              </p>
+              <p className="text-[15px] text-gray-200 leading-relaxed font-semibold">
+                {step.result_template.replace('{result}', result)}
+              </p>
+              <p className="text-[13px] text-[#ffcd1f] font-bold mt-4 animate-pulse">
+                {step.call_to_action}
+              </p>
+            </motion.div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (step.type === 'mistake_example') {
+    const [selected, setSelected] = useState<'bad_example' | 'good_example' | null>(null);
+
+    const handleSelect = (choice: 'bad_example' | 'good_example') => {
+      setSelected(choice);
+      if (choice === step.correct) {
+        playSound('correct_voice');
+        setCanContinue(true);
+        setCompanionFeedback(step.feedback, "celebrating");
+      } else {
+        playSound('wrong');
+        setCompanionFeedback("Hapo kuna makosa. Fikiria vizuri kuhusu tofauti yao kisha chagua jibu sahihi.", "thinking");
+      }
+    };
+
+    return (
+      <div className="flex flex-col gap-6 pt-4 pb-8 h-full text-white">
+        <div className="flex items-start gap-4">
+          <AudioButton />
+          <h2 className="text-[20px] font-bold mt-1 tracking-tight">{step.question}</h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="border-2 border-[#ea2b2b]/30 bg-[#ea2b2b]/5 rounded-2xl p-5 flex flex-col gap-3">
+            <span className="bg-[#ea2b2b] text-white text-[11px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider self-start">
+              Mfano Mbaya / Kosa ❌
+            </span>
+            <p className="text-[17px] font-medium leading-relaxed italic text-gray-300">
+              "{step.bad_example}"
+            </p>
+          </div>
+
+          <div className="border-2 border-[#58cc02]/30 bg-[#58cc02]/5 rounded-2xl p-5 flex flex-col gap-3">
+            <span className="bg-[#58cc02] text-white text-[11px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider self-start">
+              Mfano Mzuri / Sahihi ✔
+            </span>
+            <p className="text-[17px] font-medium leading-relaxed italic text-gray-100 font-semibold">
+              "{step.good_example}"
+            </p>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-3 mt-4">
+          <p className="text-gray-400 font-bold text-sm uppercase tracking-wider">Gusa jibu sahihi hapa chini:</p>
+          <div className="grid grid-cols-2 gap-3">
+            <motion.button
+              whileTap={{ scale: 0.98 }}
+              onClick={() => handleSelect('bad_example')}
+              disabled={canContinue}
+              className={`p-4 rounded-xl border-2 text-[16px] font-bold text-center transition-all ${
+                selected === 'bad_example'
+                  ? 'bg-[#ea2b2b]/20 border-[#ea2b2b] text-[#ea2b2b]'
+                  : 'bg-[#202f36] border-[#37464f] text-gray-300 hover:bg-[#37464f]'
+              }`}
+            >
+              Kosa
+            </motion.button>
+            <motion.button
+              whileTap={{ scale: 0.98 }}
+              onClick={() => handleSelect('good_example')}
+              disabled={canContinue}
+              className={`p-4 rounded-xl border-2 text-[16px] font-bold text-center transition-all ${
+                selected === 'good_example'
+                  ? 'bg-[#58cc02]/20 border-[#58cc02] text-[#58cc02]'
+                  : 'bg-[#202f36] border-[#37464f] text-gray-300 hover:bg-[#37464f]'
+              }`}
+            >
+              Sahihi
+            </motion.button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (step.type === 'commitment_contract') {
+    const [fields, setFields] = useState<Record<string, string>>({});
+    const [signed, setSigned] = useState(false);
+    const canvasRef = useRef<HTMLCanvasElement | null>(null);
+    const [isDrawing, setIsDrawing] = useState(false);
+    const [showCongrats, setShowCongrats] = useState(false);
+
+    const isAllFieldsFilled = step.prompt_fields.every((f) => {
+      if (f.type === 'date_auto_fill') return true;
+      return fields[f.key]?.trim().length > 0;
+    });
+
+    useEffect(() => {
+      const autoFills: Record<string, string> = {};
+      step.prompt_fields.forEach((f) => {
+        if (f.type === 'date_auto_fill') {
+          autoFills[f.key] = new Date().toLocaleDateString('sw-TZ', { day: 'numeric', month: 'long', year: 'numeric' });
+        }
+      });
+      if (Object.keys(autoFills).length > 0) {
+        setFields((prev) => ({ ...prev, ...autoFills }));
+      }
+    }, [step]);
+
+    useEffect(() => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = '#1cb0f6';
+    }, [canvasRef.current]);
+
+    const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      const rect = canvas.getBoundingClientRect();
+      let clientX = 0;
+      let clientY = 0;
+      if ('touches' in e) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+      } else {
+        clientX = e.clientX;
+        clientY = e.clientY;
+      }
+
+      ctx.beginPath();
+      ctx.moveTo(clientX - rect.left, clientY - rect.top);
+      setIsDrawing(true);
+      setSigned(true);
+    };
+
+    const draw = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+      if (!isDrawing) return;
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      const rect = canvas.getBoundingClientRect();
+      let clientX = 0;
+      let clientY = 0;
+      if ('touches' in e) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+      } else {
+        clientX = e.clientX;
+        clientY = e.clientY;
+      }
+
+      ctx.lineTo(clientX - rect.left, clientY - rect.top);
+      ctx.stroke();
+    };
+
+    const stopDrawing = () => {
+      setIsDrawing(false);
+    };
+
+    const clearCanvas = () => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      setSigned(false);
+      setCanContinue(false);
+    };
+
+    const handleSubmitContract = () => {
+      if (isAllFieldsFilled && (!step.signature_required || signed)) {
+        playSound('correct_voice');
+        setShowCongrats(true);
+        setCanContinue(true);
+        setCompanionFeedback(step.completion_message, "celebrating");
+      }
+    };
+
+    return (
+      <div className="flex flex-col gap-6 pt-4 pb-8 h-full text-white">
+        <div className="flex items-start gap-4">
+          <AudioButton />
+          <h2 className="text-[22px] font-extrabold text-[#ffcd1f] tracking-tight">{step.title}</h2>
+        </div>
+
+        <p className="text-[15px] text-gray-300 leading-relaxed font-medium">
+          {step.instruction}
+        </p>
+
+        {!showCongrats ? (
+          <div className="flex flex-col gap-4 bg-[#1a282f] border-4 border-dashed border-[#37464f] p-6 rounded-2xl">
+            {step.prompt_fields.map((field) => (
+              <div key={field.key} className="flex flex-col gap-2">
+                <label className="text-[14px] font-bold text-gray-300">{field.label}</label>
+                {field.type === 'date_auto_fill' ? (
+                  <div className="p-4 bg-[#131f24] border-2 border-[#37464f] text-[#58cc02] font-bold rounded-xl text-[16px]">
+                    {fields[field.key]}
+                  </div>
+                ) : (
+                  <input
+                    type="text"
+                    value={fields[field.key] || ''}
+                    onChange={(e) => setFields({ ...fields, [field.key]: e.target.value })}
+                    placeholder={field.placeholder}
+                    className="bg-[#131f24] border-2 border-[#37464f] p-4 rounded-xl text-white text-[16px] focus:border-[#ffcd1f] focus:outline-none w-full font-medium"
+                  />
+                )}
+              </div>
+            ))}
+
+            {step.signature_required && (
+              <div className="flex flex-col gap-2 mt-2">
+                <div className="flex justify-between items-center">
+                  <label className="text-[14px] font-bold text-gray-300">{step.signature_label}</label>
+                  <button onClick={clearCanvas} className="text-[13px] text-[#ff4b4b] font-bold uppercase tracking-wider">
+                    Futa Saini
+                  </button>
+                </div>
+                <div className="bg-[#131f24] border-2 border-[#37464f] rounded-xl overflow-hidden relative" style={{ height: '120px' }}>
+                  <canvas
+                    ref={canvasRef}
+                    width={400}
+                    height={120}
+                    className="w-full h-full cursor-crosshair"
+                    onMouseDown={startDrawing}
+                    onMouseMove={draw}
+                    onMouseUp={stopDrawing}
+                    onMouseLeave={stopDrawing}
+                    onTouchStart={startDrawing}
+                    onTouchMove={draw}
+                    onTouchEnd={stopDrawing}
+                  />
+                  {!signed && (
+                    <div className="absolute inset-0 flex items-center justify-center text-gray-500 pointer-events-none text-xs font-semibold uppercase tracking-widest">
+                      Chora saini yako hapa kwa kidole au mouse
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            <motion.button
+              whileTap={{ scale: 0.98 }}
+              onClick={handleSubmitContract}
+              disabled={!isAllFieldsFilled || (step.signature_required && !signed)}
+              className="mt-4 w-full bg-[#58cc02] border-b-4 border-[#46a302] hover:bg-[#61e002] text-white font-extrabold py-4 px-6 rounded-xl text-[17px] active:border-b-0 active:translate-y-1 transition-all disabled:opacity-40"
+            >
+              Weka Sahihi na Kamilisha Mkataba 📝✍
+            </motion.button>
+          </div>
+        ) : (
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="p-6 bg-[#58cc02]/15 border-4 border-dashed border-[#58cc02]/50 rounded-2xl text-center flex flex-col items-center gap-4"
+          >
+            <div className="w-16 h-16 bg-[#58cc02] rounded-full flex items-center justify-center text-3xl shadow-lg">
+              📜
+            </div>
+            <h3 className="text-[20px] font-extrabold text-[#58cc02]">Mkataba Umewahiwa Rasmi!</h3>
+            <p className="text-[16px] text-gray-200 leading-relaxed font-semibold">
+              {step.completion_message}
+            </p>
+            {step.xp_reward && (
+              <span className="text-yellow-400 font-bold block bg-[#131f24] px-4 py-2 border border-[#37464f] rounded-full text-xs uppercase tracking-wider">
+                +{step.xp_reward} XP Reward
+              </span>
+            )}
+          </motion.div>
+        )}
+      </div>
+    );
+  }
+
+  if (step.type === 'safe_share_prep') {
+    const [fields, setFields] = useState<Record<string, string>>({});
+    const [saved, setSaved] = useState(false);
+
+    const isAllFieldsFilled = step.prompt_fields.every((f) => fields[f.key]?.trim().length > 0);
+
+    const handleSave = () => {
+      if (isAllFieldsFilled) {
+        playSound('correct_voice');
+        setSaved(true);
+        setCanContinue(true);
+        setCompanionFeedback("Excellent! Umepanga mpango kamili, sasa uko tayari kuhusiana na watu.", "celebrating");
+      }
+    };
+
+    return (
+      <div className="flex flex-col gap-6 pt-4 pb-8 h-full text-white font-sans">
+        <div className="flex items-start gap-4">
+          <AudioButton />
+          <h2 className="text-[22px] font-extrabold text-[#1cb0f6] tracking-tight">{step.title}</h2>
+        </div>
+
+        <p className="text-[15px] text-gray-300 leading-relaxed font-medium">
+          {step.instruction}
+        </p>
+
+        {!saved ? (
+          <div className="flex flex-col gap-4 bg-[#1a282f] border-2 border-[#37464f] p-6 rounded-2xl">
+            {step.prompt_fields.map((field) => (
+              <div key={field.key} className="flex flex-col gap-2">
+                <label className="text-[14px] font-bold text-gray-300">{field.label}</label>
+                <input
+                  type="text"
+                  value={fields[field.key] || ''}
+                  onChange={(e) => setFields({ ...fields, [field.key]: e.target.value })}
+                  placeholder={field.placeholder}
+                  className="bg-[#131f24] border-2 border-[#37464f] p-4 rounded-xl text-white text-[16px] focus:border-[#1cb0f6] focus:outline-none w-full font-medium"
+                />
+              </div>
+            ))}
+
+            <motion.button
+              whileTap={{ scale: 0.98 }}
+              onClick={handleSave}
+              disabled={!isAllFieldsFilled}
+              className="mt-4 w-full bg-[#1cb0f6] border-b-4 border-[#1899d6] hover:bg-[#20b8fe] text-white font-extrabold py-4 px-6 rounded-xl text-[17px] active:border-b-0 active:translate-y-1 transition-all disabled:opacity-40"
+            >
+              Hifadhi Maandalizi yangu 🤝
+            </motion.button>
+          </div>
+        ) : (
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="p-6 bg-[#1cb0f6]/15 border-2 border-[#1cb0f6]/50 rounded-2xl flex flex-col items-center gap-4 text-center pb-8"
+          >
+            <div className="w-16 h-16 bg-[#1cb0f6] rounded-full flex items-center justify-center text-3xl shadow-lg">
+              ✨
+            </div>
+            <h3 className="text-[20px] font-extrabold text-[#1cb0f6]">{step.reassurance_message}</h3>
+            {step.xp_reward && (
+              <span className="text-yellow-400 font-bold block bg-[#131f24] px-4 py-2 border border-[#37464f] rounded-full text-xs uppercase tracking-wider">
+                +{step.xp_reward} XP Reward
+              </span>
+            )}
+          </motion.div>
+        )}
+      </div>
+    );
+  }
+
+  if (step.type === 'reflection_moment' || step.type === 'unit_reflection') {
+    const [fields, setFields] = useState<Record<string, string>>({});
+    const [submitted, setSubmitted] = useState(false);
+
+    const isComplete = step.questions.every((q) => fields[q.key]?.trim().length > 5);
+
+    const handleSubmit = () => {
+      if (isComplete) {
+        playSound('correct_voice');
+        setSubmitted(true);
+        setCanContinue(true);
+        setCompanionFeedback((step as any).completion_message || "Hongera kwa kutafakari somo hili!", "celebrating");
+      }
+    };
+
+    return (
+      <div className="flex flex-col gap-6 pt-4 pb-8 h-full text-white">
+        <div className="flex items-start gap-4">
+          <AudioButton />
+          <h2 className="text-[22px] font-extrabold text-[#ffcd1f] tracking-tight">{step.title}</h2>
+        </div>
+
+        {!submitted ? (
+          <div className="flex flex-col gap-4">
+            {step.questions.map((question) => (
+              <div key={question.key} className="flex flex-col gap-2 bg-[#1a282f] p-4 rounded-xl border border-[#37464f]">
+                <label className="text-[15px] font-bold text-gray-200">{question.prompt}</label>
+                <textarea
+                  value={fields[question.key] || ''}
+                  onChange={(e) => setFields({ ...fields, [question.key]: e.target.value })}
+                  placeholder={question.placeholder}
+                  className="w-full bg-[#131f24] border-2 border-[#37464f] rounded-xl p-4 text-white text-[16px] focus:border-[#ffcd1f] focus:outline-none min-h-[80px] resize-none font-medium"
+                />
+              </div>
+            ))}
+
+            <motion.button
+              whileTap={{ scale: 0.98 }}
+              onClick={handleSubmit}
+              disabled={!isComplete}
+              className="mt-2 w-full bg-[#ffcd1f] border-b-4 border-[#cfa310] hover:bg-[#ffd63f] text-yellow-950 font-extrabold py-4 px-6 rounded-xl text-[17px] active:border-b-0 active:translate-y-1 transition-all disabled:opacity-40"
+            >
+              Hifadhi Tafakari Yangu 🪞✍
+            </motion.button>
+          </div>
+        ) : (
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="p-6 bg-[#ffcd1f]/10 border-2 border-[#ffcd1f]/50 rounded-2xl flex flex-col items-center gap-4 text-center pb-8"
+          >
+            <div className="w-16 h-16 bg-[#ffcd1f] rounded-full flex items-center justify-center text-3xl shadow-lg">
+              🧘‍♂️
+            </div>
+            <h3 className="text-[20px] font-extrabold text-[#ffcd1f]">Tafakari Imerekodiwa!</h3>
+            <p className="text-[16px] text-gray-200 leading-relaxed font-semibold">
+              {step.completion_message}
+            </p>
+          </motion.div>
+        )}
+      </div>
+    );
+  }
+
+  if (step.type === 'certificate_unlock') {
+    useEffect(() => {
+      setCanContinue(true);
+    }, [setCanContinue]);
+
+    return (
+      <div className="flex flex-col gap-6 pt-4 pb-8 h-full text-white items-center text-center">
+        <AudioButton />
+        
+        <motion.div 
+          initial={{ scale: 0.8, rotate: -5, opacity: 0 }}
+          animate={{ scale: 1, rotate: 0, opacity: 1 }}
+          transition={{ type: 'spring', bounce: 0.5, delay: 0.1 }}
+          className="bg-gradient-to-br from-[#ffd700] via-[#cfa310] to-[#8b6508] border-4 border-[#131f24] rounded-3xl p-8 shadow-[0_0_40px_rgba(255,215,0,0.3)] max-w-sm mt-4 relative overflow-hidden"
+        >
+          <div className="absolute top-0 right-0 left-0 bottom-0 bg-gradient-to-tr from-white/0 via-white/10 to-white/0 animate-pulse pointer-events-none" />
+          
+          <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center text-4xl mb-4 mx-auto animate-bounce border-2 border-white/30 shadow-inner">
+            🎓
+          </div>
+          
+          <h3 className="text-[22px] font-black uppercase text-yellow-950 tracking-tight leading-none mb-2">
+            {step.title}
+          </h3>
+          
+          {step.badge_earned && (
+            <div className="bg-yellow-950/20 backdrop-blur-sm px-4 py-1.5 rounded-full inline-block border border-white/15 mb-4">
+              <span className="text-yellow-950 font-black text-xs uppercase tracking-widest">
+                Badge: {step.badge_earned} 🏆
+              </span>
+            </div>
+          )}
+
+          <p className="text-[14px] text-yellow-950 font-semibold leading-relaxed">
+            {step.message}
+          </p>
+        </motion.div>
+
+        <p className="text-gray-400 font-bold text-sm mt-6 uppercase tracking-wider animate-pulse">
+          Bofya "Endelea" kukamilisha course! 🎉
+        </p>
+      </div>
+    );
   }
 
   return null;

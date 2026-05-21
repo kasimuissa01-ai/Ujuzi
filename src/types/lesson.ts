@@ -1,4 +1,4 @@
-export type BlockType = 'story' | 'text' | 'image_ab' | 'fill_blank' | 'tip' | 'quiz' | 'image' | 'scenario' | 'bio_builder' | 'exercise' | 'challenge' | 'cloze' | 'match' | 'drag_drop' | 'insta_bio';
+export type BlockType = 'story' | 'text' | 'image_ab' | 'fill_blank' | 'tip' | 'quiz' | 'image' | 'scenario' | 'bio_builder' | 'exercise' | 'challenge' | 'cloze' | 'match' | 'drag_drop' | 'insta_bio' | 'pain_calculator' | 'mistake_example' | 'commitment_contract' | 'safe_share_prep' | 'reflection_moment' | 'unit_reflection' | 'certificate_unlock';
 
 export interface BaseBlock {
   type: BlockType;
@@ -119,7 +119,65 @@ export interface InstaBioBlock extends BaseBlock {
   feedback: string;
 }
 
-export type LessonBlock = StoryBlock | TextBlock | ImageABBlock | FillBlankBlock | TipBlock | QuizBlock | ImageBlock | ScenarioBlock | BioBuilderBlock | ExerciseBlock | ChallengeBlock | ClozeBlock | MatchBlock | DragDropBlock | InstaBioBlock;
+export interface PainCalculatorBlock extends BaseBlock {
+  type: 'pain_calculator';
+  prompt: string;
+  inputs: { key: string; label: string; placeholder: string }[];
+  calculation_formula: string;
+  result_template: string;
+  call_to_action: string;
+}
+
+export interface MistakeExampleBlock extends BaseBlock {
+  type: 'mistake_example';
+  bad_example: string;
+  good_example: string;
+  question: string;
+  correct: 'bad_example' | 'good_example';
+  feedback: string;
+}
+
+export interface CommitmentContractBlock extends BaseBlock {
+  type: 'commitment_contract';
+  title: string;
+  instruction: string;
+  prompt_fields: { key: string; label: string; placeholder?: string; type?: string }[];
+  signature_required?: boolean;
+  signature_label?: string;
+  completion_message: string;
+  xp_reward?: number;
+}
+
+export interface SafeSharePrepBlock extends BaseBlock {
+  type: 'safe_share_prep';
+  title: string;
+  instruction: string;
+  prompt_fields: { key: string; label: string; placeholder: string }[];
+  reassurance_message: string;
+  xp_reward?: number;
+}
+
+export interface ReflectionMomentBlock extends BaseBlock {
+  type: 'reflection_moment';
+  title: string;
+  questions: { key: string; prompt: string; placeholder: string }[];
+  completion_message: string;
+}
+
+export interface CertificateUnlockBlock extends BaseBlock {
+  type: 'certificate_unlock';
+  title: string;
+  badge_earned?: string;
+  message: string;
+}
+
+export interface UnitReflectionBlock extends BaseBlock {
+  type: 'unit_reflection';
+  title: string;
+  questions: { key: string; prompt: string; placeholder: string }[];
+}
+
+export type LessonBlock = StoryBlock | TextBlock | ImageABBlock | FillBlankBlock | TipBlock | QuizBlock | ImageBlock | ScenarioBlock | BioBuilderBlock | ExerciseBlock | ChallengeBlock | ClozeBlock | MatchBlock | DragDropBlock | InstaBioBlock | PainCalculatorBlock | MistakeExampleBlock | CommitmentContractBlock | SafeSharePrepBlock | ReflectionMomentBlock | UnitReflectionBlock | CertificateUnlockBlock;
 
 export interface Lesson {
   lesson_id: number;
