@@ -157,13 +157,6 @@ export interface SafeSharePrepBlock extends BaseBlock {
   xp_reward?: number;
 }
 
-export interface ReflectionMomentBlock extends BaseBlock {
-  type: 'reflection_moment';
-  title: string;
-  questions: { key: string; prompt: string; placeholder: string }[];
-  completion_message: string;
-}
-
 export interface CertificateUnlockBlock extends BaseBlock {
   type: 'certificate_unlock';
   title: string;
@@ -174,10 +167,31 @@ export interface CertificateUnlockBlock extends BaseBlock {
 export interface UnitReflectionBlock extends BaseBlock {
   type: 'unit_reflection';
   title: string;
-  questions: { key: string; prompt: string; placeholder: string }[];
+  prompt: string;
+  options: string[];
+  correct_index: number;
+  feedback: string;
 }
 
-export type LessonBlock = StoryBlock | TextBlock | ImageABBlock | FillBlankBlock | TipBlock | QuizBlock | ImageBlock | ScenarioBlock | BioBuilderBlock | ExerciseBlock | ChallengeBlock | ClozeBlock | MatchBlock | DragDropBlock | InstaBioBlock | PainCalculatorBlock | MistakeExampleBlock | CommitmentContractBlock | SafeSharePrepBlock | ReflectionMomentBlock | UnitReflectionBlock | CertificateUnlockBlock;
+export interface ReflectionMomentBlock extends BaseBlock {
+  type: 'reflection_moment';
+  title: string;
+  prompt: string;
+  options: string[];
+  correct_index: number;
+  feedback: string;
+}
+
+export interface PaymentVerificationScenarioBlock extends BaseBlock {
+  type: 'payment_verification_scenario';
+  label: string;
+  setup: string;
+  options: string[];
+  correct_index: number;
+  feedback: string;
+}
+
+export type LessonBlock = StoryBlock | TextBlock | ImageABBlock | FillBlankBlock | TipBlock | QuizBlock | ImageBlock | ScenarioBlock | BioBuilderBlock | ExerciseBlock | ChallengeBlock | ClozeBlock | MatchBlock | DragDropBlock | InstaBioBlock | PainCalculatorBlock | MistakeExampleBlock | CommitmentContractBlock | SafeSharePrepBlock | ReflectionMomentBlock | UnitReflectionBlock | PaymentVerificationScenarioBlock | CertificateUnlockBlock;
 
 export interface Lesson {
   lesson_id: number;

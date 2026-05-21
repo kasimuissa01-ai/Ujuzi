@@ -20,25 +20,21 @@ export default defineConfig(({mode}) => {
           background_color: '#ececf0',
           display: 'standalone',
           orientation: 'portrait',
+          start_url: '/',
+          id: '/',
           categories: ['education', 'productivity'],
           icons: [
             {
-              src: 'https://i.postimg.cc/J0CyqrKM/IMG-20260510-235338.jpg',
+              src: '/icon.svg',
               sizes: '192x192',
-              type: 'image/jpeg',
-              purpose: 'any'
+              type: 'image/svg+xml',
+              purpose: 'any maskable'
             },
             {
-              src: 'https://i.postimg.cc/J0CyqrKM/IMG-20260510-235338.jpg',
+              src: '/icon.svg',
               sizes: '512x512',
-              type: 'image/jpeg',
-              purpose: 'any'
-            },
-            {
-              src: 'https://i.postimg.cc/J0CyqrKM/IMG-20260510-235338.jpg',
-              sizes: '192x192',
-              type: 'image/jpeg',
-              purpose: 'maskable'
+              type: 'image/svg+xml',
+              purpose: 'any maskable'
             }
           ],
           screenshots: [

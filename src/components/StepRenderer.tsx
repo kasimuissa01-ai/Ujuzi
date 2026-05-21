@@ -329,7 +329,7 @@ export default function StepRenderer({ step, onContinue, setCompanionFeedback, c
     );
   }
 
-  if (step.type === 'quiz' || step.type === 'scenario') {
+  if (step.type === 'quiz' || step.type === 'scenario' || step.type === 'payment_verification_scenario' || step.type === 'unit_reflection' || step.type === 'reflection_moment') {
     const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
     const [wrongIndices, setWrongIndices] = useState<number[]>([]);
 
@@ -354,14 +354,18 @@ export default function StepRenderer({ step, onContinue, setCompanionFeedback, c
         <div className="flex items-start gap-4">
           <AudioButton />
           <h2 className="text-[20px] font-bold tracking-tight text-white leading-snug mt-1">
-            {step.type === 'scenario' ? step.label : step.question}
+            {(step.type === 'scenario' || step.type === 'payment_verification_scenario') ? step.label : 
+             (step.type === 'unit_reflection' || step.type === 'reflection_moment') ? step.prompt : 
+             (step as any).question}
           </h2>
         </div>
         
-        {step.type === 'scenario' && step.chat && step.chat.length > 0 && (
+        {(step.type === 'scenario' || step.type === 'payment_verification_scenario') && step.setup && (
            <div className="bg-[#202f36] rounded-2xl p-4 flex flex-col gap-3">
-              <span className="text-xs font-bold uppercase text-gray-400">{step.setup}</span>
-              {step.chat.map((msg, i) => (
+              <span className="text-xs font-bold uppercase text-gray-400">Hali Halisi</span>
+              <p className="text-[17px] text-white italic">"{step.setup}"</p>
+              
+              {step.chat && step.chat.length > 0 && step.chat.map((msg, i) => (
                  <div key={i} className={`flex ${msg.side === 'left' ? 'justify-start' : 'justify-end'}`}>
                     <div className={`px-4 py-3 max-w-[85%] rounded-2xl text-[17px] ${
                        msg.side === 'left' ? 'bg-[#37464f] text-white rounded-tl-sm' : 'bg-[#58cc02] text-white rounded-tr-sm'
@@ -1160,69 +1164,7 @@ export default function StepRenderer({ step, onContinue, setCompanionFeedback, c
     );
   }
 
-  if (step.type === 'reflection_moment' || step.type === 'unit_reflection') {
-    const [fields, setFields] = useState<Record<string, string>>({});
-    const [submitted, setSubmitted] = useState(false);
 
-    const isComplete = step.questions.every((q) => fields[q.key]?.trim().length > 5);
-
-    const handleSubmit = () => {
-      if (isComplete) {
-        playSound('correct_voice');
-        setSubmitted(true);
-        setCanContinue(true);
-        setCompanionFeedback((step as any).completion_message || "Hongera kwa kutafakari somo hili!", "celebrating");
-      }
-    };
-
-    return (
-      <div className="flex flex-col gap-6 pt-4 pb-8 h-full text-white">
-        <div className="flex items-start gap-4">
-          <AudioButton />
-          <h2 className="text-[22px] font-extrabold text-[#ffcd1f] tracking-tight">{step.title}</h2>
-        </div>
-
-        {!submitted ? (
-          <div className="flex flex-col gap-4">
-            {step.questions.map((question) => (
-              <div key={question.key} className="flex flex-col gap-2 bg-[#1a282f] p-4 rounded-xl border border-[#37464f]">
-                <label className="text-[15px] font-bold text-gray-200">{question.prompt}</label>
-                <textarea
-                  value={fields[question.key] || ''}
-                  onChange={(e) => setFields({ ...fields, [question.key]: e.target.value })}
-                  placeholder={question.placeholder}
-                  className="w-full bg-[#131f24] border-2 border-[#37464f] rounded-xl p-4 text-white text-[16px] focus:border-[#ffcd1f] focus:outline-none min-h-[80px] resize-none font-medium"
-                />
-              </div>
-            ))}
-
-            <motion.button
-              whileTap={{ scale: 0.98 }}
-              onClick={handleSubmit}
-              disabled={!isComplete}
-              className="mt-2 w-full bg-[#ffcd1f] border-b-4 border-[#cfa310] hover:bg-[#ffd63f] text-yellow-950 font-extrabold py-4 px-6 rounded-xl text-[17px] active:border-b-0 active:translate-y-1 transition-all disabled:opacity-40"
-            >
-              Hifadhi Tafakari Yangu 🪞✍
-            </motion.button>
-          </div>
-        ) : (
-          <motion.div
-            initial={{ scale: 0.95, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="p-6 bg-[#ffcd1f]/10 border-2 border-[#ffcd1f]/50 rounded-2xl flex flex-col items-center gap-4 text-center pb-8"
-          >
-            <div className="w-16 h-16 bg-[#ffcd1f] rounded-full flex items-center justify-center text-3xl shadow-lg">
-              🧘‍♂️
-            </div>
-            <h3 className="text-[20px] font-extrabold text-[#ffcd1f]">Tafakari Imerekodiwa!</h3>
-            <p className="text-[16px] text-gray-200 leading-relaxed font-semibold">
-              {step.completion_message}
-            </p>
-          </motion.div>
-        )}
-      </div>
-    );
-  }
 
   if (step.type === 'certificate_unlock') {
     useEffect(() => {
