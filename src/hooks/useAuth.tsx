@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, signInAnonymously, onAuthStateChanged, signInWithPopup, linkWithPopup, browserPopupRedirectResolver } from 'firebase/auth';
+import { User, signInAnonymously, onAuthStateChanged, signInWithPopup, linkWithPopup, signOut } from 'firebase/auth';
 import { auth, googleProvider } from '../lib/firebase';
 import { identifyUser, trackEvent } from '../lib/mixpanel';
 
@@ -8,6 +8,7 @@ interface AuthContextType {
   loading: boolean;
   loginWithGoogle: () => Promise<void>;
   linkAccount: () => Promise<void>;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -15,6 +16,7 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   loginWithGoogle: async () => {},
   linkAccount: async () => {},
+  logout: async () => {},
 });
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -63,6 +65,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const logout = async () => {
+    try {
+      await signOut(auth);
+      trackEvent('Logout');
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
+
   const linkAccount = async () => {
     try {
       if (auth.currentUser && auth.currentUser.isAnonymous) {
@@ -85,7 +96,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, loginWithGoogle, linkAccount }}>
+    <AuthContext.Provider value={{ user, loading, loginWithGoogle, linkAccount, logout }}>
       {children}
     </AuthContext.Provider>
   );

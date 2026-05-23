@@ -1,4 +1,4 @@
-export type BlockType = 'story' | 'text' | 'image_ab' | 'fill_blank' | 'tip' | 'quiz' | 'image' | 'scenario' | 'bio_builder' | 'exercise' | 'challenge' | 'cloze' | 'match' | 'drag_drop' | 'insta_bio' | 'pain_calculator' | 'mistake_example' | 'commitment_contract' | 'safe_share_prep' | 'reflection_moment' | 'unit_reflection' | 'certificate_unlock';
+export type BlockType = 'story' | 'text' | 'image_ab' | 'fill_blank' | 'tip' | 'quiz' | 'image' | 'scenario' | 'bio_builder' | 'exercise' | 'challenge' | 'cloze' | 'match' | 'drag_drop' | 'insta_bio' | 'pain_calculator' | 'mistake_example' | 'commitment_contract' | 'safe_share_prep' | 'reflection_moment' | 'unit_reflection' | 'certificate_unlock' | 'payment_verification_scenario';
 
 export interface BaseBlock {
   type: BlockType;

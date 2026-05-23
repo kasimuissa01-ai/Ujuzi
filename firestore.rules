@@ -7,37 +7,28 @@ service cloud.firestore {
     }
 
     // Validation functions
-    function isSignedIn() { return request.auth != null; }
-    function isOwner(userId) { return request.auth.uid == userId; }
-    function incoming() { return request.resource.data; }
-    function existing() { return resource.data; }
-
-    function isValidUserProgress(data) {
-      return data.keys().hasAll(['userId', 'completedLessons', 'streakDates', 'updatedAt']) &&
-             data.userId is string &&
-             data.userId == request.auth.uid &&
-             data.completedLessons is list &&
-             data.completedLessons.size() <= 1000 &&
-             data.streakDates is list &&
-             data.streakDates.size() <= 1000;
+    function isSignedIn() { 
+      return request.auth != null; 
+    }
+    
+    function isOwner(userId) { 
+      return request.auth != null && request.auth.uid == userId; 
     }
 
+    // User Progress rules: Only the owner of the progress can read/write their own progress
     match /user_progress/{userId} {
-      // Users can only read their own progress
-      allow read: if isSignedIn() && isOwner(userId);
-      
-      // Allow creation if the data matches the schema
-      allow create: if isSignedIn() && 
-                    isOwner(userId) && 
-                    isValidUserProgress(incoming()) &&
-                    incoming().updatedAt == request.time;
-                    
-      // Allow update if the data matches schema and fields are correctly updated
-      allow update: if isSignedIn() && 
-                    isOwner(userId) && 
-                    isValidUserProgress(incoming()) &&
-                    incoming().updatedAt == request.time &&
-                    incoming().userId == existing().userId; // Immutable
+      allow read, write: if isOwner(userId);
+    }
+
+    // Notifications rules: Only user can view and manage their in-app notifications
+    match /notifications/{docId} {
+      allow read, update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+    }
+
+    // Lessons rules: Dynamic course content can be fetched or modified by signed-in students
+    match /lessons/{lessonId} {
+      allow read, write: if isSignedIn();
     }
   }
 }

@@ -81,6 +81,14 @@ export function useProgress() {
       setCompletedLessons(newLessons);
       localStorage.setItem('ujuzi_completed_lessons', JSON.stringify(newLessons));
       
+      // Update the study timestamp to reset reminder intervals
+      try {
+        const { updateLastStudiedTimestamp } = await import('../services/notificationService');
+        updateLastStudiedTimestamp();
+      } catch (err) {
+        console.warn('Could not import or call updateLastStudiedTimestamp', err);
+      }
+      
       trackEvent('Lesson Completed', { 
         lessonId, 
         totalCompleted: newLessons.length,

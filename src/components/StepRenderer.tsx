@@ -365,7 +365,7 @@ export default function StepRenderer({ step, onContinue, setCompanionFeedback, c
               <span className="text-xs font-bold uppercase text-gray-400">Hali Halisi</span>
               <p className="text-[17px] text-white italic">"{step.setup}"</p>
               
-              {step.chat && step.chat.length > 0 && step.chat.map((msg, i) => (
+              {(step as any).chat && (step as any).chat.length > 0 && (step as any).chat.map((msg: any, i: number) => (
                  <div key={i} className={`flex ${msg.side === 'left' ? 'justify-start' : 'justify-end'}`}>
                     <div className={`px-4 py-3 max-w-[85%] rounded-2xl text-[17px] ${
                        msg.side === 'left' ? 'bg-[#37464f] text-white rounded-tl-sm' : 'bg-[#58cc02] text-white rounded-tr-sm'
