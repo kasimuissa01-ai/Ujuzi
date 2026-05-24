@@ -72,11 +72,22 @@ export default function App() {
     <div className="h-[100dvh] w-full bg-[#ececf0] sm:bg-neutral-900 flex justify-center items-center overflow-hidden">
       {/* Mobile Device Constraint for Desktop, full screen on mobile */}
       <div className="w-full h-full sm:max-w-[400px] sm:max-h-[850px] bg-[#ececf0] sm:rounded-[3rem] sm:shadow-2xl sm:border-[8px] sm:border-black overflow-hidden relative flex flex-col">
-        {currentScreen === 'onboarding' && <OnboardingScreen onNavigate={navigate} />}
-        {currentScreen === 'home' && <HomeScreen onNavigate={navigate} />}
-        {currentScreen === 'profile' && <ProfileScreen onNavigate={navigate} />}
-        {currentScreen === 'course' && <CourseDetailScreen onNavigate={navigate} onBack={goBack} params={currentParams} />}
-        {currentScreen === 'lesson' && <InteractiveLesson onNavigate={navigate} onBack={goBack} params={currentParams} />}
+        {authLoading ? (
+          <div className="flex-1 flex flex-col items-center justify-center bg-[#ececf0]">
+            <Loader2 className="w-8 h-8 text-black animate-spin mb-4 shrink-0" />
+            <span className="text-[10px] font-black uppercase tracking-widest text-neutral-500 animate-pulse select-none">
+              Ujuzi Platform
+            </span>
+          </div>
+        ) : (
+          <>
+            {currentScreen === 'onboarding' && <OnboardingScreen onNavigate={navigate} />}
+            {currentScreen === 'home' && <HomeScreen onNavigate={navigate} />}
+            {currentScreen === 'profile' && <ProfileScreen onNavigate={navigate} />}
+            {currentScreen === 'course' && <CourseDetailScreen onNavigate={navigate} onBack={goBack} params={currentParams} />}
+            {currentScreen === 'lesson' && <InteractiveLesson onNavigate={navigate} onBack={goBack} params={currentParams} />}
+          </>
+        )}
         
         {/* Inspired Polished Floating Bottom Pill Navigation Bar (Google / Senior Designer Design) */}
         <AnimatePresence>

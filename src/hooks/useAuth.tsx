@@ -33,6 +33,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     getRedirectResult(auth)
       .then((result) => {
         if (result) {
+          sessionStorage.removeItem('ujuzi_auth_in_progress');
           setUser(result.user);
           identifyUser(result.user.uid, {
             $email: result.user.email,
@@ -43,12 +44,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       })
       .catch((error) => {
+        sessionStorage.removeItem('ujuzi_auth_in_progress');
         console.error("Google auth redirect recovery failed:", error);
       });
 
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       clearTimeout(timeout);
       if (currentUser) {
+        if (!currentUser.isAnonymous) {
+          sessionStorage.removeItem('ujuzi_auth_in_progress');
+        }
         setUser(currentUser);
         identifyUser(currentUser.uid, {
           $email: currentUser.email,
@@ -57,14 +62,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
         trackEvent('Session Start', { isAnonymous: currentUser.isAnonymous });
       } else {
-        // Sign in anonymously on first load
-        try {
-          await signInAnonymously(auth);
-        } catch (error: any) {
-          console.error("Anonymous auth failed:", error);
-          if (error?.code === 'auth/admin-restricted-operation') {
-            console.warn("Ujuzi dev note: Please enable Anonymous Authentication in the Firebase Console: Build > Authentication > Sign-in method");
+        // Sign in anonymously on first load ONLY if we are not currently trying to log in with Google!
+        const isAuthInProgress = sessionStorage.getItem('ujuzi_auth_in_progress') === 'true';
+        if (!isAuthInProgress) {
+          try {
+            await signInAnonymously(auth);
+          } catch (error: any) {
+            console.error("Anonymous auth failed:", error);
+            if (error?.code === 'auth/admin-restricted-operation') {
+              console.warn("Ujuzi dev note: Please enable Anonymous Authentication in the Firebase Console: Build > Authentication > Sign-in method");
+            }
           }
+        } else {
+          console.log("onAuthStateChanged: currentUser is null but Google Login is in progress. Skipping premature anonymous session creation.");
         }
       }
       setLoading(false);
@@ -83,16 +93,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const loginWithGoogle = async () => {
+    sessionStorage.setItem('ujuzi_auth_in_progress', 'true');
     const isPWA = isStandaloneApp();
     if (isPWA) {
       try {
         await signInWithRedirect(auth, googleProvider);
       } catch (redirectError) {
+        sessionStorage.removeItem('ujuzi_auth_in_progress');
         console.error("Google Standalone redirect failed, fall-backing to popup:", redirectError);
         try {
           const result = await signInWithPopup(auth, googleProvider);
+          sessionStorage.removeItem('ujuzi_auth_in_progress');
           trackEvent('Login', { method: 'GooglePopupFallback', userId: result.user.uid });
         } catch (error) {
+          sessionStorage.removeItem('ujuzi_auth_in_progress');
           console.error("Popup fallback failed:", error);
           throw error;
         }
@@ -100,12 +114,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       try {
         const result = await signInWithPopup(auth, googleProvider);
+        sessionStorage.removeItem('ujuzi_auth_in_progress');
         trackEvent('Login', { method: 'Google', userId: result.user.uid });
       } catch (popupError: any) {
         console.warn("Popup blocked or failed in this web context, activating redirect redirect mechanism...", popupError);
         try {
           await signInWithRedirect(auth, googleProvider);
         } catch (redirectError2) {
+          sessionStorage.removeItem('ujuzi_auth_in_progress');
           console.error("Redirect fallback completely blocked:", redirectError2);
           throw redirectError2;
         }

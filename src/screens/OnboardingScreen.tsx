@@ -11,17 +11,39 @@ interface Props {
 export default function OnboardingScreen({ onNavigate }: Props) {
   const { loginWithGoogle } = useAuth();
   const [isLoggingIn, setIsLoggingIn] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [errorDetails, setErrorDetails] = useState<{ title: string; desc: string; raw?: string } | null>(null);
 
   const handleSignIn = async () => {
     setIsLoggingIn(true);
-    setErrorMsg(null);
+    setErrorDetails(null);
     try {
       await loginWithGoogle();
       // On successful auth, App.tsx's useEffect automatically triggers navigation to 'home'
     } catch (error: any) {
       console.error("Google Auth failed:", error);
-      setErrorMsg("Kuna tatizo la kuunganisha. Tafadhali jaribu tena.");
+      
+      const code = error?.code || error?.message || "";
+      let title = "Hitilafu ya Kuunganisha";
+      let desc = "Kuna tatizo la kuunganisha na seva ya Google. Tafadhali jaribu tena baada ya muda au kagua mtandao wako.";
+      
+      if (code.includes('auth/unauthorized-domain')) {
+        title = "Kikoa Hakijaidhinishwa (Domain Alert)";
+        desc = "URL hii ya sasa haijaongezwa kwenye 'Authorized domains' katika Firebase Console yako. Tafadhali nenda: Firebase Console > Authentication > Settings > Authorized Domains na uongeze domain hii ili kuruhusu Google Login.";
+      } else if (code.includes('auth/popup-blocked')) {
+        title = "Ukurasa wa Google Umezuiwa (Popup Blocked)";
+        desc = "Kivinjari chako kimepunguza au kuzuia Google Popup. Tafadhali dhibiti/ruhusu kurasa mpya (pop-ups) kutoka tovuti hii kisha jaribu tena.";
+      } else if (code.includes('auth/popup-closed-by-user')) {
+        title = "Umesitisha Kuingia";
+        desc = "Mchakato ulifutwa kwa sababu ulifunga ukurasa mdogo wa Google kabla ya kuingia kikamilifu.";
+      } else if (code.includes('auth/operation-not-allowed')) {
+        title = "Google Login haijawezeshwa";
+        desc = "Tafadhali nenda Firebase Console > Authentication > Sign-in method na uwashe Google kama Sign-in provider.";
+      } else if (code.includes('auth/network-request-failed')) {
+        title = "Tatizo la Mtandao";
+        desc = "Mwingiliano na huduma za Google umefeli. Kagua mawasiliano ya intaneti au Wi-Fi kisha ugonge tena.";
+      }
+
+      setErrorDetails({ title, desc, raw: code });
     } finally {
       setIsLoggingIn(false);
     }
@@ -89,13 +111,23 @@ export default function OnboardingScreen({ onNavigate }: Props) {
         className="bg-white/95 backdrop-blur-xl rounded-[2rem] p-5 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.6)] flex flex-col border border-white/60 max-w-sm mx-auto w-full relative z-10 mb-2"
       >
         {/* Dynamic Errors Container if Authentication fails */}
-        {errorMsg && (
+        {errorDetails && (
           <motion.div
             initial={{ opacity: 0, y: -5 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-3 text-[11px] font-extrabold text-rose-500 text-center bg-rose-50 border border-rose-100 p-2 rounded-xl"
+            className="mb-4 text-left bg-rose-50/80 backdrop-blur-sm border border-rose-100/90 p-3 rounded-2xl flex flex-col gap-1.5"
           >
-            {errorMsg}
+            <span className="text-[12px] font-black text-rose-600 uppercase tracking-tight flex items-center gap-1">
+              ⚠️ {errorDetails.title}
+            </span>
+            <span className="text-[11px] leading-relaxed text-slate-600 font-semibold">
+              {errorDetails.desc}
+            </span>
+            {errorDetails.raw && (
+              <span className="text-[9px] font-mono text-slate-400 mt-1 uppercase border-t border-rose-100/40 pt-1">
+                Kosa: {errorDetails.raw}
+              </span>
+            )}
           </motion.div>
         )}
 
