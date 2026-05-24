@@ -102,14 +102,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         sessionStorage.removeItem('ujuzi_auth_in_progress');
         trackEvent('Login', { method: 'Google', userId: result.user.uid });
       } catch (popupError: any) {
-        console.warn("Popup blocked or failed in this web context, activating redirect redirect mechanism...", popupError);
-        try {
-          await signInWithRedirect(auth, googleProvider);
-        } catch (redirectError2) {
-          sessionStorage.removeItem('ujuzi_auth_in_progress');
-          console.error("Redirect fallback completely blocked:", redirectError2);
-          throw redirectError2;
-        }
+        console.warn("Popup blocked or failed in this web context. Bubbling error to UI.", popupError);
+        sessionStorage.removeItem('ujuzi_auth_in_progress');
+        throw popupError;
       }
     }
   };
@@ -136,15 +131,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
         } catch (linkError: any) {
           if (linkError.code === 'auth/credential-already-in-use' || linkError.code === 'auth/email-already-in-use') {
-            if (isPWA) {
-              await signInWithRedirect(auth, googleProvider);
-            } else {
-              try {
-                await signInWithPopup(auth, googleProvider);
-              } catch {
-                await signInWithRedirect(auth, googleProvider);
-              }
-            }
+             // Let them login instead
+             await loginWithGoogle();
           } else {
             throw linkError;
           }
