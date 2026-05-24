@@ -37,6 +37,7 @@ export default function ProfileScreen({ onNavigate }: Props) {
   const { user, logout } = useAuth();
   const { completedLessons, streakDates } = useProgress();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   
   // Notification Config State
   const [notifConfig, setNotifConfig] = useState<ReminderConfig>({
@@ -77,12 +78,13 @@ export default function ProfileScreen({ onNavigate }: Props) {
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
-      await logout();
-      onNavigate('onboarding');
+       await logout();
+       onNavigate('onboarding');
     } catch (error) {
-      console.error("Logout failed:", error);
+       console.error("Logout failed:", error);
     } finally {
-      setIsLoggingOut(false);
+       setIsLoggingOut(false);
+       setShowLogoutConfirm(false);
     }
   };
 
@@ -298,7 +300,7 @@ export default function ProfileScreen({ onNavigate }: Props) {
 
         {/* Polished White Profile Logout Trigger */}
         <button
-          onClick={handleLogout}
+          onClick={() => setShowLogoutConfirm(true)}
           disabled={isLoggingOut}
           className="w-full h-14 bg-white hover:bg-neutral-50 active:scale-[0.98] transition-all duration-200 text-rose-600 border border-neutral-200/90 rounded-2xl flex items-center justify-center gap-3 px-4 shadow-[0_4px_20px_rgba(0,0,0,0.02)] font-bold select-none cursor-pointer mt-4"
         >
@@ -508,6 +510,52 @@ export default function ProfileScreen({ onNavigate }: Props) {
               </div>
 
             </div>
+          </motion.div>
+        )}
+
+        {showLogoutConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-[110] bg-black/60 backdrop-blur-md flex items-center justify-center p-6"
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+              className="bg-white rounded-[2rem] p-6 max-w-sm w-full shadow-2xl border border-neutral-100 flex flex-col items-center text-center space-y-5"
+            >
+              <div className="w-14 h-14 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center">
+                <LogOut className="w-7 h-7" />
+              </div>
+              
+              <div className="space-y-2">
+                <h3 className="font-sans font-black text-xl text-neutral-900 tracking-tight">Toka Wasifu</h3>
+                <p className="text-xs text-slate-500 font-medium leading-relaxed px-1">
+                  Je, una uhakika unataka kutoka kwenye wasifu wako wa Ujuzi? Maendeleo yako yanahifadhiwa salama.
+                </p>
+              </div>
+
+              <div className="flex gap-3 w-full pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowLogoutConfirm(false)}
+                  className="flex-1 h-12 bg-neutral-150 hover:bg-neutral-200 active:scale-95 transition-all text-neutral-800 text-xs font-black uppercase tracking-wider rounded-xl cursor-pointer"
+                >
+                  Hapana, Baki
+                </button>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  disabled={isLoggingOut}
+                  className="flex-1 h-12 bg-rose-600 hover:bg-rose-700 disabled:bg-rose-400 active:scale-95 transition-all text-white text-xs font-black uppercase tracking-wider rounded-xl cursor-pointer shadow-md flex items-center justify-center gap-1.5"
+                >
+                  Ndiyo, Ondoka
+                </button>
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

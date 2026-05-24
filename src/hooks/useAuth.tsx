@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, signInAnonymously, onAuthStateChanged, signInWithPopup, linkWithPopup, signOut } from 'firebase/auth';
+import { User, signInAnonymously, onAuthStateChanged, signInWithPopup, signInWithRedirect, getRedirectResult, linkWithPopup, linkWithRedirect, signOut } from 'firebase/auth';
 import { auth, googleProvider } from '../lib/firebase';
 import { identifyUser, trackEvent } from '../lib/mixpanel';
 
@@ -29,6 +29,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(false);
     }, 5000);
 
+    // Dynamic recovery: process redirection result when PWA returns from Google login flow
+    getRedirectResult(auth)
+      .then((result) => {
+        if (result) {
+          setUser(result.user);
+          identifyUser(result.user.uid, {
+            $email: result.user.email,
+            $name: result.user.displayName,
+            isAnonymous: result.user.isAnonymous,
+          });
+          trackEvent('Login Redirect Resolved', { userId: result.user.uid });
+        }
+      })
+      .catch((error) => {
+        console.error("Google auth redirect recovery failed:", error);
+      });
+
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       clearTimeout(timeout);
       if (currentUser) {
@@ -56,12 +73,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return unsubscribe;
   }, []);
 
+  // Standalone/PWA detection
+  const isStandaloneApp = () => {
+    return (
+      window.matchMedia('(display-mode: standalone)').matches ||
+      (window.navigator as any).standalone ||
+      document.referrer.includes('android-app://')
+    );
+  };
+
   const loginWithGoogle = async () => {
-    try {
-      const result = await signInWithPopup(auth, googleProvider);
-      trackEvent('Login', { method: 'Google', userId: result.user.uid });
-    } catch (error) {
-      console.error("Google Auth failed:", error);
+    const isPWA = isStandaloneApp();
+    if (isPWA) {
+      try {
+        await signInWithRedirect(auth, googleProvider);
+      } catch (redirectError) {
+        console.error("Google Standalone redirect failed, fall-backing to popup:", redirectError);
+        try {
+          const result = await signInWithPopup(auth, googleProvider);
+          trackEvent('Login', { method: 'GooglePopupFallback', userId: result.user.uid });
+        } catch (error) {
+          console.error("Popup fallback failed:", error);
+          throw error;
+        }
+      }
+    } else {
+      try {
+        const result = await signInWithPopup(auth, googleProvider);
+        trackEvent('Login', { method: 'Google', userId: result.user.uid });
+      } catch (popupError: any) {
+        console.warn("Popup blocked or failed in this web context, activating redirect redirect mechanism...", popupError);
+        try {
+          await signInWithRedirect(auth, googleProvider);
+        } catch (redirectError2) {
+          console.error("Redirect fallback completely blocked:", redirectError2);
+          throw redirectError2;
+        }
+      }
     }
   };
 
@@ -75,14 +123,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const linkAccount = async () => {
+    const isPWA = isStandaloneApp();
     try {
       if (auth.currentUser && auth.currentUser.isAnonymous) {
         try {
-          const result = await linkWithPopup(auth.currentUser, googleProvider);
-          trackEvent('Link Account', { method: 'Google', userId: result.user.uid });
+          if (isPWA) {
+            await linkWithRedirect(auth.currentUser, googleProvider);
+          } else {
+            const result = await linkWithPopup(auth.currentUser, googleProvider);
+            trackEvent('Link Account', { method: 'Google', userId: result.user.uid });
+          }
         } catch (linkError: any) {
           if (linkError.code === 'auth/credential-already-in-use' || linkError.code === 'auth/email-already-in-use') {
-            await signInWithPopup(auth, googleProvider);
+            if (isPWA) {
+              await signInWithRedirect(auth, googleProvider);
+            } else {
+              try {
+                await signInWithPopup(auth, googleProvider);
+              } catch {
+                await signInWithRedirect(auth, googleProvider);
+              }
+            }
           } else {
             throw linkError;
           }
