@@ -61,9 +61,9 @@ export default function App() {
     }
   };
 
-  // Auto route to home screen if user is authenticated with a non-anonymous Google Account
+  // Auto route to home screen if user is authenticated
   useEffect(() => {
-    if (user && !user.isAnonymous && currentScreen === 'onboarding') {
+    if (user && currentScreen === 'onboarding') {
       navigate('home');
     }
   }, [user, currentScreen]);
