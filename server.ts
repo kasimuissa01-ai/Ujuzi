@@ -5,6 +5,7 @@ import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
 import admin from "firebase-admin";
+import cron from "node-cron";
 
 dotenv.config();
 
@@ -327,6 +328,72 @@ async function startServer() {
     app.get("*", (req, res) => {
       res.sendFile(path.join(distPath, "index.html"));
     });
+  }
+
+  // --- Push Notification Cron Jobs ---
+  const adminSdk = getFirebaseAdminInstance();
+  if (adminSdk) {
+    const db = adminSdk.firestore();
+    
+    const sendBroadcast = async (timeOfDay: string) => {
+      try {
+        console.log(`Cron: Running ${timeOfDay} broadcast`);
+        const usersSnap = await db.collection("users").get();
+        const tokens: string[] = [];
+        
+        usersSnap.forEach(doc => {
+          const data = doc.data();
+          if (data.fcmTokens && Array.isArray(data.fcmTokens)) {
+            data.fcmTokens.forEach((token: string) => {
+              if (token) tokens.push(token);
+            });
+          }
+        });
+        
+        // Optional unique filter
+        const uniqueTokens = Array.from(new Set(tokens));
+
+        if (uniqueTokens.length > 0) {
+          const messagePayload = {
+            tokens: uniqueTokens,
+            notification: {
+              title: "Ujuzi App 🎓",
+              body: "Ni wakati wa kujifunza! Fungua Ujuzi na uendelee na masomo yako sasa.",
+            },
+            data: {
+              link: "/",
+            },
+            webpush: {
+              notification: {
+                icon: "/icon.svg", 
+                badge: "/icon.svg",
+                vibrate: [150, 80, 150],
+              },
+              fcmOptions: {
+                link: "/",
+              }
+            }
+          };
+          
+          // Chunk tokens as sendEachForMulticast accepts maximum of 500 tokens at a time
+          const chunkSize = 500;
+          for (let i = 0; i < uniqueTokens.length; i += chunkSize) {
+            const chunk = uniqueTokens.slice(i, i + chunkSize);
+            const response = await adminSdk.messaging().sendEachForMulticast({ ...messagePayload, tokens: chunk });
+            console.log(`Cron ${timeOfDay} delivery chunk success: ${response.successCount}, failed: ${response.failureCount}`);
+          }
+        }
+      } catch (err) {
+        console.error(`Cron ${timeOfDay} Error:`, err);
+      }
+    };
+
+    const timezone = "Africa/Nairobi";
+    cron.schedule("0 7 * * *", () => sendBroadcast("Morning (7 AM)"), { timezone });
+    cron.schedule("0 12 * * *", () => sendBroadcast("Afternoon (12 PM)"), { timezone });
+    cron.schedule("0 20 * * *", () => sendBroadcast("Evening (8 PM)"), { timezone });
+    
+    console.log("Registered Push Notification Cron Jobs initialized for 7AM, 12PM, and 8PM (EAT).");
   }
 
   app.listen(PORT, "0.0.0.0", () => {
