@@ -16,7 +16,12 @@ import {
   Info,
   ExternalLink,
   Globe,
-  Scale
+  Scale,
+  Smartphone,
+  Copy,
+  Send,
+  Key,
+  Sparkles
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useProgress } from '../hooks/useProgress';
@@ -28,6 +33,7 @@ import {
   ReminderPersona, 
   NotificationFrequency 
 } from '../services/notificationService';
+import { setupFCMToken, isFCMSupported } from '../services/fcmService';
 
 interface Props {
   onNavigate: (screen: ScreenType) => void;
@@ -51,28 +57,138 @@ export default function ProfileScreen({ onNavigate }: Props) {
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [activeTab, setActiveTab] = useState<'all' | 'terms' | 'privacy' | 'acceptable'>('all');
 
+  // FCM Firebase Cloud Messaging Configuration States
+  const [fcmToken, setFcmToken] = useState(localStorage.getItem('ujuzi_fcm_token') || '');
+  const [copiedToken, setCopiedToken] = useState(false);
+  const [fcmStatusMsg, setFcmStatusMsg] = useState<{ type: 'success' | 'err' | 'info'; text: string } | null>(null);
+  const [isGeneratingToken, setIsGeneratingToken] = useState(false);
+  const [permissionState, setPermissionState] = useState<'granted' | 'denied' | 'default'>('default');
+  const [showPermissionPrompt, setShowPermissionPrompt] = useState(false);
+
   // Load configuration on mount
   useEffect(() => {
     setNotifConfig(getNotificationConfig());
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      setPermissionState(Notification.permission);
+    }
   }, []);
 
-  const handleToggleNotifications = () => {
+  const handleCopyToken = () => {
+    if (fcmToken) {
+      navigator.clipboard.writeText(fcmToken);
+      setCopiedToken(true);
+      setTimeout(() => setCopiedToken(false), 2000);
+    }
+  };
+
+  const activatePushNotifications = async () => {
+    setIsGeneratingToken(true);
+    setFcmStatusMsg({ type: 'info', text: 'Inatengeneza usajili wako salama wa Cloud Messaging...' });
+    try {
+      const token = await setupFCMToken('BCtuEHlAd25tc9oChH8GcKC00Bqv8sGEAEWMd_WYBCFu_vrbNwW0OmQHI5kOeFXtQwD8vRvp10jCKTU0ZkMDGB8');
+      if (token) {
+        setFcmToken(token);
+        setPermissionState('granted');
+        const updated = { ...notifConfig, enabled: true };
+        setNotifConfig(updated);
+        saveNotificationConfig({ enabled: true });
+        setFcmStatusMsg({ 
+          type: 'success', 
+          text: 'Arifa zako za Cloud Push zimeunganishwa kwa asilimia 100%! Utapokea mbinu na mafunzo tangu asubuhi! 🚀' 
+        });
+
+        // Send confirmation test push to verify immediately!
+        setTimeout(async () => {
+          try {
+            await fetch('/api/send-push', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                token: token,
+                title: 'Ujuzi Imekamilika! 🎉',
+                body: 'Hongera! Sasa utapokea masomo na mbinu mpya za biashara kila siku moja kwa moja hapa!',
+                link: '/'
+              })
+            });
+          } catch (e) {
+            console.warn('Welcome push failed to deliver:', e);
+          }
+        }, 1200);
+      } else {
+        throw new Error('Tulishindwa kupata Secure token kutoka Google.');
+      }
+    } catch (e: any) {
+      setFcmStatusMsg({ 
+        type: 'err', 
+        text: e.message || 'Mchakato wa token umefeli.' 
+      });
+      const updated = { ...notifConfig, enabled: false };
+      setNotifConfig(updated);
+      saveNotificationConfig({ enabled: false });
+    } finally {
+      setIsGeneratingToken(false);
+    }
+  };
+
+  const handleRequestPermission = async () => {
+    setShowPermissionPrompt(false);
+    setIsGeneratingToken(true);
+    setFcmStatusMsg({ type: 'info', text: 'Tafadhali chagua "Ruhusu" au "Allow" kwenye dirisha la kivinjari linalojitokeza...' });
+    try {
+      if (typeof window !== 'undefined' && 'Notification' in window) {
+        const permission = await Notification.requestPermission();
+        setPermissionState(permission);
+        if (permission === 'granted') {
+          await activatePushNotifications();
+        } else {
+          setFcmStatusMsg({ 
+            type: 'err', 
+            text: 'Mchakato umezuiwa kwa sababu ulikataa/uliahirisha kuruhusu arifa.' 
+          });
+          const updated = { ...notifConfig, enabled: false };
+          setNotifConfig(updated);
+          saveNotificationConfig({ enabled: false });
+        }
+      }
+    } catch (e: any) {
+      setFcmStatusMsg({ type: 'err', text: e.message || 'Shida imetokea wakati wa kuomba ruhusa.' });
+    } finally {
+      setIsGeneratingToken(false);
+    }
+  };
+
+  const handleToggleNotifications = async () => {
     const nextEnabled = !notifConfig.enabled;
-    const updated = { ...notifConfig, enabled: nextEnabled };
-    setNotifConfig(updated);
-    saveNotificationConfig({ enabled: nextEnabled });
-  };
+    
+    if (!nextEnabled) {
+      // Deactivating
+      const updated = { ...notifConfig, enabled: false };
+      setNotifConfig(updated);
+      saveNotificationConfig({ enabled: false });
+      setFcmStatusMsg({ type: 'info', text: 'Arifa za Kusukuma zimezimwa kwa mafanikio.' });
+    } else {
+      // Activating
+      if (typeof window === 'undefined' || !('Notification' in window)) {
+        setFcmStatusMsg({ type: 'err', text: 'Push notifications haziafikiwi kwenye mazingira haya.' });
+        return;
+      }
 
-  const handleChangePersona = (persona: ReminderPersona) => {
-    const updated = { ...notifConfig, persona };
-    setNotifConfig(updated);
-    saveNotificationConfig({ persona });
-  };
+      const permission = Notification.permission;
+      setPermissionState(permission);
 
-  const handleChangeFrequency = (frequency: NotificationFrequency) => {
-    const updated = { ...notifConfig, frequency };
-    setNotifConfig(updated);
-    saveNotificationConfig({ frequency });
+      if (permission === 'granted') {
+        await activatePushNotifications();
+      } else if (permission === 'denied') {
+        // Show guidance on manual browser settings
+        setFcmStatusMsg({ 
+          type: 'err', 
+          text: 'Umeziba arifa kwenye kivinjari chako. Tafadhali bofya aikoni ya kufuli (Lock/Settings) karibu na anuani (URL bar) ya jukwaa hili kwenye kivinjari chako ili uruhusu upya.' 
+        });
+      } else {
+        // Show popup/banner prompt style to motivate user
+        setShowPermissionPrompt(true);
+      }
+    }
   };
 
   const handleLogout = async () => {
@@ -188,24 +304,23 @@ export default function ProfileScreen({ onNavigate }: Props) {
             </span>
           </div>
         </div>
-
-        {/* Polished Native-Looking Toggle Notification Feature Settings */}
-        <div className="bg-white rounded-3xl p-5 border border-neutral-200/60 shadow-[0_4px_25px_rgba(0,0,0,0.01)] space-y-5">
+         {/* CONSOLIDATED PUSH NOTIFICATIONS SETTING CARD */}
+        <div className="bg-white rounded-[2rem] p-5 border border-neutral-200/60 shadow-[0_4px_25px_rgba(0,0,0,0.01)] space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600">
+              <div className="w-10 h-10 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 shrink-0">
                 <Bell className="w-5 h-5" />
               </div>
-              <div>
-                <h4 className="text-xs font-extrabold text-neutral-800 uppercase tracking-wider">Arifa za Kusukuma</h4>
-                <p className="text-[11px] text-slate-400 font-medium">Kupokea vikumbusho vya masomo</p>
+              <div className="text-left">
+                <h4 className="text-xs font-extrabold text-neutral-800 uppercase tracking-wider">Arifa za Kujifunza Kila Siku</h4>
+                <p className="text-[11px] text-slate-400 font-medium">Vikumbusho vya masomo na mbinu mpya za biashara</p>
               </div>
             </div>
             
             {/* Custom Interactive Toggle Switch */}
             <button
               onClick={handleToggleNotifications}
-              className={`w-14 h-8 rounded-full p-1 transition-colors duration-200 ease-in-out cursor-pointer ${
+              className={`w-14 h-8 rounded-full p-1 transition-colors duration-200 ease-in-out cursor-pointer shrink-0 ${
                 notifConfig.enabled ? 'bg-black' : 'bg-neutral-200'
               }`}
             >
@@ -217,65 +332,99 @@ export default function ProfileScreen({ onNavigate }: Props) {
             </button>
           </div>
 
-          {notifConfig.enabled && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="space-y-4 pt-3 border-t border-neutral-100"
-            >
-              {/* Persona Selection */}
-              <div>
-                <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider block mb-2.5">
-                  Mtindo wa Kikumbusho (Assistant Persona)
-                </span>
-                <div className="grid grid-cols-3 gap-2">
-                  {(['strict', 'gentle', 'hustler'] as ReminderPersona[]).map((p) => {
-                    const label = p === 'strict' ? 'Mkali 🍎' : p === 'gentle' ? 'Mpole 🤝' : 'Tajiri 💸';
-                    const active = notifConfig.persona === p;
-                    return (
-                      <button
-                        key={p}
-                        onClick={() => handleChangePersona(p)}
-                        className={`py-2 px-1 text-center shrink-0 rounded-xl text-xs font-bold border transition-all duration-150 cursor-pointer ${
-                          active 
-                            ? 'bg-black text-white border-black' 
-                            : 'bg-neutral-50 text-slate-600 border-neutral-250 hover:bg-neutral-100'
-                        }`}
-                      >
-                        {label}
-                      </button>
-                    );
-                  })}
+          {/* FCM Status alerts/instructions if they exist */}
+          {fcmStatusMsg && (
+            <div className={`p-3 rounded-xl border text-[11px] font-medium leading-relaxed text-left ${
+              fcmStatusMsg.type === 'success' ? 'bg-emerald-50 border-emerald-100 text-emerald-800' :
+              fcmStatusMsg.type === 'err' ? 'bg-rose-50 border-rose-100 text-rose-800' :
+              'bg-indigo-50 border-indigo-100 text-indigo-800'
+            }`}>
+              {fcmStatusMsg.text}
+            </div>
+          )}
+
+          {/* FCM Token Display with Copy capability - Styled Compactly */}
+          {fcmToken && notifConfig.enabled && (
+            <div className="bg-neutral-50/70 p-3 rounded-2xl border border-neutral-100 space-y-2 text-left">
+              <span className="text-[9px] text-slate-400 font-extrabold uppercase tracking-wider block">Token ya Kifaa (FCM Token)</span>
+              <div className="flex items-center gap-2">
+                <div className="flex-1 min-w-0 bg-white border border-neutral-100 p-2 rounded-xl text-[10px] font-mono break-all line-clamp-1 select-all hover:line-clamp-none transition-all text-neutral-600 leading-tight">
+                  {fcmToken}
+                </div>
+                <button
+                  onClick={handleCopyToken}
+                  className="w-8 h-8 border border-neutral-200 hover:bg-neutral-100 flex items-center justify-center bg-white rounded-lg shrink-0 cursor-pointer transition-colors"
+                  title="Copy FCM Token"
+                >
+                  {copiedToken ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-slate-500" />}
+                </button>
+              </div>
+
+              {/* Instant Test Push Button */}
+              <button
+                onClick={async () => {
+                  try {
+                    await fetch('/api/send-push', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        token: fcmToken,
+                        title: 'Jaribio la Arifa ya Ujuzi! 🎓',
+                        body: 'Safi sana mkuu! Mfumo wako wa arifa unafanya kazi kikamilifu. Ukaribie kujifunza leo!',
+                        link: '/'
+                      })
+                    });
+                  } catch (e) {
+                    console.warn(e);
+                  }
+                }}
+                className="w-full mt-1 py-1.5 border border-dashed border-indigo-200 hover:bg-indigo-50 text-indigo-600 hover:text-indigo-700 font-extrabold text-[10px] uppercase tracking-wider rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                <Send className="w-3 h-3" />
+                <span>Nitumie Jaribio la Arifa Sasa 🔔</span>
+              </button>
+            </div>
+          )}
+
+          {/* EVERYDAY LEARNING MOTIVATION PROMPT STYLE (Pre-permission onboarding) */}
+          {permissionState !== 'granted' && (
+            <div className="bg-gradient-to-tr from-indigo-50/70 via-indigo-50/30 to-purple-50/60 border border-indigo-100 p-5 rounded-3xl space-y-3.5 text-left relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-3 opacity-10">
+                <Sparkles className="w-16 h-16 text-indigo-600" />
+              </div>
+              
+              <div className="flex items-start gap-3 relative z-10">
+                <div className="w-10 h-10 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-indigo-100 animate-bounce">
+                  <Bell className="w-5 h-5" />
+                </div>
+                <div className="space-y-1">
+                  <h5 className="text-[11px] font-black text-indigo-950 uppercase tracking-widest">Msaidizi wa Masomo (Ujuzi Reminders)</h5>
+                  <p className="text-[10px] text-indigo-600 font-bold uppercase tracking-wider">Mbinu Mpya Kila Siku 🎓</p>
                 </div>
               </div>
 
-              {/* Intervals selection */}
-              <div>
-                <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider block mb-2.5">
-                  Mzunguko wa Vikumbusho
-                </span>
-                <div className="grid grid-cols-3 gap-2">
-                  {(['10s-test', 'hourly', 'daily'] as NotificationFrequency[]).map((f) => {
-                    const label = f === '10s-test' ? 'Sekunde 10' : f === 'hourly' ? 'Kila Saa' : 'Kila Siku';
-                    const active = notifConfig.frequency === f;
-                    return (
-                      <button
-                        key={f}
-                        onClick={() => handleChangeFrequency(f)}
-                        className={`py-2 px-1 text-center shrink-0 rounded-xl text-xs font-bold border transition-all duration-150 cursor-pointer ${
-                          active 
-                            ? 'bg-black text-white border-black' 
-                            : 'bg-neutral-50 text-slate-600 border-neutral-250 hover:bg-neutral-100'
-                        }`}
-                      >
-                        {label}
-                      </button>
-                    );
-                  })}
+              <div className="bg-white/95 p-4 rounded-2xl border border-neutral-150 text-xs text-neutral-800 leading-relaxed font-semibold relative z-10 animate-fade-in">
+                <p className="leading-relaxed text-slate-700">
+                  &quot;Mkuu, safari yako ya kujifunza na kukua kibiashara haipaswi kusimama! 🚀 Nikufahamishe siri na mbinu mpya za masoko kila asubuhi ili uendeleze <strong>Streak</strong> yako na kuzuia biashara yako kudorora.&quot;
+                </p>
+                <div className="mt-3 flex items-center gap-2 text-[10px] text-emerald-700 font-black uppercase tracking-wider">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>USALAMA MKUBWA • HAKUNA USUMBU</span>
                 </div>
               </div>
-            </motion.div>
+
+              <div className="flex gap-2 relative z-10">
+                <button
+                  type="button"
+                  onClick={handleRequestPermission}
+                  disabled={isGeneratingToken}
+                  className="flex-1 h-11 bg-black hover:bg-neutral-800 active:scale-95 text-white font-black text-xs uppercase tracking-wider rounded-xl cursor-pointer flex items-center justify-center gap-2 shadow-md transition-all disabled:opacity-50"
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Ruhusu Arifa 🔔</span>
+                </button>
+              </div>
+            </div>
           )}
         </div>
 

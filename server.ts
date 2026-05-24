@@ -1,16 +1,249 @@
 import express from "express";
 import path from "path";
+import fs from "fs";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
+import admin from "firebase-admin";
 
 dotenv.config();
+
+// Load Firebase configuration once
+let firebaseConfig: any = null;
+try {
+  const configPath = path.join(process.cwd(), "firebase-applet-config.json");
+  if (fs.existsSync(configPath)) {
+    firebaseConfig = JSON.parse(fs.readFileSync(configPath, "utf-8"));
+  }
+} catch (e) {
+  console.warn("Failed to load firebase-applet-config.json in server.ts:", e);
+}
+
+// Lazy initializer for Firebase Admin SDK using HTTP v1
+let adminAppInitialized = false;
+function getFirebaseAdminInstance(): typeof admin | null {
+  if (adminAppInitialized) {
+    return admin;
+  }
+
+  let cert: admin.ServiceAccount | null = null;
+
+  // 1. Check Full Service Account JSON string from environment variable (Option A)
+  const envServiceAccount = process.env.FIREBASE_SERVICE_ACCOUNT;
+  if (envServiceAccount) {
+    try {
+      const cleaned = envServiceAccount.trim();
+      const parsed = cleaned.startsWith("{") 
+        ? JSON.parse(cleaned) 
+        : JSON.parse(Buffer.from(cleaned, "base64").toString("utf8"));
+      cert = parsed;
+    } catch (e) {
+      console.error("FCM v1: Imeshindwa kusoma FIREBASE_SERVICE_ACCOUNT ya env:", e);
+    }
+  }
+
+  // 2. Check individual fields from environment variables (Option B)
+  if (!cert && process.env.FIREBASE_PRIVATE_KEY && process.env.FIREBASE_CLIENT_EMAIL && process.env.FIREBASE_PROJECT_ID) {
+    try {
+      const formattedPrivateKey = process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n");
+      cert = {
+        projectId: process.env.FIREBASE_PROJECT_ID,
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+        privateKey: formattedPrivateKey,
+      };
+    } catch (e) {
+      console.error("FCM v1: Imeshindwa kuunda cheti kutoka kwa split fields:", e);
+    }
+  }
+
+  // 3. Fallback to a local secure firebase-service-account.json file if present on disk
+  const localCredsPath = path.join(process.cwd(), "firebase-service-account.json");
+  if (!cert && fs.existsSync(localCredsPath)) {
+    try {
+      cert = JSON.parse(fs.readFileSync(localCredsPath, "utf-8"));
+    } catch (e) {
+      console.error("FCM v1: Imeshindwa kusoma faili ya firebase-service-account.json:", e);
+    }
+  }
+
+  if (cert) {
+    try {
+      admin.initializeApp({
+        credential: admin.credential.cert(cert),
+      });
+      adminAppInitialized = true;
+      console.log("FCM v1: Firebase Admin imeanzishwa vizuri tayari kwa push notifications! 🚀");
+      return admin;
+    } catch (e) {
+      console.error("FCM v1: initializeApp imefeli kwa cheti kibaya:", e);
+    }
+  }
+
+  return null;
+}
 
 async function startServer() {
   const app = express();
   const PORT = 3000;
 
   app.use(express.json());
+
+  // Dynamic Service Worker endpoint for FCM background receiving
+  app.get("/firebase-messaging-sw.js", (req, res) => {
+    res.setHeader("Content-Type", "application/javascript");
+    if (!firebaseConfig) {
+      return res.send(`
+        console.warn('firebase-messaging-sw.js: No Firebase applet configuration file found.');
+      `);
+    }
+
+    res.send(`
+      importScripts('https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js');
+      importScripts('https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging-compat.js');
+
+      const firebaseConfig = {
+        apiKey: "${firebaseConfig.apiKey}",
+        authDomain: "${firebaseConfig.authDomain}",
+        projectId: "${firebaseConfig.projectId}",
+        storageBucket: "${firebaseConfig.storageBucket}",
+        messagingSenderId: "${firebaseConfig.messagingSenderId}",
+        appId: "${firebaseConfig.appId}"
+      };
+
+      firebase.initializeApp(firebaseConfig);
+      const messaging = firebase.messaging();
+
+      messaging.onBackgroundMessage((payload) => {
+        console.log('[firebase-messaging-sw.js] Background message: ', payload);
+        const title = payload.notification?.title || payload.data?.title || 'Ujuzi Platform';
+        const body = payload.notification?.body || payload.data?.body || 'Ujumbe mpya unakusubiri!';
+        const link = payload.data?.link || '/';
+
+        self.registration.showNotification(title, {
+          body: body,
+          icon: '/icon.svg',
+          badge: '/icon.svg',
+          vibrate: [150, 80, 150],
+          data: { url: link }
+        });
+      });
+
+      // Handle notification click to navigate to the correct path
+      self.addEventListener('notificationclick', (event) => {
+        event.notification.close();
+        const urlToOpen = event.notification.data?.url || '/';
+        
+        event.waitUntil(
+          clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+            // Check if there is already a window open with this applet
+            for (let i = 0; i < windowClients.length; i++) {
+              const client = windowClients[i];
+              if ('focus' in client) {
+                return client.focus();
+              }
+            }
+            if (clients.openWindow) {
+              return clients.openWindow(urlToOpen);
+            }
+          })
+        );
+      });
+    `);
+  });
+
+  // Safe HTTP POST proxy endpoint to trigger Firebase Cloud Messaging (FCM)
+  app.post("/api/send-push", async (req, res) => {
+    const { token, serverKey: bodyServerKey, title, body, link } = req.body;
+    
+    // 1. Try FCM HTTP v1 via official Firebase Admin SDK (Recommended)
+    const adminSdk = getFirebaseAdminInstance();
+    if (adminSdk) {
+      try {
+        console.log("Using FCM HTTP v1 (Service Account) to deliver notification...");
+        const response = await adminSdk.messaging().send({
+          token: token,
+          notification: {
+            title: title || "Ujuzi App 🎓",
+            body: body || "Huu ni ufalme wa masomo mapya!",
+          },
+          data: {
+            link: link || "/",
+            title: title || "Ujuzi App 🎓",
+            body: body || "Huu ni ufalme wa masomo mapya!",
+          },
+          webpush: {
+            notification: {
+              icon: "/icon.svg",
+              badge: "/icon.svg",
+              vibrate: [150, 80, 150],
+            },
+            fcmOptions: {
+              link: link || "/",
+            }
+          }
+        });
+        
+        console.log("FCM HTTP v1 delivered successfully response:", response);
+        return res.json({ 
+          success: true, 
+          method: "FCM HTTP v1 (Secure Service Account)", 
+          messageId: response 
+        });
+      } catch (err: any) {
+        console.error("FCM HTTP v1 Delivery failed:", err);
+        return res.status(500).json({ 
+          error: `FCM HTTP v1 Delivery failed: ${err.message || 'Unknown error'}` 
+        });
+      }
+    }
+
+    // 2. Fallback to Legacy HTTP protocol if Server Key is provided (Highly discouraged, deprecated by Google)
+    const serverKey = process.env.FCM_SERVER_KEY || bodyServerKey;
+    if (!token || !serverKey) {
+      return res.status(400).json({ 
+        error: "FCM Device Token na Server Key / Service Account credentials vinahitajika! Tafadhali sanidi Service Account kwenye Vercel/env kufuata matakwa ya Google ya sasa." 
+      });
+    }
+
+    try {
+      console.log("Using Deprecated FCM Legacy API with Server Key...");
+      const response = await fetch("https://fcm.googleapis.com/fcm/send", {
+        method: "POST",
+        headers: {
+          "Authorization": `key=${serverKey}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          to: token,
+          notification: {
+            title: title || "Ujuzi App 🎓",
+            body: body || "Huu ni ufalme wa masomo mapya!",
+            icon: "/icon.svg",
+            sound: "default"
+          },
+          data: {
+            link: link || "/",
+            title: title,
+            body: body
+          }
+        })
+      });
+
+      const responseText = await response.text();
+      if (response.ok) {
+        res.json({ 
+          success: true, 
+          method: "FCM Legacy API (Deprecated)", 
+          details: responseText 
+        });
+      } else {
+        res.status(response.status).json({ error: responseText });
+      }
+    } catch (error: any) {
+      console.error("FCM Legacy Send Proxy Error:", error);
+      res.status(500).json({ error: error.message || "Failed to deliver push notification via FCM" });
+    }
+  });
 
   // AI Endpoint (Securely on server)
   app.post("/api/ai", async (req, res) => {
