@@ -90,68 +90,7 @@ async function startServer() {
 
   app.use(express.json());
 
-  // Dynamic Service Worker endpoint for FCM background receiving
-  app.get("/firebase-messaging-sw.js", (req, res) => {
-    res.setHeader("Content-Type", "application/javascript");
-    if (!firebaseConfig) {
-      return res.send(`
-        console.warn('firebase-messaging-sw.js: No Firebase applet configuration file found.');
-      `);
-    }
-
-    res.send(`
-      importScripts('https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js');
-      importScripts('https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging-compat.js');
-
-      const firebaseConfig = {
-        apiKey: "${firebaseConfig.apiKey}",
-        authDomain: "${firebaseConfig.authDomain}",
-        projectId: "${firebaseConfig.projectId}",
-        storageBucket: "${firebaseConfig.storageBucket}",
-        messagingSenderId: "${firebaseConfig.messagingSenderId}",
-        appId: "${firebaseConfig.appId}"
-      };
-
-      firebase.initializeApp(firebaseConfig);
-      const messaging = firebase.messaging();
-
-      messaging.onBackgroundMessage((payload) => {
-        console.log('[firebase-messaging-sw.js] Background message: ', payload);
-        const title = payload.notification?.title || payload.data?.title || 'Ujuzi Platform';
-        const body = payload.notification?.body || payload.data?.body || 'Ujumbe mpya unakusubiri!';
-        const link = payload.data?.link || '/';
-
-        self.registration.showNotification(title, {
-          body: body,
-          icon: '/icon.svg',
-          badge: '/icon.svg',
-          vibrate: [150, 80, 150],
-          data: { url: link }
-        });
-      });
-
-      // Handle notification click to navigate to the correct path
-      self.addEventListener('notificationclick', (event) => {
-        event.notification.close();
-        const urlToOpen = event.notification.data?.url || '/';
-        
-        event.waitUntil(
-          clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
-            // Check if there is already a window open with this applet
-            for (let i = 0; i < windowClients.length; i++) {
-              const client = windowClients[i];
-              if ('focus' in client) {
-                return client.focus();
-              }
-            }
-            if (clients.openWindow) {
-              return clients.openWindow(urlToOpen);
-            }
-          })
-        );
-      });
-    `);
-  });
+  // Dynamic Service Worker endpoint removed; using static generation via generate-sw.ts
 
   // Safe HTTP POST proxy endpoint to trigger Firebase Cloud Messaging (FCM)
   app.post("/api/send-push", async (req, res) => {
