@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { getApiUrl } from '../lib/apiUrl';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   LogOut, 
@@ -100,7 +101,7 @@ export default function ProfileScreen({ onNavigate }: Props) {
         // Send confirmation test push to verify immediately!
         setTimeout(async () => {
           try {
-            await fetch('/api/send-push', {
+            await fetch(getApiUrl('/api/send-push'), {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
@@ -364,7 +365,7 @@ export default function ProfileScreen({ onNavigate }: Props) {
               <button
                 onClick={async () => {
                   try {
-                    await fetch('/api/send-push', {
+                    await fetch(getApiUrl('/api/send-push'), {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({
@@ -389,7 +390,7 @@ export default function ProfileScreen({ onNavigate }: Props) {
                 onClick={async () => {
                   try {
                     setFcmStatusMsg({ type: 'info', text: 'Inatuma jaribio tangazo la watu wote kwa Cron...' });
-                    const res = await fetch('/api/test-cron', { method: 'POST' });
+                    const res = await fetch(getApiUrl('/api/test-cron'), { method: 'POST' });
                     if (res.ok) {
                        setFcmStatusMsg({ type: 'success', text: 'Jaribio la Broadcast la Cron limetumwa kikamilifu!' });
                     } else {

@@ -90,6 +90,24 @@ async function startServer() {
 
   app.use(express.json());
 
+  // CORS Middleware to allow requests from any origin (e.g. Vercel, localhost, previews)
+  app.use((req, res, next) => {
+    const origin = req.headers.origin;
+    if (origin) {
+      res.setHeader("Access-Control-Allow-Origin", origin);
+    } else {
+      res.setHeader("Access-Control-Allow-Origin", "*");
+    }
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    
+    if (req.method === "OPTIONS") {
+      return res.sendStatus(200);
+    }
+    next();
+  });
+
   // Dynamic Service Worker endpoint removed; using static generation via generate-sw.ts
 
   // Safe HTTP POST proxy endpoint to trigger Firebase Cloud Messaging (FCM)

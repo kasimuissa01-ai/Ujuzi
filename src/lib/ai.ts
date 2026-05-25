@@ -119,10 +119,12 @@ export async function chatWithTutor(history: { role: string, content: string }[]
   return executeAI(prompt, undefined, true);
 }
 
+import { getApiUrl } from './apiUrl';
+
 async function executeAI(prompt: string, fallbackContext?: any, isChat: boolean = false, jsonMode: boolean = false): Promise<string> {
   try {
     // Try Server-side AI Endpoint
-    const res = await fetch('/api/ai', {
+    const res = await fetch(getApiUrl('/api/ai'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ prompt, jsonMode })
@@ -130,7 +132,7 @@ async function executeAI(prompt: string, fallbackContext?: any, isChat: boolean 
 
     if (!res.ok) {
        // Fallback to Groq server-side if Gemini fails
-       const groqRes = await fetch('/api/ai/groq', {
+       const groqRes = await fetch(getApiUrl('/api/ai/groq'), {
          method: 'POST',
          headers: { 'Content-Type': 'application/json' },
          body: JSON.stringify({ prompt, jsonMode })
