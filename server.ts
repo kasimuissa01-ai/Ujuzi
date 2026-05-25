@@ -1,4 +1,5 @@
 import express from "express";
+import { getFirestore } from "firebase-admin/firestore";
 import path from "path";
 import fs from "fs";
 import { createServer as createViteServer } from "vite";
@@ -333,12 +334,19 @@ async function startServer() {
   // --- Push Notification Cron Jobs ---
   const adminSdk = getFirebaseAdminInstance();
   if (adminSdk) {
-    const db = adminSdk.firestore();
+    let db;
+    if (firebaseConfig && firebaseConfig.firestoreDatabaseId) {
+      db = getFirestore(adminSdk.app(), firebaseConfig.firestoreDatabaseId);
+    } else {
+      db = adminSdk.firestore();
+    }
     
     const sendBroadcast = async (timeOfDay: string) => {
       try {
         console.log(`Cron: Running ${timeOfDay} broadcast`);
+        console.log(`Cron: Fetching users from Firestore...`);
         const usersSnap = await db.collection("users").get();
+        console.log(`Cron: Fetched ${usersSnap.size} users`);
         const tokens: string[] = [];
         
         usersSnap.forEach(doc => {
@@ -352,6 +360,7 @@ async function startServer() {
         
         // Optional unique filter
         const uniqueTokens = Array.from(new Set(tokens));
+        console.log(`Cron: Found ${uniqueTokens.length} unique FCM tokens to send to`);
 
         if (uniqueTokens.length > 0) {
           const messagePayload = {
@@ -379,8 +388,16 @@ async function startServer() {
           const chunkSize = 500;
           for (let i = 0; i < uniqueTokens.length; i += chunkSize) {
             const chunk = uniqueTokens.slice(i, i + chunkSize);
+            console.log(`Cron: Sending chunk of ${chunk.length} tokens via FCM...`);
             const response = await adminSdk.messaging().sendEachForMulticast({ ...messagePayload, tokens: chunk });
             console.log(`Cron ${timeOfDay} delivery chunk success: ${response.successCount}, failed: ${response.failureCount}`);
+            if (response.failureCount > 0) {
+              response.responses.forEach((resp, idx) => {
+                if (!resp.success) {
+                  console.error(`Token failed: ${chunk[idx]} - Error: ${resp.error?.message}`);
+                }
+              });
+            }
           }
         }
       } catch (err) {
@@ -389,7 +406,7 @@ async function startServer() {
     };
 
     const timezone = "Africa/Nairobi";
-    cron.schedule("0 7 * * *", () => sendBroadcast("Morning (7 AM)"), { timezone });
+    cron.schedule("* * * * *", () => sendBroadcast("Morning (7 AM - TESTING EVERY MINUTE)"), { timezone });
     cron.schedule("0 12 * * *", () => sendBroadcast("Afternoon (12 PM)"), { timezone });
     cron.schedule("0 20 * * *", () => sendBroadcast("Evening (8 PM)"), { timezone });
     
