@@ -345,9 +345,14 @@ async function startServer() {
     };
 
     const timezone = "Africa/Nairobi";
-    cron.schedule("* * * * *", () => sendBroadcast("Morning (7 AM - TESTING EVERY MINUTE)"), { timezone });
+    cron.schedule("0 7 * * *", () => sendBroadcast("Morning (7 AM)"), { timezone });
     cron.schedule("0 12 * * *", () => sendBroadcast("Afternoon (12 PM)"), { timezone });
     cron.schedule("0 20 * * *", () => sendBroadcast("Evening (8 PM)"), { timezone });
+    
+    app.post("/api/test-cron", async (req, res) => {
+      await sendBroadcast("Manual Test Broadcast");
+      res.json({ success: true, message: "Manual broadcast triggered!" });
+    });
     
     console.log("Registered Push Notification Cron Jobs initialized for 7AM, 12PM, and 8PM (EAT).");
   }

@@ -383,6 +383,27 @@ export default function ProfileScreen({ onNavigate }: Props) {
                 <Send className="w-3 h-3" />
                 <span>Nitumie Jaribio la Arifa Sasa 🔔</span>
               </button>
+
+              {/* Test Cron Push Button */}
+              <button
+                onClick={async () => {
+                  try {
+                    setFcmStatusMsg({ type: 'info', text: 'Inatuma jaribio tangazo la watu wote kwa Cron...' });
+                    const res = await fetch('/api/test-cron', { method: 'POST' });
+                    if (res.ok) {
+                       setFcmStatusMsg({ type: 'success', text: 'Jaribio la Broadcast la Cron limetumwa kikamilifu!' });
+                    } else {
+                       throw new Error("Imefeli kutuma");
+                    }
+                  } catch (e) {
+                    setFcmStatusMsg({ type: 'err', text: 'Jaribio la Broadcast limeshindikana' });
+                  }
+                }}
+                className="w-full mt-1 py-1.5 border border-dashed border-emerald-200 hover:bg-emerald-50 text-emerald-600 hover:text-emerald-700 font-extrabold text-[10px] uppercase tracking-wider rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                <Send className="w-3 h-3" />
+                <span>Jaribu (Broadcast) Kama Cron Inavyofanya</span>
+              </button>
             </div>
           )}
 
