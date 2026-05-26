@@ -136,6 +136,18 @@ export async function loginToOneSignal(userId: string): Promise<void> {
     try {
       console.log('Identifying user in OneSignal with Firebase UID:', userId);
       await OneSignal.login(userId);
+
+      // Sync user profile first name tag with OneSignal
+      const currentUser = auth.currentUser;
+      if (currentUser?.displayName) {
+        const firstName = currentUser.displayName.split(' ')[0];
+        try {
+          await OneSignal.User.addTag("first_name", firstName);
+          console.log('OneSignal first_name tag synced:', firstName);
+        } catch (tagErr) {
+          console.warn('Failed to sync tag with OneSignal:', tagErr);
+        }
+      }
       
       // Look up and track the subscription ID as well
       const subId = OneSignal.User?.PushSubscription?.id;

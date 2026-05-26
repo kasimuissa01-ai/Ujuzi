@@ -1,5 +1,5 @@
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { db, auth } from '../lib/firebase';
 
 export type ReminderPersona = 'strict' | 'gentle' | 'hustler';
 export type NotificationFrequency = '10s-test' | 'daily' | 'hourly';
@@ -225,6 +225,16 @@ export async function addInAppNotification(userId: string | undefined, title: st
   }
 }
 
+// Helper to personalize notifications with user's first name
+export function personalizeMessage(text: string, name?: string | null): string {
+  const finalName = name || 'Mkuu';
+  return text
+    .replace(/Mkuu/g, finalName)
+    .replace(/mkuu/g, finalName.toLowerCase())
+    .replace(/Rafiki/g, finalName)
+    .replace(/rafiki/g, finalName.toLowerCase());
+}
+
 // Fetch random persona-based creative message
 export function getRandomPersonaMessage(persona: ReminderPersona): { title: string; body: string } {
   const collectionList = PERSONA_MESSAGES[persona] || PERSONA_MESSAGES.gentle;
@@ -252,7 +262,12 @@ export async function checkAndTriggerReminder(userId?: string) {
   const alreadyNotified = localStorage.getItem('ujuzi_missed_notified') === 'true';
 
   if (timeDifferenceMs >= thresholdsMs && !alreadyNotified) {
-    const { title, body } = getRandomPersonaMessage(config.persona);
+    const rawMessage = getRandomPersonaMessage(config.persona);
+    const currentUser = auth.currentUser;
+    const firstName = currentUser?.displayName ? currentUser.displayName.split(' ')[0] : null;
+
+    const title = personalizeMessage(rawMessage.title, firstName);
+    const body = personalizeMessage(rawMessage.body, firstName);
     
     // Fire native local push alert
     const success = await triggerNativePushNotification(title, body, '/');

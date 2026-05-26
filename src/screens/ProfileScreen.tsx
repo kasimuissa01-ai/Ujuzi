@@ -137,13 +137,14 @@ export default function ProfileScreen({ onNavigate }: Props) {
         try {
           const currentId = subId || getOneSignalSubscriptionId();
           if (currentId) {
+            const firstName = user?.displayName ? user.displayName.split(' ')[0] : 'Mkuu';
             await fetch(getApiUrl('/api/send-push'), {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 token: currentId,
-                title: 'Ujuzi Imekamilika! 🎉',
-                body: 'Hongera! Sasa utapokea masomo na mbinu mpya za biashara kila siku moja kwa moja hapa kupitia OneSignal!',
+                title: `Hongera ${firstName}! 🎉`,
+                body: `${firstName}, sasa utapokea masomo na mbinu mpya za biashara kila siku moja kwa moja hapa kupitia OneSignal!`,
                 link: '/'
               })
             });
