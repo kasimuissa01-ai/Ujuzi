@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, signInAnonymously, onAuthStateChanged, signInWithPopup, signInWithRedirect, getRedirectResult, linkWithPopup, linkWithRedirect, signOut } from 'firebase/auth';
 import { auth, googleProvider } from '../lib/firebase';
 import { identifyUser, trackEvent } from '../lib/mixpanel';
+import { loginToOneSignal, logoutFromOneSignal } from '../services/onesignalService';
 
 interface AuthContextType {
   user: User | null;
@@ -40,6 +41,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             $name: result.user.displayName,
             isAnonymous: result.user.isAnonymous,
           });
+          loginToOneSignal(result.user.uid);
           trackEvent('Login Redirect Resolved', { userId: result.user.uid });
         }
       })
@@ -58,9 +60,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           $name: currentUser.displayName,
           isAnonymous: currentUser.isAnonymous,
         });
+        loginToOneSignal(currentUser.uid);
         trackEvent('Session Start', { isAnonymous: currentUser.isAnonymous });
       } else {
         setUser(null);
+        logoutFromOneSignal();
       }
       setLoading(false);
     });

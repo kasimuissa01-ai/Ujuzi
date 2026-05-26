@@ -34,7 +34,13 @@ import {
   ReminderPersona, 
   NotificationFrequency 
 } from '../services/notificationService';
-import { setupFCMToken, isFCMSupported } from '../services/fcmService';
+import { 
+  isOneSignalSupported, 
+  optInPushNotifications, 
+  optOutPushNotifications, 
+  getOneSignalSubscriptionId,
+  isOneSignalAllowedOnCurrentDomain
+} from '../services/onesignalService';
 
 interface Props {
   onNavigate: (screen: ScreenType) => void;
@@ -58,19 +64,38 @@ export default function ProfileScreen({ onNavigate }: Props) {
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [activeTab, setActiveTab] = useState<'all' | 'terms' | 'privacy' | 'acceptable'>('all');
 
-  // FCM Firebase Cloud Messaging Configuration States
-  const [fcmToken, setFcmToken] = useState(localStorage.getItem('ujuzi_fcm_token') || '');
+  // OneSignal Push Notification Configuration States
+  const [fcmToken, setFcmToken] = useState(localStorage.getItem('ujuzi_onesignal_id') || '');
   const [copiedToken, setCopiedToken] = useState(false);
   const [fcmStatusMsg, setFcmStatusMsg] = useState<{ type: 'success' | 'err' | 'info'; text: string } | null>(null);
   const [isGeneratingToken, setIsGeneratingToken] = useState(false);
   const [permissionState, setPermissionState] = useState<'granted' | 'denied' | 'default'>('default');
   const [showPermissionPrompt, setShowPermissionPrompt] = useState(false);
 
-  // Load configuration on mount
+  // Load configuration on mount and read active OneSignal subscription check
   useEffect(() => {
     setNotifConfig(getNotificationConfig());
     if (typeof window !== 'undefined' && 'Notification' in window) {
       setPermissionState(Notification.permission);
+      
+      // Auto-retrieve subscription ID if initialized
+      const checkInterval = setInterval(() => {
+        const subId = getOneSignalSubscriptionId();
+        if (subId) {
+          setFcmToken(subId);
+          clearInterval(checkInterval);
+        }
+      }, 1000);
+
+      // Timeout after 6 seconds to prevent leaking interval
+      const safetyTimeout = setTimeout(() => {
+        clearInterval(checkInterval);
+      }, 6000);
+
+      return () => {
+        clearInterval(checkInterval);
+        clearTimeout(safetyTimeout);
+      };
     }
   }, []);
 
@@ -84,44 +109,54 @@ export default function ProfileScreen({ onNavigate }: Props) {
 
   const activatePushNotifications = async () => {
     setIsGeneratingToken(true);
-    setFcmStatusMsg({ type: 'info', text: 'Inatengeneza usajili wako salama wa Cloud Messaging...' });
+    setFcmStatusMsg({ type: 'info', text: 'Inatayarisha muunganisho salama wa OneSignal...' });
     try {
-      const token = await setupFCMToken('BCtuEHlAd25tc9oChH8GcKC00Bqv8sGEAEWMd_WYBCFu_vrbNwW0OmQHI5kOeFXtQwD8vRvp10jCKTU0ZkMDGB8');
-      if (token) {
-        setFcmToken(token);
-        setPermissionState('granted');
-        const updated = { ...notifConfig, enabled: true };
-        setNotifConfig(updated);
-        saveNotificationConfig({ enabled: true });
-        setFcmStatusMsg({ 
-          type: 'success', 
-          text: 'Arifa zako za Cloud Push zimeunganishwa kwa asilimia 100%! Utapokea mbinu na mafunzo tangu asubuhi! 🚀' 
-        });
+      if (!isOneSignalSupported()) {
+        throw new Error('Kivinjari chako hakiafiki Push Notifications za kivinjari kwa sasa.');
+      }
 
-        // Send confirmation test push to verify immediately!
-        setTimeout(async () => {
-          try {
+      await optInPushNotifications();
+      
+      const subId = getOneSignalSubscriptionId();
+      if (subId) {
+        setFcmToken(subId);
+      }
+      
+      setPermissionState('granted');
+      const updated = { ...notifConfig, enabled: true };
+      setNotifConfig(updated);
+      saveNotificationConfig({ enabled: true });
+      
+      setFcmStatusMsg({ 
+        type: 'success', 
+        text: 'Arifa za OneSignal zimeunganishwa kikamilifu! Utapokea mafunzo na mbinu kwenye skrini yako kuanzia sasa! 🚀' 
+      });
+
+      // Send confirmation test push to verify immediately!
+      setTimeout(async () => {
+        try {
+          const currentId = subId || getOneSignalSubscriptionId();
+          if (currentId) {
             await fetch(getApiUrl('/api/send-push'), {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                token: token,
+                token: currentId,
                 title: 'Ujuzi Imekamilika! 🎉',
-                body: 'Hongera! Sasa utapokea masomo na mbinu mpya za biashara kila siku moja kwa moja hapa!',
+                body: 'Hongera! Sasa utapokea masomo na mbinu mpya za biashara kila siku moja kwa moja hapa kupitia OneSignal!',
                 link: '/'
               })
             });
-          } catch (e) {
-            console.warn('Welcome push failed to deliver:', e);
           }
-        }, 1200);
-      } else {
-        throw new Error('Tulishindwa kupata Secure token kutoka Google.');
-      }
+        } catch (e) {
+          console.warn('OneSignal initial welcome push failed:', e);
+        }
+      }, 1500);
+
     } catch (e: any) {
       setFcmStatusMsg({ 
         type: 'err', 
-        text: e.message || 'Mchakato wa token umefeli.' 
+        text: e.message || 'Mchakato wa OneSignal umeshindana.' 
       });
       const updated = { ...notifConfig, enabled: false };
       setNotifConfig(updated);
@@ -134,23 +169,9 @@ export default function ProfileScreen({ onNavigate }: Props) {
   const handleRequestPermission = async () => {
     setShowPermissionPrompt(false);
     setIsGeneratingToken(true);
-    setFcmStatusMsg({ type: 'info', text: 'Tafadhali chagua "Ruhusu" au "Allow" kwenye dirisha la kivinjari linalojitokeza...' });
+    setFcmStatusMsg({ type: 'info', text: 'Tafadhali chagua "Ruhusu" au "Allow" kwenye kisanduku kitakachotokea...' });
     try {
-      if (typeof window !== 'undefined' && 'Notification' in window) {
-        const permission = await Notification.requestPermission();
-        setPermissionState(permission);
-        if (permission === 'granted') {
-          await activatePushNotifications();
-        } else {
-          setFcmStatusMsg({ 
-            type: 'err', 
-            text: 'Mchakato umezuiwa kwa sababu ulikataa/uliahirisha kuruhusu arifa.' 
-          });
-          const updated = { ...notifConfig, enabled: false };
-          setNotifConfig(updated);
-          saveNotificationConfig({ enabled: false });
-        }
-      }
+      await activatePushNotifications();
     } catch (e: any) {
       setFcmStatusMsg({ type: 'err', text: e.message || 'Shida imetokea wakati wa kuomba ruhusa.' });
     } finally {
@@ -162,19 +183,29 @@ export default function ProfileScreen({ onNavigate }: Props) {
     const nextEnabled = !notifConfig.enabled;
     
     if (!nextEnabled) {
-      // Deactivating
+      // Deactivating OneSignal
       const updated = { ...notifConfig, enabled: false };
       setNotifConfig(updated);
       saveNotificationConfig({ enabled: false });
-      setFcmStatusMsg({ type: 'info', text: 'Arifa za Kusukuma zimezimwa kwa mafanikio.' });
+      await optOutPushNotifications();
+      setFcmToken('');
+      setFcmStatusMsg({ type: 'info', text: 'Arifa za OneSignal zimezimwa kwa mafanikio.' });
     } else {
-      // Activating
-      if (typeof window === 'undefined' || !('Notification' in window)) {
+      // Activating OneSignal
+      if (!isOneSignalAllowedOnCurrentDomain()) {
+        setFcmStatusMsg({ 
+          type: 'err', 
+          text: 'Arifa za Push (OneSignal) zinafanya kazi kwenye tovuti rasmi pekee (https://ujuzii.vercel.app). Mfumo umezimwa kwenye mazingira haya ya majaribio.' 
+        });
+        return;
+      }
+
+      if (!isOneSignalSupported()) {
         setFcmStatusMsg({ type: 'err', text: 'Push notifications haziafikiwi kwenye mazingira haya.' });
         return;
       }
 
-      const permission = Notification.permission;
+      const permission = typeof window !== 'undefined' && 'Notification' in window ? Notification.permission : 'default';
       setPermissionState(permission);
 
       if (permission === 'granted') {
@@ -183,7 +214,7 @@ export default function ProfileScreen({ onNavigate }: Props) {
         // Show guidance on manual browser settings
         setFcmStatusMsg({ 
           type: 'err', 
-          text: 'Umeziba arifa kwenye kivinjari chako. Tafadhali bofya aikoni ya kufuli (Lock/Settings) karibu na anuani (URL bar) ya jukwaa hili kwenye kivinjari chako ili uruhusu upya.' 
+          text: 'Umeziba arifa kwenye kivinjari chako. Tafadhali bofya aikoni ya kufuli (Lock/Settings) karibu na pini ya URL ya kivinjari chako ili uruhusu upya.' 
         });
       } else {
         // Show popup/banner prompt style to motivate user
@@ -344,10 +375,10 @@ export default function ProfileScreen({ onNavigate }: Props) {
             </div>
           )}
 
-          {/* FCM Token Display with Copy capability - Styled Compactly */}
+          {/* OneSignal Token Display with Copy capability - Styled Compactly */}
           {fcmToken && notifConfig.enabled && (
             <div className="bg-neutral-50/70 p-3 rounded-2xl border border-neutral-100 space-y-2 text-left">
-              <span className="text-[9px] text-slate-400 font-extrabold uppercase tracking-wider block">Token ya Kifaa (FCM Token)</span>
+              <span className="text-[9px] text-slate-400 font-extrabold uppercase tracking-wider block">ID ya OneSignal (Player ID)</span>
               <div className="flex items-center gap-2">
                 <div className="flex-1 min-w-0 bg-white border border-neutral-100 p-2 rounded-xl text-[10px] font-mono break-all line-clamp-1 select-all hover:line-clamp-none transition-all text-neutral-600 leading-tight">
                   {fcmToken}
@@ -355,7 +386,7 @@ export default function ProfileScreen({ onNavigate }: Props) {
                 <button
                   onClick={handleCopyToken}
                   className="w-8 h-8 border border-neutral-200 hover:bg-neutral-100 flex items-center justify-center bg-white rounded-lg shrink-0 cursor-pointer transition-colors"
-                  title="Copy FCM Token"
+                  title="Copy ID ya OneSignal"
                 >
                   {copiedToken ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-slate-500" />}
                 </button>

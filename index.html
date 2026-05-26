@@ -9,6 +9,38 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Ujuzi" />
     <title>Ujuzi - Jifunze Kidogo</title>
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    <script>
+      (function() {
+        const hostname = window.location.hostname;
+        const isAllowedOneSignalDomain = 
+          hostname.includes('ujuzii.vercel.app') || 
+          hostname.includes('ujuzi.vercel.app') ||
+          hostname === 'localhost' || 
+          hostname === '127.0.0.1';
+
+        if (isAllowedOneSignalDomain) {
+          window.OneSignalDeferred = window.OneSignalDeferred || [];
+          window.OneSignalDeferred.push(async function(OneSignal) {
+            try {
+              await OneSignal.init({
+                appId: "1780c6e8-a0f3-4cc8-a5e1-a328a231a995",
+                safari_web_id: "web.onesignal.auto.01b883ce-5cfa-4aca-8569-bf08de600615",
+                notifyButton: {
+                  enable: true,
+                },
+              });
+              window.__onesignal_initialized = true;
+              console.log("OneSignal initialized successfully on allowed domain.");
+            } catch (err) {
+              console.warn("OneSignal failed to initialize:", err);
+            }
+          });
+        } else {
+          console.log("OneSignal integration is inactive on this domain (" + hostname + "). Supported domain: https://ujuzii.vercel.app");
+        }
+      })();
+    </script>
     <script>
       // Capture the event as early as possible
       window.deferredPrompt = null;

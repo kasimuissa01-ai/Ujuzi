@@ -110,97 +110,64 @@ async function startServer() {
 
   // Dynamic Service Worker endpoint removed; using static generation via generate-sw.ts
 
-  // Safe HTTP POST proxy endpoint to trigger Firebase Cloud Messaging (FCM)
+  // Safe HTTP POST proxy endpoint to trigger OneSignal Push Notifications
   app.post("/api/send-push", async (req, res) => {
-    const { token, serverKey: bodyServerKey, title, body, link } = req.body;
+    const { token, title, body, link } = req.body;
     
-    // 1. Try FCM HTTP v1 via official Firebase Admin SDK (Recommended)
-    const adminSdk = getFirebaseAdminInstance();
-    if (adminSdk) {
-      try {
-        console.log("Using FCM HTTP v1 (Service Account) to deliver notification...");
-        const response = await adminSdk.messaging().send({
-          token: token,
-          notification: {
-            title: title || "Ujuzi App 🎓",
-            body: body || "Huu ni ufalme wa masomo mapya!",
-          },
-          data: {
-            link: link || "/",
-            title: title || "Ujuzi App 🎓",
-            body: body || "Huu ni ufalme wa masomo mapya!",
-          },
-          webpush: {
-            notification: {
-              icon: "/icon.svg",
-              badge: "/icon.svg",
-              vibrate: [150, 80, 150],
-            },
-            fcmOptions: {
-              link: link || "/",
-            }
-          }
-        });
-        
-        console.log("FCM HTTP v1 delivered successfully response:", response);
-        return res.json({ 
-          success: true, 
-          method: "FCM HTTP v1 (Secure Service Account)", 
-          messageId: response 
-        });
-      } catch (err: any) {
-        console.error("FCM HTTP v1 Delivery failed:", err);
-        return res.status(500).json({ 
-          error: `FCM HTTP v1 Delivery failed: ${err.message || 'Unknown error'}` 
-        });
-      }
-    }
+    // Default OneSignal App ID from user parameter
+    const onesignalAppId = process.env.ONESIGNAL_APP_ID || "1780c6e8-a0f3-4cc8-a5e1-a328a231a995";
+    const onesignalApiKey = process.env.ONESIGNAL_REST_API_KEY;
 
-    // 2. Fallback to Legacy HTTP protocol if Server Key is provided (Highly discouraged, deprecated by Google)
-    const serverKey = process.env.FCM_SERVER_KEY || bodyServerKey;
-    if (!token || !serverKey) {
-      return res.status(400).json({ 
-        error: "FCM Device Token na Server Key / Service Account credentials vinahitajika! Tafadhali sanidi Service Account kwenye Vercel/env kufuata matakwa ya Google ya sasa." 
-      });
+    if (!token) {
+      return res.status(400).json({ error: "OneSignal Subscription ID (Player ID) is required!" });
     }
 
     try {
-      console.log("Using Deprecated FCM Legacy API with Server Key...");
-      const response = await fetch("https://fcm.googleapis.com/fcm/send", {
+      console.log(`Sending OneSignal single push to subscription ${token}...`);
+      
+      const payload: any = {
+        app_id: onesignalAppId,
+        include_subscription_ids: [token],
+        headings: { en: title || "Ujuzi App 🎓" },
+        contents: { en: body || "Huu ni ufalme wa masomo mapya!" },
+        url: link || "/"
+      };
+
+      const headers: any = {
+        "Content-Type": "application/json"
+      };
+
+      if (onesignalApiKey) {
+        headers["Authorization"] = `Basic ${onesignalApiKey}`;
+      }
+
+      const response = await fetch("https://onesignal.com/api/v1/notifications", {
         method: "POST",
-        headers: {
-          "Authorization": `key=${serverKey}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          to: token,
-          notification: {
-            title: title || "Ujuzi App 🎓",
-            body: body || "Huu ni ufalme wa masomo mapya!",
-            icon: "/icon.svg",
-            sound: "default"
-          },
-          data: {
-            link: link || "/",
-            title: title,
-            body: body
-          }
-        })
+        headers,
+        body: JSON.stringify(payload)
       });
 
       const responseText = await response.text();
+      console.log("OneSignal push API response status:", response.status, responseText);
+
       if (response.ok) {
-        res.json({ 
-          success: true, 
-          method: "FCM Legacy API (Deprecated)", 
-          details: responseText 
+        let details = {};
+        try {
+          details = JSON.parse(responseText);
+        } catch {
+          details = { raw: responseText };
+        }
+        res.json({
+          success: true,
+          method: "OneSignal REST API",
+          details
         });
       } else {
         res.status(response.status).json({ error: responseText });
       }
     } catch (error: any) {
-      console.error("FCM Legacy Send Proxy Error:", error);
-      res.status(500).json({ error: error.message || "Failed to deliver push notification via FCM" });
+      console.error("OneSignal Send Proxy Error:", error);
+      res.status(500).json({ error: error.message || "Failed to deliver push notification via OneSignal" });
     }
   });
 
@@ -274,91 +241,52 @@ async function startServer() {
   });
 
   // --- Push Notification Cron Jobs ---
-  const adminSdk = getFirebaseAdminInstance();
-  if (adminSdk) {
-    let db;
-    if (firebaseConfig && firebaseConfig.firestoreDatabaseId) {
-      db = getFirestore(adminSdk.app(), firebaseConfig.firestoreDatabaseId);
-    } else {
-      db = adminSdk.firestore();
-    }
-    
-    const sendBroadcast = async (timeOfDay: string) => {
-      try {
-        console.log(`Cron: Running ${timeOfDay} broadcast`);
-        console.log(`Cron: Fetching users from Firestore...`);
-        const usersSnap = await db.collection("users").get();
-        console.log(`Cron: Fetched ${usersSnap.size} users`);
-        const tokens: string[] = [];
-        
-        usersSnap.forEach(doc => {
-          const data = doc.data();
-          if (data.fcmTokens && Array.isArray(data.fcmTokens)) {
-            data.fcmTokens.forEach((token: string) => {
-              if (token) tokens.push(token);
-            });
-          }
-        });
-        
-        // Optional unique filter
-        const uniqueTokens = Array.from(new Set(tokens));
-        console.log(`Cron: Found ${uniqueTokens.length} unique FCM tokens to send to`);
+  const sendBroadcast = async (timeOfDay: string) => {
+    try {
+      console.log(`Cron: Running ${timeOfDay} broadcast via OneSignal...`);
+      const onesignalAppId = process.env.ONESIGNAL_APP_ID || "1780c6e8-a0f3-4cc8-a5e1-a328a231a995";
+      const onesignalApiKey = process.env.ONESIGNAL_REST_API_KEY;
 
-        if (uniqueTokens.length > 0) {
-          const messagePayload = {
-            tokens: uniqueTokens,
-            notification: {
-              title: "Ujuzi App 🎓",
-              body: "Ni wakati wa kujifunza! Fungua Ujuzi na uendelee na masomo yako sasa.",
-            },
-            data: {
-              link: "/",
-            },
-            webpush: {
-              notification: {
-                icon: "/icon.svg", 
-                badge: "/icon.svg",
-                vibrate: [150, 80, 150],
-              },
-              fcmOptions: {
-                link: "/",
-              }
-            }
-          };
-          
-          // Chunk tokens as sendEachForMulticast accepts maximum of 500 tokens at a time
-          const chunkSize = 500;
-          for (let i = 0; i < uniqueTokens.length; i += chunkSize) {
-            const chunk = uniqueTokens.slice(i, i + chunkSize);
-            console.log(`Cron: Sending chunk of ${chunk.length} tokens via FCM...`);
-            const response = await adminSdk.messaging().sendEachForMulticast({ ...messagePayload, tokens: chunk });
-            console.log(`Cron ${timeOfDay} delivery chunk success: ${response.successCount}, failed: ${response.failureCount}`);
-            if (response.failureCount > 0) {
-              response.responses.forEach((resp, idx) => {
-                if (!resp.success) {
-                  console.error(`Token failed: ${chunk[idx]} - Error: ${resp.error?.message}`);
-                }
-              });
-            }
-          }
-        }
-      } catch (err) {
-        console.error(`Cron ${timeOfDay} Error:`, err);
+      const payload: any = {
+        app_id: onesignalAppId,
+        included_segments: ["Subscribed Users"],
+        headings: { en: "Mbinu Mpya ya Ujuzi! 🎓" },
+        contents: { en: `Mkuu, ufundi na maarifa mapya ya biashara yameshaingia leo (${timeOfDay}). Bofya hapa kujiunga na wenzako kujifunza sasa!` },
+        url: "/"
+      };
+
+      const headers: any = {
+        "Content-Type": "application/json"
+      };
+
+      if (onesignalApiKey) {
+        headers["Authorization"] = `Basic ${onesignalApiKey}`;
       }
-    };
 
-    const timezone = "Africa/Nairobi";
-    cron.schedule("0 7 * * *", () => sendBroadcast("Morning (7 AM)"), { timezone });
-    cron.schedule("0 12 * * *", () => sendBroadcast("Afternoon (12 PM)"), { timezone });
-    cron.schedule("0 20 * * *", () => sendBroadcast("Evening (8 PM)"), { timezone });
-    
-    app.post("/api/test-cron", async (req, res) => {
-      await sendBroadcast("Manual Test Broadcast");
-      res.json({ success: true, message: "Manual broadcast triggered!" });
-    });
-    
-    console.log("Registered Push Notification Cron Jobs initialized for 7AM, 12PM, and 8PM (EAT).");
-  }
+      const response = await fetch("https://onesignal.com/api/v1/notifications", {
+        method: "POST",
+        headers,
+        body: JSON.stringify(payload)
+      });
+
+      const text = await response.text();
+      console.log(`Cron ${timeOfDay} OneSignal Broadcast response status: ${response.status}`, text);
+    } catch (err) {
+      console.error(`Cron ${timeOfDay} OneSignal Broadcast Error:`, err);
+    }
+  };
+
+  const timezone = "Africa/Nairobi";
+  cron.schedule("0 7 * * *", () => sendBroadcast("Asubuhi (7 AM)"), { timezone });
+  cron.schedule("0 12 * * *", () => sendBroadcast("Mchana (12 PM)"), { timezone });
+  cron.schedule("0 20 * * *", () => sendBroadcast("Jioni (8 PM)"), { timezone });
+  
+  app.post("/api/test-cron", async (req, res) => {
+    await sendBroadcast("Jaribio la Broadcast la Cron");
+    res.json({ success: true, message: "Manual broadcast triggered successfully!" });
+  });
+  
+  console.log("Registered Push Notification Cron Jobs initialized via OneSignal for 7AM, 12PM, and 8PM (EAT).");
 
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
