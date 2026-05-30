@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { doc, getDoc, setDoc, serverTimestamp, onSnapshot } from 'firebase/firestore';
-import { db, auth } from '../lib/firebase';
+import { db, auth, handleFirestoreError, OperationType } from '../lib/firebase';
 import { useAuth } from './useAuth';
 import { trackEvent } from '../lib/mixpanel';
 
@@ -36,6 +36,12 @@ export function useProgress() {
       return;
     }
 
+    // Bypass Firestore sync for mock guest or unauthenticated sandbox users to avoid security rule Denials
+    if (user.uid === 'guest_sandbox_user_override' || !auth.currentUser) {
+      setLoading(false);
+      return;
+    }
+
     const docRef = doc(db, 'user_progress', user.uid);
     
     const unsubscribe = onSnapshot(docRef, async (snapshot) => {
@@ -62,12 +68,17 @@ export function useProgress() {
             updatedAt: serverTimestamp()
           });
         } catch (error) {
+          handleFirestoreError(error, OperationType.WRITE, `user_progress/${user.uid}`);
           console.error("Failed to initialize remote progress", error);
         }
       }
       setLoading(false);
     }, (error) => {
-      console.error("Progress sync error:", error);
+      try {
+        handleFirestoreError(error, OperationType.GET, `user_progress/${user.uid}`);
+      } catch (perr) {
+        console.error("Progress sync error:", perr);
+      }
       setLoading(false);
     });
 
@@ -95,7 +106,7 @@ export function useProgress() {
         userId: user?.uid 
       });
       
-      if (user) {
+      if (user && user.uid !== 'guest_sandbox_user_override' && auth.currentUser) {
         try {
           await setDoc(doc(db, 'user_progress', user.uid), {
             userId: user.uid,
@@ -104,6 +115,7 @@ export function useProgress() {
             updatedAt: serverTimestamp()
           }, { merge: true });
         } catch (error) {
+          handleFirestoreError(error, OperationType.WRITE, `user_progress/${user.uid}`);
           console.error("Failed to save lesson completion to Firestore", error);
         }
       }
@@ -125,7 +137,7 @@ export function useProgress() {
         userId: user?.uid
       });
 
-      if (user) {
+      if (user && user.uid !== 'guest_sandbox_user_override' && auth.currentUser) {
         try {
           await setDoc(doc(db, 'user_progress', user.uid), {
             userId: user.uid,
@@ -134,6 +146,7 @@ export function useProgress() {
             updatedAt: serverTimestamp()
           }, { merge: true });
         } catch (error) {
+          handleFirestoreError(error, OperationType.WRITE, `user_progress/${user.uid}`);
           console.error("Failed to save streak to Firestore", error);
         }
       }

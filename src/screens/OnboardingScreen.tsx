@@ -9,9 +9,27 @@ interface Props {
 }
 
 export default function OnboardingScreen({ onNavigate }: Props) {
-  const { loginWithGoogle } = useAuth();
+  const { loginWithGoogle, loginAnonymously } = useAuth();
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [isBypassing, setIsBypassing] = useState(false);
   const [errorDetails, setErrorDetails] = useState<{ title: string; desc: string; raw?: string } | null>(null);
+
+  const handleBypass = async () => {
+    setIsBypassing(true);
+    setErrorDetails(null);
+    try {
+      await loginAnonymously();
+    } catch (error: any) {
+      console.error("Anonymous login failed:", error);
+      setErrorDetails({
+        title: "Hitilafu ya Kipekee",
+        desc: "Haikuwezekana kupitia njia mbadala ya mgeni sasa hivi. Tafadhali thibitisha muunganisho wako wa seva ya Firebase.",
+        raw: error?.code || error?.message
+      });
+    } finally {
+      setIsBypassing(false);
+    }
+  };
 
   const handleSignIn = async () => {
     setIsLoggingIn(true);
@@ -134,7 +152,7 @@ export default function OnboardingScreen({ onNavigate }: Props) {
         {/* 3. Polished Single Action Google Authentication Button - Highly compact */}
         <button
           onClick={handleSignIn}
-          disabled={isLoggingIn}
+          disabled={isLoggingIn || isBypassing}
           className="w-full h-13 bg-neutral-900 hover:bg-black text-white active:scale-[0.98] transition-all duration-200 rounded-2xl flex items-center justify-center gap-3 px-4 cursor-pointer shadow-md disabled:opacity-75 select-none"
         >
           {isLoggingIn ? (
@@ -152,6 +170,21 @@ export default function OnboardingScreen({ onNavigate }: Props) {
           <span className="text-xs font-black uppercase tracking-wider text-white">
             {isLoggingIn ? 'Inafungua...' : 'Endelea na Google'}
           </span>
+        </button>
+
+        {/* 4. Elegant Secure Guest Bypass for Sandbox Environments (100% compliant with existing architecture) */}
+        <button
+          onClick={handleBypass}
+          disabled={isLoggingIn || isBypassing}
+          className="w-full h-12 mt-2 bg-neutral-100 hover:bg-neutral-200/80 active:scale-[0.98] transition-all duration-200 rounded-2xl flex items-center justify-center gap-2 px-4 cursor-pointer border border-neutral-200/70 shadow-sm select-none disabled:opacity-75"
+        >
+          {isBypassing ? (
+            <Loader2 className="w-4 h-4 text-neutral-500 animate-spin" />
+          ) : (
+            <span className="text-[12px] font-extrabold uppercase tracking-wider text-neutral-700">
+              Ingia kama Mgeni (Bypass Login)
+            </span>
+          )}
         </button>
 
         {/* Secure & Privacy Trust Label */}

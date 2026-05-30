@@ -792,7 +792,11 @@
                     "text": "Piga picha kutoka pembe tofauti (front, side, close-up)"
                   }
                 ],
-                "correct_order": ["1", "2", "3"],
+                "correct_order": [
+                  "1",
+                  "2",
+                  "3"
+                ],
                 "feedback": "Kufuata hatua hizi kutabadilisha picha za simu yako kuonekana kama zimepigwa na mtaalamu."
               },
               {
@@ -1100,7 +1104,11 @@
                     "text": "Swali la Kufunga la kuendeleza mazungumzo (mfano: Ungependa nikuandalie rangi gani leo?)"
                   }
                 ],
-                "correct_order": ["1", "2", "3"],
+                "correct_order": [
+                  "1",
+                  "2",
+                  "3"
+                ],
                 "feedback": "Fomula hii (Salamu + Bei/Thamani + Swali) ni injini yako kuu ya kufunga mauzo mtandaoni kiprofessional."
               },
               {
@@ -1474,6 +1482,844 @@
                 "title": "🎓 Sehemu ya 1 Imekamilika!",
                 "badge_earned": "Fundi wa Mauzo na Mahusiano",
                 "message": "Hongera sana! 🎉 Umekamilisha mafunzo ya misingi ya kuanzisha na kuendesha Biashara Mtandaoni kwa mafanikio nchini Tanzania. Wewe sio tena mwanafunzi — wewe ni Mjasiriamali wa Kisasa wa Tanzania anayejua jinsi ya kujenga, kuvutia, na kufunga mauzo mtandaoni. Safari yako ya kweli inaanza sasa."
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "course_id": "biashara_mtandaoni_002_v6",
+    "course_title": "Uendeshaji na Ukuaji wa Biashara Mtandaoni",
+    "category": "Digital Skills",
+    "language": "Swahili",
+    "level": "intermediate",
+    "version": "6.0",
+    "xp_total": 18000,
+    "estimated_minutes": 600,
+    "estimated_days": 14,
+    "course_goal": "Kumsaidia SME aliyezindua duka lake mtandaoni kusimamia mzunguko wa hela, kudhibiti usafirishaji, kununua mzigo kwa usalama, na kuanza kukua kwa matangazo ya kulipia.",
+    "gamification": {
+      "daily_streak_enabled": true,
+      "daily_missions_enabled": true,
+      "badges_enabled": true,
+      "leaderboard_enabled": false,
+      "challenge_rewards_enabled": true,
+      "micro_commitment_tracking": true,
+      "pain_calculator_enabled": true,
+      "identity_declaration_required": true
+    },
+    "units": [
+      {
+        "unit_id": 1,
+        "unit_title": "Kusimamia Pesa za Biashara",
+        "unit_icon": "💰",
+        "description": "Jifunze nidhamu ya mzunguko wa hela, kutenganisha duka na matumizi binafsi, na kukokotoa faida halisi.",
+        "estimated_minutes": 150,
+        "unlock_requirement": "Start",
+        "unit_reward_xp": 1500,
+        "badge": {
+          "new_label": "Mhasibu wa Kisasa",
+          "icon": "⚖️",
+          "description": "Hupotezi hata shilingi moja ya biashara — unajua mzunguko thabiti wa pesa za dukaako."
+        },
+        "lessons": [
+          {
+            "lesson_id": 2101,
+            "title": "Tenganisha Hela ya Duka na Matumizi Binafsi",
+            "xp": 350,
+            "duration_min": 15,
+            "mission": "Chagua benki au akaunti maalum ya simu utakayoitumia kwa ajili ya biashara pekee.",
+            "daily_mission": {
+              "tracking_id": "dm_201_separate_wallet",
+              "task": "Dhamiria kutotumia hata shilingi 100 ya duka leo kwa matumizi ya chakula au nauli yako binafsi.",
+              "xp_reward": 50
+            },
+            "blocks": [
+              {
+                "type": "story",
+                "character": "Neema, Muuzaji wa Nguo Kariakoo",
+                "content": "Neema alipata mauzo ya TZS 100,000 leo. Jioni hiyo hiyo, shemeji yake alimuomba TZS 20,000 ya dharura ya matibabu, na Neema akampa kutoka kwenye hela ya mauzo. Mwisho wa mwezi, alishindwa kununua mzigo mpya kwa sababu mtaji ulikuwa umepungua bila yeye kujua."
+              },
+              {
+                "type": "text",
+                "content": "Kosa namba moja linaloua 90% ya SMEs Tanzania ni kuchanganya hela ya duka na matumizi binafsi. Hela yote inayopokelewa kutoka kwa wateja ni mali ya biashara, siyo hela yako ya mifuko."
+              },
+              {
+                "type": "scenario",
+                "label": "Tathmini nidhamu ya pesa",
+                "setup": "Mteja amekutumia TZS 50,000 ya ununuzi wa viatu kwenye simu yako. Baadaye mchana, unapata njaa kali na unataka kula chakula cha TZS 5,000 lakini huna hela mfukoni.",
+                "options": [
+                  "Chukua TZS 5,000 kwenye ile ile ya mteja ukile kisha utairudisha kesho asubuhi",
+                  "Vumilia njaa au tafuta njia ya kukopa hela ya chakula nje ya akaunti ya duka, usiguse kabisa ile 50,000 ya duka",
+                  "Chukua ile 50,000 yote ukaifanyie matumizi yako"
+                ],
+                "correct_index": 1,
+                "feedback": "Hii ndiyo chaguo gumu lakini ndiyo pekee inayolinda uhai wa duka lako. Ukianza tabia ya 'nitairudisha kesho', utaiua biashara haraka."
+              },
+              {
+                "type": "cloze",
+                "prompt": "Hela yote inayoingia kutoka kwa wateja inapaswa kuhifadhiwa kwenye akaunti ya ________.",
+                "sentence_with_blank": "Kamwe usichanganye hela ya duka na ya {blank}.",
+                "options": [
+                  "Biashara pekee",
+                  "Matumizi binafsi",
+                  "Marafiki"
+                ],
+                "correct": "Biashara pekee",
+                "feedback": "Sahihi kabisa! Kutenganisha akaunti ndio ngao ya kwanza ya mtaji wako."
+              },
+              {
+                "type": "mistake_example",
+                "bad_example": "Kutumia akaunti yako ya kibinafsi ya M-pesa kupokea hela zote za duka na kununua mboga za nyumbani humo humo.",
+                "good_example": "Kufungua Lipa kwa M-Pesa (Till Number) ya biashara ili malipo yote ya wateja yaende huko moja kwa moja.",
+                "question": "Ni njia ipi inayokuokoa usishawishike kutumia hela ya duka?",
+                "correct": "good_example",
+                "feedback": "Till number au akaunti tofauti ya simu inakusaidia kuona mtaji wako halisi ukikua bila kuugusa."
+              },
+              {
+                "type": "quiz",
+                "question": "Njia bora ya kujilipa kama mmiliki wa biashara ili usichukue mtaji wa duka ni ipi?",
+                "options": [
+                  "Kuchukua pesa stoo kila unapojisikia",
+                  "Kujiwekea mshahara maalum (fixed salary) wa kila mwezi kulingana na faida ya duka",
+                  "Kutojilipa kabisa na kuishi kwa kukopa"
+                ],
+                "correct_index": 1,
+                "feedback": "Kujiwekea mshahara mdogo thabiti kunakulinda usitafune mtaji wa duka lako."
+              },
+              {
+                "type": "match",
+                "prompt": "Oanisha tabia za fedha na matokeo yake kwenye biashara yako:",
+                "pairs": [
+                  {
+                    "left": "Kujiwekea mshahara thabiti",
+                    "right": "Unajua matumizi yako binafsi na unalinda mtaji wa duka ukue."
+                  },
+                  {
+                    "left": "Kuchukua hela stoo",
+                    "right": "Unapunguza mtaji wa duka kila siku na duka litakufa ndani ya miezi mitatu."
+                  }
+                ],
+                "feedback": "Safi sana! Nidhamu ya pesa ndiyo inayotofautisha wafanyabiashara wakubwa na wadogo."
+              },
+              {
+                "type": "drag_drop",
+                "prompt": "Panga hatua za kupanga pesa zako kuanzia ya kwanza:",
+                "items": [
+                  {
+                    "id": "1",
+                    "text": "Fungua Till Number au akaunti ya simu ya pembeni ya duka"
+                  },
+                  {
+                    "id": "2",
+                    "text": "Pokea malipo yote ya wateja kupitia akaunti hiyo pekee"
+                  },
+                  {
+                    "id": "3",
+                    "text": "Jilipe mshahara wako uliopangwa mwisho wa mwezi kutoka kwenye faida"
+                  }
+                ],
+                "correct_order": [
+                  "1",
+                  "2",
+                  "3"
+                ],
+                "feedback": "Ukifuata nidhamu hii, duka lako halitakosa mtaji wa mzigo kamwe."
+              },
+              {
+                "type": "unit_reflection",
+                "title": "Tafakari ya Nidhamu ya Pesa",
+                "prompt": "Chagua kauli jedna utakayoitekeleza kuanzia leo kwenye matumizi yako:",
+                "options": [
+                  "Nitaanza kutumia akaunti tofauti ya duka na sitagusa hata mia ya mauzo",
+                  "Nitaendelea kuchukua hela kidogo kidogo nikiahidi kurudisha",
+                  "Nitaacha biashara ifanye kazi yenyewe bila hesabu"
+                ],
+                "correct_index": 0,
+                "feedback": "Hongera sana! Uamuzi wako utalinda mtaji wako na kuhakikisha unakua kila mwezi."
+              }
+            ]
+          },
+          {
+            "lesson_id": 2102,
+            "title": "Mauzo siyo Faida — Jifunze Kukokotoa",
+            "xp": 350,
+            "duration_min": 15,
+            "mission": "Chagua bidhaa moja ya duka lako na ukokotoe faida yake halisi (Net Profit) leo.",
+            "daily_mission": {
+              "tracking_id": "dm_202_profit_math",
+              "task": "Kagua mauzo yako ya jana na utenganishe mtaji wa mzigo na faida yako halisi.",
+              "xp_reward": 50
+            },
+            "blocks": [
+              {
+                "type": "story",
+                "character": "Juma, Muuzaji wa Pilau",
+                "content": "Juma ameuza sahani 20 za pilau leo na kupata TZS 100,000 mkononi. Alijisikia tajiri sana akaenda kununua shati jipya la TZS 30,000. Baadaye alipopiga hesabu ya gharama za mchele, nyama, mkaa, na boda boda, aligundua faida yake halisi ilikuwa TZS 20,000 tu. Alikuwa ametumia mtaji wake kununua shati."
+              },
+              {
+                "type": "text",
+                "content": "**Hesabu ya Faida Halisi:** Faida halisi siyo kiasi cha pesa ulichopokea mkononi. Ni Mauzo yako (Revenue) ukiondoa gharama ya kununua mzigo (Cost of Goods) pamoja na gharama za uendeshaji (Boda Boda, vifungashio, umeme, na vifurushi vya internet)."
+              },
+              {
+                "type": "scenario",
+                "label": "Kukokotoa faida ya nguo",
+                "setup": "Umenunua raba Kariakoo kwa TZS 20,000. Ukailipia Boda Boda TZS 3,000 kuileta kwako. Umemtumia mteja kwa gharama yako ya TZS 2,000 na kumshajiisha kununua kwa TZS 30,000. Mauzo yako ni 30,000. Faida yako halisi ni kiasi gani?",
+                "options": [
+                  "TZS 10,000 (Mauzo ya 30,000 kutoa mtaji wa 20,000)",
+                  "TZS 5,000 (Mauzo ya 30,000 kutoa mtaji wa 20,000, boda boda ya 3,000 na usafirishaji wa 2,000)",
+                  "TZS 30,000 (Pesa zote ulizopokea mkononi)"
+                ],
+                "correct_index": 1,
+                "feedback": "Safi sana! Hapa umefanya hesabu ya kweli ya ujasiriamali. Ukisahau kukata gharama za Boda Boda and vifurushi, utakuwa unakula mtaji wako bila kujua."
+              },
+              {
+                "type": "cloze",
+                "prompt": "Gharama zote ndogo ndogo kama vifungashio na Boda Boda lazima zikatwe ili kupata faida ________.",
+                "sentence_with_blank": "Usiangalie faida ghafi, angalia faida {blank} ya duka lako.",
+                "options": [
+                  "Halisi (Net Profit)",
+                  "Kubwa ya jumla",
+                  "Yote ya mkononi"
+                ],
+                "correct": "Halisi (Net Profit)",
+                "feedback": "Sahihi kabisa! Faida halisi ndiyo pesa inayobaki kwako baada ya kulipia kila kitu."
+              },
+              {
+                "type": "mistake_example",
+                "bad_example": "Kuamini kuwa pesa zote zilizoingia kwenye simu yako leo ni faida ya kula na kufurahia.",
+                "good_example": "Kukata gharama zote za ununuzi na usafirishaji, kisha kuhifadhi mtaji kando na kubakiza faida pekee.",
+                "question": "Ni njia ipi inayoweka mtaji wako salama kwa ajili ya kununua mzigo mpya?",
+                "correct": "good_example",
+                "feedback": "Kuhifadhi mtaji kando kunakuhakikishia duka lako halitakosa mzigo kesho."
+              },
+              {
+                "type": "quiz",
+                "question": "Ukipata mauzo ya TZS 50,000 na gharama zako zote zilikuwa TZS 40,000. Pesa inayopaswa kurudishwa stoo kununua mzigo mpya ni kiasi gani?",
+                "options": [
+                  "TZS 10,000 pekee",
+                  "TZS 40,000 (Mtaji halisi wa mzigo)",
+                  "TZS 50,000 yote"
+                ],
+                "correct_index": 1,
+                "feedback": "Sahihi! TZS 40,000 ni mtaji wa mzigo, lazima urudishwe stoo mara moja ili biashara iendelee."
+              },
+              {
+                "type": "match",
+                "prompt": "Oanisha aina ya fedha na tafsiri zake sahihi:",
+                "pairs": [
+                  {
+                    "left": "Mauzo ya Jumla (Revenue)",
+                    "right": "Pesa zote zilizoingia mkononi kutoka kwa wateja kabla ya kutoa gharama yoyote."
+                  },
+                  {
+                    "left": "Faida Halisi (Net Profit)",
+                    "right": "Pesa inayobaki baada ya kutoa gharama ya bidhaa, Boda Boda, na vifurushi vya mtandao."
+                  }
+                ],
+                "feedback": "Safi sana! Kuelewa tofauti hii kunakulinda na kufilisika."
+              },
+              {
+                "type": "unit_reflection",
+                "title": "Tafakari ya Kukokotoa Faida",
+                "prompt": "Chagua hatua utakayoifuata kuanzia leo kwenye mahesabu yako ya faida:",
+                "options": [
+                  "Nitakokotoa faida halisi kwa kukata gharama zote hadi za vifurushi vya simu",
+                  "Nitaendelea kukadiria kwa macho tu",
+                  "Nitaacha kabisa kufanya hesabu ngumu"
+                ],
+                "correct_index": 0,
+                "feedback": "Uamuzi mzuri mkuu! Wewe sasa ni Mhasibu wa Kisasa anayelinda mtaji wa duka lake."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "unit_id": 2,
+        "unit_title": "Usafirishaji na Kudhibiti Hasara",
+        "unit_icon": "🚚",
+        "description": "Jifunze kusimamia madereva wa usafirishaji, kutuma mizigo mikoani kupitia mabasi, na kudhibiti hasara za malipo ya mlangoni (COD).",
+        "estimated_minutes": 150,
+        "unlock_requirement": "Complete Unit 1",
+        "unit_reward_xp": 1500,
+        "badge": {
+          "new_label": "Fundi wa Logistiki",
+          "icon": "📦",
+          "description": "📦 Mzigo unafika salama, unadhibiti wezi na matapeli wa usafirishaji kwa usalama wa hali ya juu."
+        },
+        "lessons": [
+          {
+            "lesson_id": 2201,
+            "title": "Kusimamia Boda Boda na Kupunguza Hasara",
+            "xp": 350,
+            "duration_min": 15,
+            "mission": "Tafuta dereva mmoja wa uaminifu wa Boda Boda na uweke naye makubaliano ya bei za standard.",
+            "daily_mission": {
+              "tracking_id": "dm_201_rider_verify",
+              "task": "Daima thibitisha namba ya simu na jina halisi la dereva wa Boda Boda kabla ya kumkabidhi mzigo wa mteja leo.",
+              "xp_reward": 50
+            },
+            "blocks": [
+              {
+                "type": "story",
+                "character": "Aisha, Muuzaji wa Vitenge",
+                "content": "Aisha alikabidhi kitenge cha TZS 60,000 kwa dereva yeyote wa Boda Boda aliyemkuta barabarani ili ampelekee mteja wake Kinondoni. Dereva huyo alizima simu na kutoweka na mzigo huo. Aisha alipoteza kitenge na ikabidi amrudishie mteja pesa zake."
+              },
+              {
+                "type": "text",
+                "content": "**Usalama wa Usafirishaji:** Usikabidhi mzigo wa thamani kwa dereva usiyemjua au usiye na namba yake iliyothibitishwa. Daima tumia madereva wa kuaminika au kampuni za uwasilishaji zenye mifumo ya kufuatilia mizigo."
+              },
+              {
+                "type": "scenario",
+                "label": "Chagua hatua sahihi ya uwasilishaji",
+                "setup": "Mteja wako wa Kinondoni anataka mzigo wake sasa hivi. Huna dereva wako wa kawaida wa Boda Boda karibu nawe.",
+                "options": [
+                  "Nenda barabarani ukamkabidhi dereva yeyote wa Boda Boda unayemkuta",
+                  "Agiza Boda Boda kupitia app rasmi (kama Bolt au Uber) au piga simu kwa dereva wako wa uaminifu uliyemzoea hata kama atachelewa kidogo",
+                  "Mpe mtu yeyote anayepita mtaani kwako ampelekee"
+                ],
+                "correct_index": 1,
+                "feedback": "Huu ndio usalama wa kweli wa kibiashara. Kutumia madereva waliosajiliwa kwenye app au yule unayemjua kunakulinda dhidi ya wizi wa mizigo."
+              },
+              {
+                "type": "cloze",
+                "prompt": "Kabla ya kukabidhi mzigo kwa Boda Boda, daima hakikisha umechukua namba yake ya simu na ukapiga kuona kama inaita na jina lake la ________.",
+                "sentence_with_blank": "Thibitisha namba ya simu na jina la {blank} la dereva kwanza.",
+                "options": [
+                  "NIDA au M-Pesa",
+                  "Facebook",
+                  "Kadi ya kliniki"
+                ],
+                "correct": "NIDA au M-Pesa",
+                "feedback": "Sahihi! Jina la M-Pesa au NIDA linakuhakikishia kuwa mtu huyo anatambulika kisheria."
+              },
+              {
+                "type": "quiz",
+                "question": "Ni njia ipi bora ya kulipa gharama ya Boda Boda ili usipoteze faida yako?",
+                "options": [
+                  "Kumlipia mteja usafiri kila wakati bila kuongeza kwenye bei",
+                  "Kumuambia mteja mapema gharama ya usafiri kulingana na eneo lake na kuijumlisha kwenye malipo ya mzigo",
+                  "Kumpa dereva hela yoyote anayotaka yeye"
+                ],
+                "correct_index": 1,
+                "feedback": "Mteja lazima ajue mapema gharama ya usafiri ili usije ukala faida yako ya bidhaa kulipia usafiri."
+              },
+              {
+                "type": "match",
+                "prompt": "Oanisha tabia za usafirishaji na matokeo yake kwenye usalama wako:",
+                "pairs": [
+                  {
+                    "left": "Kutumia dereva usiyemjua",
+                    "right": "Hatari kubwa ya kupoteza mzigo na mteja wako bila fidia yoyote."
+                  },
+                  {
+                    "left": "Kutumia madereva wa kusajiliwa",
+                    "right": "Mzigo unafika salama na unakuwa na bima au njia ya kumkamata dereva akisumbua."
+                  }
+                ],
+                "feedback": "Safi sana! Usalama wa usafirishaji unalinda mahusiano yako na wateja."
+              },
+              {
+                "type": "unit_reflection",
+                "title": "Tafakari ya Logistiki",
+                "prompt": "Chagua uamuzi wako wa kulinda usafirishaji kuanzia leo:",
+                "options": [
+                  "Nitatumia madereva thabiti niliowahoji na kuwatambua pekee",
+                  "Nitaendelea kumpa dereva yeyote wa mtaani",
+                  "Nitaacha kabisa kufanya delivery"
+                ],
+                "correct_index": 0,
+                "feedback": "Hongera sana mkuu! Sasa wewe ni Fundi wa Logistiki anayejua kulinda mali za duka lake."
+              }
+            ]
+          },
+          {
+            "lesson_id": 2202,
+            "title": "Kutuma Mzigo Mikoani na Usalama wa Malipo ya COD",
+            "xp": 350,
+            "duration_min": 15,
+            "mission": "Tafuta ofisi au makubaliano ya uwasilishaji mizigo ya mabasi ya mikoani (mfano ubungo/magufuli) unayoweza kuitumia.",
+            "daily_mission": {
+              "tracking_id": "dm_202_bus_verification",
+              "task": "Kamwe usitume mzigo mkoani kwa mteja mpya kabla ya kupokea angalau hela ya usafiri wa kwenda na kurudi.",
+              "xp_reward": 50
+            },
+            "blocks": [
+              {
+                "type": "story",
+                "character": "Juma, Muuzaji wa Pilau na Vyakula",
+                "content": "Juma alipata mteja kutoka Arusha aliyetaka keki ya TZS 40,000. Mteja alisema: 'Nitumie keki kwenye basi la shabiby, nikipokea nitakutumia hela'. Juma alituma keki, mteja aliipokea stendi kisha akamlock Juma kwenye WhatsApp. Juma alipoteza keki na hela ya nauli."
+              },
+              {
+                "type": "text",
+                "content": "**Usalama wa Malipo ya Mikoani (COD):** Kamwe usitume mzigo mkoani bila kupokea malipo kamili kwanza, au bila kutumia mfumo thabiti wa 'Dereva wa Basi kama mdhamini wa malipo' (Escrow). Dereva anakabidhi mzigo tu baada ya kupokea pesa ya mteja stendi."
+              },
+              {
+                "type": "scenario",
+                "label": "Tathmini utumaji wa mzigo mkoani",
+                "setup": "Mteja mpya kutoka Mwanza anataka viatu vya TZS 50,000. Anasema hataki kulipa hadi aone mzigo stendi ya basi ya Mwanza.",
+                "options": [
+                  "Mtumie mzigo mara moja kwa sababu unaamini kila mtu ni mwaminifu",
+                  "Wasiliana na ofisi rasmi ya basi (mfano Kilimanjaro au Abood), mpe mzigo mfanyakazi rasmi wa ofisi hiyo na uwaambie wamkabidhi mteja mwanza tu baada ya yeye kulipia pesa ya mzigo kwenye ofisi yao ya Mwanza",
+                  "Mwambie aje Dar es Salaam mwenyewe kuchukua viatu"
+                ],
+                "correct_index": 1,
+                "feedback": "Huu ndio utumaji salama mkoani. Kutumia ofisi rasmi ya basi kama mdhamini (Escrow) kunakulinda usitapeliwe mzigo wako mkoani."
+              },
+              {
+                "type": "cloze",
+                "prompt": "Kutuma mzigo mikoani kunahitaji uthibitisho wa risiti rasmi kutoka kwenye ofisi ya ________ ya mabasi.",
+                "sentence_with_blank": "Daima chukua risiti ya mzigo kutoka ofisi ya {blank} ya basi.",
+                "options": [
+                  "Mizigo (Parcel Office)",
+                  "Tiketi za abiria",
+                  "Ulinzi wa stendi"
+                ],
+                "correct": "Mizigo (Parcel Office)",
+                "feedback": "Sahihi! Risiti ya ofisi ya mizigo ndio uthibitisho pekee wa kisheria kuwa mzigo umetumwa."
+              },
+              {
+                "type": "quiz",
+                "question": "Kwanini malipo ya mlangoni (Cash on Delivery) mikoani ni hatari kama huna ofisi rasmi ya usafirishaji ya basi inayokusaidia?",
+                "options": [
+                  "Mteja anaweza kuchukua mzigo na kukublacklist kwenye simu bila kulipa",
+                  "Inapunguza uwezo wa simu yako kupokea ujumbe",
+                  "Inafuta historia ya akaunti yako"
+                ],
+                "correct_index": 0,
+                "feedback": "Bila mdhamini rasmi, mteja akishachukua mzigo huna nguvu yoyote ya kumlazimisha kulipa."
+              },
+              {
+                "type": "match",
+                "prompt": "Oanisha mbinu za utumaji mikoani na matokeo yake ya kiusalama:",
+                "pairs": [
+                  {
+                    "left": "Kutuma mzigo kwa dereva usiyemjua kibinafsi",
+                    "right": "Mzigo unaweza kupotea njiani bila risiti au njia ya kufuatilia."
+                  },
+                  {
+                    "left": "Kutumia ofisi rasmi ya basi ya mizigo",
+                    "right": "Unapata risiti yenye namba ya simu ya ofisi na uwezo wa kudai fidia mzigo ukipotea."
+                  }
+                ],
+                "feedback": "Safi sana! Kujifunza njia hizi za usalama kunakuhakikishia utulivu wa akili wakati wa kufanya biashara nchi nzima."
+              },
+              {
+                "type": "unit_reflection",
+                "title": "Tafakari ya Usafiri wa Mikoani",
+                "prompt": "Chagua hatua thabiti utakayoifuata kuanzia leo unapotuma mzigo mkoani:",
+                "options": [
+                  "Nitatumia ofisi rasmi za mabasi pekee na sitatuma mzigo bila malipo au escrow thabiti",
+                  "Nitaendelea kutuma kupitia madereva wa kawaida bila risiti",
+                  "Nitaacha kabisa kuuza mikoani"
+                ],
+                "correct_index": 0,
+                "feedback": "Uamuzi mzuri mkuu! Wewe sasa ni mjasiriamali wa kisasa anayejua kukuza soko lake nchi nzima kwa usalama."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "unit_id": 3,
+        "unit_title": "Kupata Mzigo na Kusimamia Stoo",
+        "unit_icon": "📦",
+        "description": "Jifunze mbinu za kununua mzigo Kariakoo kwa bei nafuu na kusimamia stoo yako iti usikose wateja.",
+        "estimated_minutes": 150,
+        "unlock_requirement": "Complete Unit 2",
+        "unit_reward_xp": 1500,
+        "badge": {
+          "new_label": "Msimamizi wa Stoo",
+          "icon": "🔑",
+          "description": "Duka lako halikosi mzigo kamwe, na unajua siri ya kupata bei nafuu ya wholesalers Kariakoo."
+        },
+        "lessons": [
+          {
+            "lesson_id": 2301,
+            "title": "Jinsi ya Kununua kwa Wholesalers Kariakoo",
+            "xp": 350,
+            "duration_min": 15,
+            "mission": "Tafuta wholesalers watatu wa uaminifu Kariakoo wa bidhaa yako.",
+            "daily_mission": {
+              "tracking_id": "dm_301_wholesaler_check",
+              "task": "Daima linganisha bei za wholesalers watatu tofauti Kariakoo kabla ya kufanya uamuzi wa kununua leo.",
+              "xp_reward": 50
+            },
+            "blocks": [
+              {
+                "type": "story",
+                "character": "Neema, Muuzaji wa Nguo",
+                "content": "Neema alikuwa ananunua vitenge kwa muuzaji wa kwanza aliyemkuta mtaa wa Congo Kariakoo kwa TZS 15,000 kwa doti. Siku moja aliamua kutembea ndani zaidi mtaa wa Msimbazi na akakuta wholesalers wakubwa wanaouza vitenge vile vile kwa TZS 10,000 tu kwa doti. Alikuwa anapoteza TZS 5,000 kwa kila doti."
+              },
+              {
+                "type": "text",
+                "content": "**Mbinu za Kununua Kariakoo:** Wholesalers wa mbele ya barabara kuu (kama Congo) mara nyingi wana bei kubwa kwa sababu ya kodi kubwa za pango. Tembea ndani zaidi kwenye mitaa ya nyuma au ghorofa za juu za majengo ya Kariakoo ili kuwapata wholesalers wakuu wenye bei za chini kabisa."
+              },
+              {
+                "type": "scenario",
+                "label": "Tathmini ununuzi wa mzigo",
+                "setup": "Unataka kununua mikoba ya kike Kariakoo ili uweke kwenye duka lako la mtandaoni.",
+                "options": [
+                  "Nunua kwenye duka la kwanza barabara kuu ya Congo iti uokoe muda wa kutembea",
+                  "Kagua maduka matatu tofauti, tembea mitaa ya ndani na ya ghorofa za juu ili kulinganisha bei na ubora kabla ya kununua",
+                  "Agiza kwa mtu yeyote anayeleta mzigo bila kujua chanzo chake"
+                ],
+                "correct_index": 1,
+                "feedback": "Safi sana! Kutembea mitaa ya ndani na kulinganisha bei kunakuokoa mtaji mwingi na kukupa faida kubwa zaidi."
+              },
+              {
+                "type": "cloze",
+                "prompt": "Wholesalers wengi wenye bei nafuu sana Kariakoo wanapatikana mitaa ya ndani au kwenye ________ za juu za majengo.",
+                "sentence_with_blank": "Tafuta wholesalers kwenye mitaa ya ndani na {blank} za juu.",
+                "options": [
+                  "Ghorofa",
+                  "Barabara kuu pekee",
+                  "Stendi za mabasi"
+                ],
+                "correct": "Ghorofa",
+                "feedback": "Sahihi! Majengo ya ghorofa Kariakoo yanaficha wholesalers wakubwa wenye bei nafuu sana."
+              },
+              {
+                "type": "quiz",
+                "question": "Kwanini si mbinu nzuri ya kibiashara kununua mzigo kwa wholesaler mmoja tu maisha yako yote bila kulinganisha bei?",
+                "options": [
+                  "Inakufanya ukose fursa ya kupata bei nafuu na bidhaa mpya za washindani wengine",
+                  "Inapunguza chaji ya betri ya simu yako",
+                  "Inafuta picha zako za duka"
+                ],
+                "correct_index": 0,
+                "feedback": "Soko linabadilika kila siku, lazima ulinganishe bei na ubora kila wakati ili ubaki na faida."
+              },
+              {
+                "type": "match",
+                "prompt": "Oanisha eneo la Kariakoo na faida zake sahihi za bei:",
+                "pairs": [
+                  {
+                    "left": "Barabara kuu (Congo/Msimbazi mbele)",
+                    "right": "Urahisi wa kufika lakini bei ni kubwa kwa sababu ya kodi kubwa za pango la maduka ya mbele."
+                  },
+                  {
+                    "left": "Mitaa ya ndani na ghorofani",
+                    "right": "Bei ni nafuu sana kwa sababu kodi za pango ni ndogo na wholesalers wakuu wengi wanapatikana huko."
+                  }
+                ],
+                "feedback": "Safi sana! Kujua jiografia ya Kariakoo kunakuongezea faida ya biashara yako."
+              },
+              {
+                "type": "unit_reflection",
+                "title": "Tafakari ya Kununua Kariakoo",
+                "prompt": "Chagua hatua utakayoifuata kuanzia leo unaponunua mzigo:",
+                "options": [
+                  "Nitajenga tabia ya kulinganisha bei kwa maduka matatu tofauti na kutembea ndani zaidi kupata bei nafuu",
+                  "Nitaendelea kununua duka la kwanza la mbele ya barabara",
+                  "Nitaacha kabisa kwenda Kariakoo"
+                ],
+                "correct_index": 0,
+                "feedback": "Hongera mkuu! Sasa una siri kubwa ya ujasiriamali ya kupata mzigo kwa bei nafuu zaidi mtaani."
+              }
+            ]
+          },
+          {
+            "lesson_id": 2302,
+            "title": "Kudhibiti Stoo na Kuepuka \"Imeisha\"",
+            "xp": 350,
+            "duration_min": 15,
+            "mission": "Tengeneza daftari au faili rahisi la kufuatilia idadi ya bidhaa zilizobaki stoo kwako.",
+            "daily_mission": {
+              "tracking_id": "dm_302_stock_alert",
+              "task": "Kagua bidhaa zako leo — kama imebaki doti mbili pekee, wasiliana na wholesaler wako kuweka order mpya mapema.",
+              "xp_reward": 50
+            },
+            "blocks": [
+              {
+                "type": "story",
+                "character": "Juma, Muuzaji wa Pilau na Vyakula",
+                "content": "Juma alikuwa na video ya pilau yake iliyoenda viral Instagram leo. Wateja 15 walimtumia ujumbe asubuhi kutaka kuagiza chakula. Juma alipenda sana, lakini alipoenda jikoni aligundua mchele ulikuwa umeisha na duka lilikuwa mbali. Alipoteza wateja wote 15 kwa sababu hakukagua stoo yake jana usiku."
+              },
+              {
+                "type": "text",
+                "content": "**Kanuni ya Kudhibiti Stoo (Kuepuka Imeisha):** Mteja wa mtandaoni akisikia neno 'imeisha', anaenda kununua kwa mpinzani wako na uwezekano vya kurudi kwako unapungua kwa 80%. Daima weka kiwango vya tahadhari (Safety Stock) — bidhaa ikifikia doti mbili au tatu, agiza mzigo mpya mapema kabla stoo haijawa sifuri."
+              },
+              {
+                "type": "scenario",
+                "label": "Tathmini usimamizi wa stoo",
+                "setup": "Unauza viatu vya watoto mtandaoni. Una raba za shule zilizobaki jozi 3 pekee stoo kwako na ni msimu wa shule kufunguliwa.",
+                "options": [
+                  "Subiri hadi raba hizo 3 ziishe kabisa ndio uende Kariakoo kununua mpya",
+                  "Wasiliana na wholesaler wako uagize raba mpya sasa hivi kabla hizi 3 hazijaisha, kwa sababu mahitaji ni makubwa",
+                  "Acha kupost raba hizo hadi upate muda mwezi ujao"
+                ],
+                "correct_index": 1,
+                "feedback": "Safi sana! Huu ndio usimamizi bora wa stoo. Kuagiza mapema kabla mzigo haujaisha kabisa kunakuhakikishia hupotezi wateja kipindi cha msimu wa mauzo."
+              },
+              {
+                "type": "cloze",
+                "prompt": "Kiwango cha tahadhari (Safety Stock) kinakuhakikishia kuwa duka lako halitakosa mzigo pindi mteja anapotaka kuagiza haraka kabla stoo haijawa ________.",
+                "sentence_with_blank": "Hakikisha stoo yako haifikii {blank} kabla ya kuagiza mpya.",
+                "options": [
+                  "Sifuri (0)",
+                  "Nyingi sana",
+                  "Chafu"
+                ],
+                "correct": "Sifuri (0)",
+                "feedback": "Sahihi! Kufikia sifuri kunamaanisha unakosa mauzo na unapoteza wateja."
+              },
+              {
+                "type": "quiz",
+                "question": "Ni kitu gani kinatokea kisaikolojia mteja anaposikia neno 'Imeisha' mara tatu mfululizo kwenye duka lako?",
+                "options": [
+                  "Anajenga tabia ya kukuheshimu sana",
+                  "Anapoteza uaminifu na duka lako na anaenda kununua kwa mpinzani wako anayejua kusimamai stoo",
+                  "Anavumilia na kusubiri mwezi mzima bila kununua kwingine"
+                ],
+                "correct_index": 1,
+                "feedback": "Mteja vya kisasa anataka huduma ya haraka na ya uhakika. Ukikosa mzigo, anaenda kwingine mara moja."
+              },
+              {
+                "type": "match",
+                "prompt": "Oanisha tabia za stoo na matokeo yake ya kibiashara:",
+                "pairs": [
+                  {
+                    "left": "Kukagua stoo kila siku jioni",
+                    "right": "Unajua bidhaa gani inakaribia kuisha na unaagiza mpya mapema."
+                  },
+                  {
+                    "left": "Kutokagua stoo kabisa",
+                    "right": "Unpata orders za wateja lakini unalazimika kusema 'imeisha' kwa sababu huna mzigo."
+                  }
+                ],
+                "feedback": "Safi sana! Nidhamu ya kukagua stoo ndiyo inayokuhakikishia muendelezo mzuri wa mauzo."
+              },
+              {
+                "type": "unit_reflection",
+                "title": "Tafakari ya Kusimamia Stoo",
+                "prompt": "Chagua tabia utakayoifuata kuanzia leo kwenye stoo yako:",
+                "options": [
+                  "Nitakagua stoo yangu kila jioni na kuweka 'Safety Stock' ya doti mbili",
+                  "Nitaagiza mzigo pale tu stoo ikifikia sifuri",
+                  "Nitasubiri wateja wenyewe waniambie mzigo umeisha"
+                ],
+                "correct_index": 0,
+                "feedback": "Hongera mkuu! Sasa wewe ni Msimamizi wa Stoo anayejua kulinda na kudumisha wateja wake."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "unit_id": 4,
+        "unit_title": "Kukuza Biashara Yako",
+        "unit_icon": "🚀",
+        "description": "Jifunze kuanza ku-boost post kwa bajeti ndogo ya kila siku, na kujenga wateja wa kudumu wa duka lako.",
+        "estimated_minutes": 150,
+        "unlock_requirement": "Complete Unit 3",
+        "unit_reward_xp": 1500,
+        "badge": {
+          "new_label": "Kiongozi wa Masoko",
+          "icon": "⚡",
+          "description": "Unajua siri ya ku-boost post kupata wateja wapya, na unajua kuwafanya wateja warudi tena na tena."
+        },
+        "lessons": [
+          {
+            "lesson_id": 2401,
+            "title": "Kuanza Ku-Boost Post kwa Bajeti Ndogo ($1/Siku)",
+            "xp": 350,
+            "duration_min": 15,
+            "mission": "Andika na uchague eneo moja maalum la Dar es Salaam (mfano Kinondoni, Mikocheni) unalotaka kufanyia ad targeting leo.",
+            "daily_mission": {
+              "tracking_id": "dm_411_ads_target",
+              "task": "Tazama post zako leo — chagua ile yenye likes na maoni mengi zaidi na uandae akili yako ku-boost post hiyo kwa bajeti ya Tsh 2,500 tu kwa siku.",
+              "xp_reward": 50
+            },
+            "blocks": [
+              {
+                "type": "story",
+                "character": "Neema, Muuzaji wa Nguo",
+                "content": "Neema alikuwa anapata wateja kupitia marafiki zake pekee. Aliamua ku-boost video ya nguo zake mpya kwa bajeti ndogo ya Tsh 2,500 ($1) kwa siku. Alilenga eneo la 'Sinza' na 'Kinondoni' pekee. Ndani ya siku 3, alipata wateja wapya 8 waliompa faida ya Tsh 40,000. Alikuwa ametumia Tsh 7,500 tu ya ad."
+              },
+              {
+                "type": "text",
+                "content": "**Siri ya Ku-Boost Post (Bajeti Ndogo):** Huhitaji mamilioni kuanza kutangaza. Siri ni: (1) Chagua post ambayo tayari ina ufanisi mkubwa organically, (2) Weka bajeti ndogo (Tsh 2,500 kwa siku), (3) Usitarget nchi nzima — target maeneo maalum yenye wateja wako (mfano: Masaki, Mikocheni, Sinza)."
+              },
+              {
+                "type": "scenario",
+                "label": "Tathmini targeting ya matangazo",
+                "setup": "Unauza mikoba ya kike ya gharama mtandaoni Dar es Salaam. Unataka ku-boost post yako ya kwanza.",
+                "options": [
+                  "Target nchi nzima ya Tanzania kuanzia watoto wa miaka 13 hadi wazee wa miaka 65 iti ufikie kila mtu",
+                  "Target wanawake wa umri vya miaka 22 hadi 45 pekee, wanaoishi maeneo ya Dar es Salaam kama Mikocheni, Masaki, na Oysterbay",
+                  "Target wanaume wanaopenda mpira wa miguu pekee"
+                ],
+                "correct_index": 1,
+                "feedback": "Huu ndio ulengaji sahihi (Targeting) wa kitaalamu. Kulenga kundi maalum linaloweza kununua na maeneo yao kunakuokoa usipoteze pesa yako ya matangazo bure kwa watu wasio na uwezo au nia ya kununua."
+              },
+              {
+                "type": "cloze",
+                "prompt": "Badala ya kutarget nchi nzima, target maeneo ________ ya mji wako ambapo wateja wako wengi wanaishi.",
+                "sentence_with_blank": "Daima target maeneo {blank} unapoanza ku-boost post.",
+                "options": [
+                  "Maalum (Specific locations)",
+                  "Yote nchini",
+                  "Yasiyo na mitandao"
+                ],
+                "correct": "Maalum (Specific locations)",
+                "feedback": "Sahihi! Ulengaji maalum unapunguza gharama za matangazo na kuongeza mauzo ya haraka."
+              },
+              {
+                "type": "quiz",
+                "question": "Ni kosa gani kubwa ambaro SMEs hufanya wanapoanza ku-boost post kwa mara ya kwanza?",
+                "options": [
+                  "Kuweka bajeti kubwa sana kwa post mbaya isiyo na ufanisi bila kulenga wateja maalum",
+                  "Kuanza na bajeti ndogo ya Tsh 2,500 kwa siku",
+                  "Kuchagua post yenye ufanisi mkubwa organically ku-boost"
+                ],
+                "correct_index": 0,
+                "feedback": "Kuweka pesa nyingi kwenye post isiyovutia bila kulenga kundi sahihi ni njia ya haraka ya kupoteza mtaji wako vya ad."
+              },
+              {
+                "type": "match",
+                "prompt": "Oanisha bajeti ya matangazo na matokeo yake sahihi kibiashara:",
+                "pairs": [
+                  {
+                    "left": "Kuanza na Tsh 2,500 kwa siku",
+                    "right": "Inakuruhusu kufanya majaribio ya soko kwa usalama bila kupoteza mtaji mkubwa vya ad."
+                  },
+                  {
+                    "left": "Kuweka Tsh 100,000 siku ya kwanza",
+                    "right": "Hatari kubwa ya kupoteza pesa zote kama picha au ulengaji wako ukiwa mbaya njiani."
+                  }
+                ],
+                "feedback": "Safi sana! Kuanza na hatua ndogo ni nidhamu ya kiongozi wa masoko."
+              },
+              {
+                "type": "unit_reflection",
+                "title": "Tafakari ya Kuanza Ku-Boost",
+                "prompt": "Chagua mpango wako vya kuanza ku-boost post kuanzia leo:",
+                "options": [
+                  "Nitajifunza ku-boost kwa kuanza na bajeti ya mwanzo ya Tsh 2,500 kwa siku maeneo ya karibu yangu",
+                  "Nitasubiri hadi nikuze mtaji wa ad ufikie mamilioni",
+                  "Nitaendelea kutegemea marafiki zangu pekee kupata wateja"
+                ],
+                "correct_index": 0,
+                "feedback": "Uamuzi mzuri mkuu! Wewe sasa ni Kiongozi wa Masoko anayejua kukuza soko lake kwa akili na usalama."
+              }
+            ]
+          },
+          {
+            "lesson_id": 2402,
+            "title": "Kujenga Wateja wa Kudumu na Vikundi vya VICOBA",
+            "xp": 350,
+            "duration_min": 15,
+            "mission": "Tengeneza orodha rahisi ya WhatsApp ya wateja wako wa zamani kuwapa ofa maalum leo.",
+            "daily_mission": {
+              "tracking_id": "dm_402_loyalty_loop",
+              "task": "Wasiliana na mteja wako mmoja wa zamani leo — mpe asante ya ukarimu au punguzo dogo ili arudi kununua tena kwako.",
+              "xp_reward": 50
+            },
+            "blocks": [
+              {
+                "type": "story",
+                "character": "Juma, Muuzaji wa Pilau",
+                "content": "Juma alikuwa anahangaika kupata wateja wapya kila siku. Siku moja aliamua kuandika namba za wateja 20 waliowahi kula pilau yake mwezi uliopita. Alitengeneza Broadcast list WhatsApp akawaambia: 'Ndugu mteja wetu wa faida, asante kwa kuwa nasi. Alhamisi hii una ofa ya soda ya bure ukiagiza pilau yetu.' Wateja 12 kati ya wale 20 waliagiza pilau hiyo papo hapo. Hakuhitaji kutangaza nje kupata mauzo leo."
+              },
+              {
+                "type": "text",
+                "content": "**Nguvu ya Wateja wa Kudumu (Customer Loyalty):** Ni rahisi na bei nafuu mara tano zaidi kuuza kwa mteja aliyewahi kununua kwako na kukujua, kuliko kumtafuta mteja mpya kabisa asiyekujua. Jenga ukaribu, weka kumbukumbu zao, na uwape ofa maalum za mara kwa mara wateja wako wa zamani na vikundi kama VICOBA vya mtaani kwako."
+              },
+              {
+                "type": "scenario",
+                "label": "Tathmini uhifadhi wa wateja",
+                "setup": "Unwant to increase sales for your store this week but you don't have ad budget.",
+                "options": [
+                  "Subiri hadi upate mtaji wa ad, usiwasiliane na mtu yeyote",
+                  "Watumie ujumbe vya asante wa ukarimu wateja wako wote wa zamani waliowahi kununua kwako miezi miwili iliyopita, na uwape ofa ya kwanza ya kurejea (Loyalty offer)",
+                  "Gombana na wateja wa zamani kwa nini hawanunui sasa hivi"
+                ],
+                "correct_index": 1,
+                "feedback": "Safi sana! Kurudi kwa wateja vya zamani ndio njia ya siri ya kupata mauzo ya haraka bila kutumia shilingi moja ya ad."
+              },
+              {
+                "type": "cloze",
+                "prompt": "Ni rahisi na bei nafuu mara tano zaidi kuuza kwa mteja wa ________ kuliko kumtafuta mteja mpya kabisa asiyekujua.",
+                "sentence_with_blank": "Daima tunza na thamini wateja wako wa {blank} wa duka lako.",
+                "options": [
+                  "Zamani (Existing customers)",
+                  "Nje ya nchi pekee",
+                  "Wapinzani wako"
+                ],
+                "correct": "Zamani (Existing customers)",
+                "feedback": "Sahihi kabisa! Wateja wa zamani ndio mtaji wa dhahabu wa kila duka lililofanikiwa."
+              },
+              {
+                "type": "quiz",
+                "question": "Ni njia ipi bora ya kutumia kikundi cha VICOBA vya mtaani kwako kukuza duka lako la mtandaoni?",
+                "options": [
+                  "Wape ofa maalum ya kikundi (Group offer) kwa wanachama wote wakisambaza link ya catalog yako kwenye vikundi vyao vya WhatsApp",
+                  "Omba mkopo uende ukale chakula kizuri na marafiki",
+                  "Usiongee nao kabisa"
+                ],
+                "correct_index": 0,
+                "feedback": "Kutumia nguvu ya vikundi vya kijamii kama VICOBA kusambaza catalog yako kunakupa uaminifu na mauzo ya haraka kwa kundi kubwa la watu mara moja."
+              },
+              {
+                "type": "match",
+                "prompt": "Oanisha tabia za huduma na matokeo yake kwenye uaminifu wa wateja:",
+                "pairs": [
+                  {
+                    "left": "Kuwapa wateja wa zamani asante na ofa za siri",
+                    "right": "Wanajisikia wanathaminiwa na wanakuwa mabalozi wa bure wa kusambaza duka lako kwa marafiki zao."
+                  },
+                  {
+                    "left": "Kuwapuuza wateja baada ya kununua mara ya kwanza",
+                    "right": "Wanasahau jina la duka lako na wanaenda kununua kwa muuzaji mwingine."
+                  }
+                ],
+                "feedback": "Safi sana! Kujenga uaminifu wa kudumu ndio msingi thabiti wa milionea wa kesho."
+              },
+              {
+                "type": "drag_drop",
+                "prompt": "Panga vipaumbele vya kujenga uaminifu wa wateja kuanzia vya kwanza kabisa:",
+                "items": [
+                  {
+                    "id": "1",
+                    "text": "Weka majina na namba za wateja wote waliowahi kununua vizuri kwenye simu yako"
+                  },
+                  {
+                    "id": "2",
+                    "text": "Watumie ujumbe vya asante au kuwajulia hali baada ya wiki mbili za matumizi"
+                  },
+                  {
+                    "id": "3",
+                    "text": "Wape ofa maalum ya siri (Loyalty offer) ya kurejea duka lako"
+                  }
+                ],
+                "correct_order": [
+                  "1",
+                  "2",
+                  "3"
+                ],
+                "feedback": "Fomula hii itakuhakikishia duka lako halitakosa wateja thabiti wa kila mwezi!"
+              },
+              {
+                "type": "unit_reflection",
+                "title": "Tafakari ya Mwisho ya Kuhitimu Course 2",
+                "prompt": "Tathmini utayari wako sasa wa kusimamia, kulinda, na kukuza biashara yako ya kidijitali nchini Tanzania kiprofessional:",
+                "options": [
+                  "Nipo tayari kuanza kusimamia pesa, usafirishaji, stoo na kukuza soko langu kiprofessional sasa hivi!",
+                  "Ninajihisi bado nataka kusubiri kidogo",
+                  "Mabadiliko yangu sasa ndio ngao yangu kuuu ya ushindi!"
+                ],
+                "correct_index": 0,
+                "feedback": "Hongera sana mkuu! Sasa umekamilisha Course ya pili ya Uendeshaji na Ukuaji. Wewe sasa ni Mjasiriamali thabiti wa Kisasa wa Tanzania."
+              },
+              {
+                "type": "certificate_unlock",
+                "title": "🎓 Course ya Pili Imekamilika!",
+                "badge_earned": "Kiongozi wa Masoko",
+                "message": "Hongera sana! 🎉 Umekamilisha mafunzo ya Course ya pili ya Uendeshaji na Ukuaji wa Biashara yako nchini Tanzania. Wewe sio tena mfanyabiashara wa kawaida — wewe ni Mjasiriamali wa Kisasa wa Tanzania anayejua kusimamia fedha, usafirishaji salama, stoo thabiti, na kukuza duka lake kiprofessional kila siku. Safari yako ya kweli ya ushindi inaanza sasa."
               }
             ]
           }

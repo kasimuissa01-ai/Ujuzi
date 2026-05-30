@@ -34,16 +34,6 @@ export function useCourseSound() {
           chime.currentTime = 0;
           chime.play().catch(() => {});
         }
-        
-        const randomKey = CORRECT_VOICES[Math.floor(Math.random() * CORRECT_VOICES.length)];
-        const voice = audioRef.current[randomKey];
-        if (voice) {
-          // Play the voice slightly after the chime
-          setTimeout(() => {
-            voice.currentTime = 0;
-            voice.play().catch(() => {});
-          }, 300);
-        }
         return;
       }
 

@@ -15,21 +15,14 @@ export default function DragDropExercise({ step, onSuccess, canContinue }: DragD
 
   const handleSelect = (item: typeof step.items[0]) => {
      if (canContinue) return;
-     setAvailableItems(prev => prev.filter(i => i.id !== item.id));
-     setSelectedItems(prev => [...prev, item]);
+     const newAvailable = availableItems.filter(i => i.id !== item.id);
+     const newSelected = [...selectedItems, item];
+     setAvailableItems(newAvailable);
+     setSelectedItems(newSelected);
      setHasError(false);
-  };
 
-  const handleDeselect = (item: typeof step.items[0]) => {
-     if (canContinue) return;
-     setSelectedItems(prev => prev.filter(i => i.id !== item.id));
-     setAvailableItems(prev => [...prev, item]);
-     setHasError(false);
-  };
-
-  useEffect(() => {
-     if (selectedItems.length === step.items.length) {
-         const currentOrder = selectedItems.map(i => i.id);
+     if (newSelected.length === step.items.length) {
+         const currentOrder = newSelected.map(i => i.id);
          const isCorrect = step.correct_order.every((id, index) => id === currentOrder[index]);
          if (isCorrect) {
              onSuccess(step.feedback);
@@ -40,7 +33,16 @@ export default function DragDropExercise({ step, onSuccess, canContinue }: DragD
              }
          }
      }
-  }, [selectedItems, step.items.length, step.correct_order, step.feedback, onSuccess]);
+  };
+
+  const handleDeselect = (item: typeof step.items[0]) => {
+     if (canContinue) return;
+     const newSelected = selectedItems.filter(i => i.id !== item.id);
+     const newAvailable = [...availableItems, item];
+     setSelectedItems(newSelected);
+     setAvailableItems(newAvailable);
+     setHasError(false);
+  };
 
   return (
     <div className="flex flex-col gap-6 pt-2">

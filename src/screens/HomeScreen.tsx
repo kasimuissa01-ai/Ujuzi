@@ -68,9 +68,17 @@ export default function HomeScreen({ onNavigate }: Props) {
     }
   };
   
-  // Hardcoded for old course data just so notifications don't break if no courses
-  const totalLessons = 0; 
-  const progressPercent = 0;
+  // Dynamically calculate progress across all loaded courses in databases
+  const totalAllLessons = coursesData.reduce((acc, course) => {
+    return acc + course.units.reduce((uAcc, unit) => uAcc + unit.lessons.length, 0);
+  }, 0);
+
+  const completedCount = coursesData.reduce((acc, course) => {
+    const courseLessons = course.units.flatMap(u => u.lessons);
+    return acc + courseLessons.filter(l => completedLessons.includes(l.lesson_id.toString())).length;
+  }, 0);
+
+  const progressPercent = totalAllLessons > 0 ? Math.round((completedCount / totalAllLessons) * 100) : 0;
 
   return (
     <div className="flex-1 flex flex-col bg-[#ececf0] h-full overflow-y-auto pb-20 relative">
@@ -245,7 +253,9 @@ export default function HomeScreen({ onNavigate }: Props) {
             className="grid grid-cols-1 md:grid-cols-2 gap-4"
           >
              {coursesData.map((course, index) => {
-               const totalLessons = course.units.reduce((acc, unit) => acc + unit.lessons.length, 0);
+               const courseLessons = course.units.flatMap(u => u.lessons);
+               const totalLessons = courseLessons.length;
+               const completedForThisCourse = courseLessons.filter(l => completedLessons.includes(l.lesson_id.toString())).length;
                const isFirst = index === 0;
                const bgColors = ["bg-[#121212]", "bg-[#1cb0f6]", "bg-[#ff4b4b]", "bg-[#ffc800]"];
                const textColors = ["text-white", "text-white", "text-white", "text-[#121212]"];
@@ -269,7 +279,7 @@ export default function HomeScreen({ onNavigate }: Props) {
                     onClick={() => onNavigate('course', { courseId: course.course_id })}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className={`${bgColor} ${textColor} rounded-[2rem] p-6 lg:p-8 shadow-xl relative overflow-hidden cursor-pointer group ${isFirst ? 'md:col-span-2 min-h-[240px]' : 'min-h-[260px]'}`}
+                    className={`${bgColor} ${textColor} rounded-[2rem] p-6 lg:p-8 shadow-xl relative overflow-hidden cursor-pointer group min-h-[260px] flex flex-col justify-between`}
                     role="button"
                   >
                     <div className="absolute right-[-2rem] bottom-[-2rem] opacity-20 group-hover:scale-110 transition-transform duration-700 ease-out">
@@ -278,21 +288,26 @@ export default function HomeScreen({ onNavigate }: Props) {
                        </div>
                     </div>
 
-                    <div className="flex justify-between items-center mb-8 relative z-10">
-                      <div className={`${bgMutedClass} px-4 py-2 rounded-full flex items-center gap-2 text-xs font-bold uppercase tracking-wider backdrop-blur-md`}>
-                        <Briefcase className="w-3.5 h-3.5" /> {course.category}
+                    <div className="flex justify-between items-center mb-6 relative z-10 w-full">
+                      <div className="flex gap-2 items-center flex-wrap">
+                        <div className={`${bgMutedClass} px-3 py-1.5 rounded-full flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md`}>
+                          <Briefcase className="w-3.5 h-3.5" /> {course.category}
+                        </div>
+                        <div className={`${bgMutedClass} px-3 py-1.5 rounded-full flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-widest backdrop-blur-md border ${borderClass} text-yellow-500`}>
+                          Kozi {index + 1}
+                        </div>
                       </div>
-                      <div className={`w-10 h-10 rounded-full border ${borderClass} flex items-center justify-center text-xs font-bold`}>
-                        ?/{totalLessons}
+                      <div className={`px-2.5 py-1.5 rounded-xl border ${borderClass} text-[11px] font-extrabold tracking-wider bg-black/5`}>
+                        {completedForThisCourse}/{totalLessons} Masomo
                       </div>
                     </div>
 
-                    <div className="relative z-10 flex flex-col justify-end h-[calc(100%-4rem)]">
+                    <div className="relative z-10 flex flex-col justify-end flex-1">
                       <div>
-                        <h2 className={`font-display ${isFirst ? 'text-3xl md:text-4xl' : 'text-2xl'} font-extrabold mb-3 w-4/5 leading-tight`}>
+                        <h2 className="font-display text-2xl font-extrabold mb-3 w-4/5 leading-tight line-clamp-2">
                           {course.course_title}
                         </h2>
-                        <p className={`text-sm mb-6 w-4/5 font-medium ${textColor === "text-white" ? "text-gray-300" : "text-gray-700"}`}>
+                        <p className={`text-xs mb-6 w-4/5 font-medium ${textColor === "text-white" ? "text-gray-300" : "text-gray-700"}`}>
                           {course.level} • {course.language}
                         </p>
                       </div>
