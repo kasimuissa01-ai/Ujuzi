@@ -7,7 +7,6 @@ import { useProgress } from '../hooks/useProgress';
 import { useAuth } from '../hooks/useAuth';
 import { useNotifications } from '../hooks/useNotifications';
 import { usePWA } from '../hooks/usePWA';
-import { checkAndTriggerReminder } from '../services/notificationService';
 
 interface Props {
   onNavigate: (screen: ScreenType, params?: Record<string, any>) => void;
@@ -40,20 +39,7 @@ export default function HomeScreen({ onNavigate }: Props) {
     setIsInAppBrowser(inApp);
   }, []);
 
-  useEffect(() => {
-    // Check and trigger missed-lesson reminders on load or log in
-    if (user?.uid) {
-      checkAndTriggerReminder(user.uid);
-      
-      // Setup periodic interval checks (every 30 seconds for simulation integrity)
-      const interval = setInterval(() => {
-        checkAndTriggerReminder(user.uid);
-      }, 30000);
-      return () => clearInterval(interval);
-    } else {
-      checkAndTriggerReminder(undefined);
-    }
-  }, [user]);
+
 
   const handleInstallClick = (e: React.MouseEvent) => {
     e.stopPropagation();

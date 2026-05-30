@@ -240,6 +240,111 @@ async function startServer() {
     }
   });
 
+  // --- Dynamic AI & Local Fallback Push notification content generator ---
+  const generateRetentionNotification = async (timeOfDayLabel: string): Promise<{ title: string; body: string }> => {
+    // Normalize label to determine time slot Vibe
+    let timeKey = "Asubuhi";
+    if (timeOfDayLabel.includes("Mchana")) {
+      timeKey = "Mchana";
+    } else if (timeOfDayLabel.includes("Jioni")) {
+      timeKey = "Jioni";
+    }
+
+    // High quality Duolingo-style Swahili street-smart fallbacks
+    const fallbacks: Record<string, Array<{ title: string; body: string }>> = {
+      "Asubuhi": [
+        { 
+          title: "Siku imeanza! 🌄", 
+          body: "Mkuu, umeridhika na mauzo yako ya jana? 📈 Amka sasa kwa somo jipya la sekunde 45 uongeze faida ya leo!" 
+        },
+        { 
+          title: "Siri ya Mafanikio 🔑", 
+          body: "Dakika 1 tu ya Ujuzi kabla ya kufungua biashara inakupa maarifa ya kupiga pesa mchana mzima. Kusoma ni sasa!" 
+        },
+        { 
+          title: "Habari ya asubuhi, Boss! 👋", 
+          body: "Leta nguvu mpya leo! Fungua darasa usome jinsi ya kuvuta wateja wapya kwenye duka lako kabla wenzako hawajachukua dili zote." 
+        }
+      ],
+      "Mchana": [
+        { 
+          title: "Chai na Ujuzi! ☕", 
+          body: "Chukua mapumziko ya dakika 1, kunywa maji, na upate mbinu 1 thabiti ya kujibu wapelelezi (wateja wasiolipa) mtandaoni!" 
+        },
+        { 
+          title: "Mchana wa Mauzo 🔥", 
+          body: "Usipoteze faida ya leo. Fungua sasa darasa la kujifunza kuongeza kipato chako kupitia WhatsApp Status leo." 
+        },
+        { 
+          title: "Mkuu, umesahau? 🤔", 
+          body: "Saa sita imeshapita na bado hujafanya somo la leo! Usiache streak yako izimike kirahisi hivi, fanya somo sasa." 
+        }
+      ],
+      "Jioni": [
+        { 
+          title: "Mwalimu Mkali anakucheki... 🙄", 
+          body: "Ulikuwa Instagram na TikTok mchana wote lakini masomo ya mbinu za biashara yalikupita? Bofya hapa uokoe streak yako haraka sasa!" 
+        },
+        { 
+          title: "Streak iko Hatarini! ⚠️", 
+          body: "Mtoa huduma thabiti, streak yako inaelekea kuzimika leo usiku! Fanya somo fupi sasa kulinda kasi yako ya mafanikio." 
+        },
+        { 
+          title: "Tathmini ya jioni 🌙", 
+          body: "Kabla ya kulala mkuu: je, leo umeongeza akili yoyote mpya ya kujiingizia TZS 10,000 za ziada kesho? Soma somo fupi hapa." 
+        }
+      ]
+    };
+
+    const currentFallbacks = fallbacks[timeKey] || fallbacks["Asubuhi"];
+    const randomFallback = currentFallbacks[Math.floor(Math.random() * currentFallbacks.length)];
+
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      console.log(`[Cron AI Notification]: No GEMINI_API_KEY found, using curated Duolingo Swahili fallback for ${timeKey}...`);
+      return randomFallback;
+    }
+
+    try {
+      console.log(`[Cron AI Notification]: Querying Gemini to generate witty Duolingo Swahili retention notification for ${timeKey}...`);
+      const ai = new GoogleGenAI({
+        apiKey,
+        httpOptions: {
+          headers: {
+            'User-Agent': 'aistudio-build',
+          }
+        }
+      });
+
+      const response = await ai.models.generateContent({
+        model: "gemini-3.5-flash",
+        contents: `You are the creative, witty Duolingo push notification copywriter for 'Ujuzi', an interactive micro-learning application that teaches sales, marketing, and business skills to entrepreneurs in East Africa (written in Swahili).
+Generate exactly 1 push notification designed to maximize user retention. The user has not studied today yet.
+Target Slot: ${timeKey} (${timeKey === "Asubuhi" ? "Morning motivation" : timeKey === "Mchana" ? "Quick midday break / action step" : "Playful passive-aggressive streak warning / evening review"}).
+Formatting requirements:
+1. Translate to extremely charming, professional, street-smart Swahili (use words like 'mkuu', 'streak', 'mauzo', 'kupiga hela', 'duka', 'wateja').
+2. Tone must be a mix of high encouragement, cheeky wit, and healthy passive-aggressive motivation (Duolingo style), with relevant emojis.
+3. Return EXACTLY a JSON object with keys "title" (maximum 30 characters, must have emoji) and "body" (maximum 80 characters, highly convincing). Do not return markdown wrapping or backticks. Just raw JSON.`,
+        config: {
+          responseMimeType: "application/json"
+        }
+      });
+
+      const jsonString = response.text ? response.text.trim() : "";
+      const parsed = JSON.parse(jsonString);
+      if (parsed.title && parsed.body) {
+         return {
+           title: parsed.title,
+           body: parsed.body
+         };
+      }
+    } catch (e) {
+      console.warn("Failed to generate AI notification from Gemini, falling back to curated list:", e);
+    }
+
+    return randomFallback;
+  };
+
   // --- Push Notification Cron Jobs ---
   const sendBroadcast = async (timeOfDay: string) => {
     try {
@@ -247,11 +352,14 @@ async function startServer() {
       const onesignalAppId = process.env.ONESIGNAL_APP_ID || "1780c6e8-a0f3-4cc8-a5e1-a328a231a995";
       const onesignalApiKey = process.env.ONESIGNAL_REST_API_KEY;
 
+      // Generate dynamic witty Swahili notification content (AI-powered or premium fallback)
+      const messageObj = await generateRetentionNotification(timeOfDay);
+
       const payload: any = {
         app_id: onesignalAppId,
         included_segments: ["Subscribed Users"],
-        headings: { en: "Mbinu Mpya ya Ujuzi! 🎓" },
-        contents: { en: `Mkuu, ufundi na maarifa mapya ya biashara yameshaingia leo (${timeOfDay}). Bofya hapa kujiunga na wenzako kujifunza sasa!` },
+        headings: { en: messageObj.title },
+        contents: { en: messageObj.body },
         url: "/"
       };
 

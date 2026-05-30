@@ -57,7 +57,10 @@ export default function ProfileScreen({ onNavigate }: Props) {
     enabled: true,
     persona: 'gentle',
     frequency: 'daily',
-    lastStudiedTimestamp: Date.now()
+    lastStudiedTimestamp: Date.now(),
+    timeMorningActive: true,
+    timeAfternoonActive: true,
+    timeEveningActive: true
   });
 
   // UI state for sliding Legal Document Screen
@@ -224,6 +227,33 @@ export default function ProfileScreen({ onNavigate }: Props) {
     }
   };
 
+  const handleToggleMorning = () => {
+    const nextVal = !notifConfig.timeMorningActive;
+    const updated = { ...notifConfig, timeMorningActive: nextVal };
+    setNotifConfig(updated);
+    saveNotificationConfig({ timeMorningActive: nextVal });
+  };
+
+  const handleToggleAfternoon = () => {
+    const nextVal = !notifConfig.timeAfternoonActive;
+    const updated = { ...notifConfig, timeAfternoonActive: nextVal };
+    setNotifConfig(updated);
+    saveNotificationConfig({ timeAfternoonActive: nextVal });
+  };
+
+  const handleToggleEvening = () => {
+    const nextVal = !notifConfig.timeEveningActive;
+    const updated = { ...notifConfig, timeEveningActive: nextVal };
+    setNotifConfig(updated);
+    saveNotificationConfig({ timeEveningActive: nextVal });
+  };
+
+  const handleSelectPersona = (selectedPersona: ReminderPersona) => {
+    const updated = { ...notifConfig, persona: selectedPersona };
+    setNotifConfig(updated);
+    saveNotificationConfig({ persona: selectedPersona });
+  };
+
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
@@ -338,10 +368,10 @@ export default function ProfileScreen({ onNavigate }: Props) {
           </div>
         </div>
          {/* CONSOLIDATED PUSH NOTIFICATIONS SETTING CARD */}
-        <div className="bg-white rounded-[2rem] p-5 border border-neutral-200/60 shadow-[0_4px_25px_rgba(0,0,0,0.01)] space-y-4">
+        <div className="bg-white rounded-[2rem] p-6 border border-neutral-200/60 shadow-[0_4px_25px_rgba(0,0,0,0.01)] space-y-6 text-left">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 shrink-0">
+              <div className="w-10 h-10 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 shrink-0">
                 <Bell className="w-5 h-5" />
               </div>
               <div className="text-left">
@@ -354,7 +384,7 @@ export default function ProfileScreen({ onNavigate }: Props) {
             <button
               onClick={handleToggleNotifications}
               className={`w-14 h-8 rounded-full p-1 transition-colors duration-200 ease-in-out cursor-pointer shrink-0 ${
-                notifConfig.enabled ? 'bg-black' : 'bg-neutral-200'
+                notifConfig.enabled ? 'bg-blue-600' : 'bg-neutral-200'
               }`}
             >
               <div
@@ -370,114 +400,9 @@ export default function ProfileScreen({ onNavigate }: Props) {
             <div className={`p-3 rounded-xl border text-[11px] font-medium leading-relaxed text-left ${
               fcmStatusMsg.type === 'success' ? 'bg-emerald-50 border-emerald-100 text-emerald-800' :
               fcmStatusMsg.type === 'err' ? 'bg-rose-50 border-rose-100 text-rose-800' :
-              'bg-indigo-50 border-indigo-100 text-indigo-800'
+              'bg-blue-50 border-blue-100 text-blue-800'
             }`}>
               {fcmStatusMsg.text}
-            </div>
-          )}
-
-          {/* OneSignal Token Display with Copy capability - Styled Compactly */}
-          {fcmToken && notifConfig.enabled && (
-            <div className="bg-neutral-50/70 p-3 rounded-2xl border border-neutral-100 space-y-2 text-left">
-              <span className="text-[9px] text-slate-400 font-extrabold uppercase tracking-wider block">ID ya OneSignal (Player ID)</span>
-              <div className="flex items-center gap-2">
-                <div className="flex-1 min-w-0 bg-white border border-neutral-100 p-2 rounded-xl text-[10px] font-mono break-all line-clamp-1 select-all hover:line-clamp-none transition-all text-neutral-600 leading-tight">
-                  {fcmToken}
-                </div>
-                <button
-                  onClick={handleCopyToken}
-                  className="w-8 h-8 border border-neutral-200 hover:bg-neutral-100 flex items-center justify-center bg-white rounded-lg shrink-0 cursor-pointer transition-colors"
-                  title="Copy ID ya OneSignal"
-                >
-                  {copiedToken ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-slate-500" />}
-                </button>
-              </div>
-
-              {/* Instant Test Push Button */}
-              <button
-                onClick={async () => {
-                  try {
-                    await fetch(getApiUrl('/api/send-push'), {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({
-                        token: fcmToken,
-                        title: 'Jaribio la Arifa ya Ujuzi! 🎓',
-                        body: 'Safi sana mkuu! Mfumo wako wa arifa unafanya kazi kikamilifu. Ukaribie kujifunza leo!',
-                        link: '/'
-                      })
-                    });
-                  } catch (e) {
-                    console.warn(e);
-                  }
-                }}
-                className="w-full mt-1 py-1.5 border border-dashed border-indigo-200 hover:bg-indigo-50 text-indigo-600 hover:text-indigo-700 font-extrabold text-[10px] uppercase tracking-wider rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5"
-              >
-                <Send className="w-3 h-3" />
-                <span>Nitumie Jaribio la Arifa Sasa 🔔</span>
-              </button>
-
-              {/* Test Cron Push Button */}
-              <button
-                onClick={async () => {
-                  try {
-                    setFcmStatusMsg({ type: 'info', text: 'Inatuma jaribio tangazo la watu wote kwa Cron...' });
-                    const res = await fetch(getApiUrl('/api/test-cron'), { method: 'POST' });
-                    if (res.ok) {
-                       setFcmStatusMsg({ type: 'success', text: 'Jaribio la Broadcast la Cron limetumwa kikamilifu!' });
-                    } else {
-                       throw new Error("Imefeli kutuma");
-                    }
-                  } catch (e) {
-                    setFcmStatusMsg({ type: 'err', text: 'Jaribio la Broadcast limeshindikana' });
-                  }
-                }}
-                className="w-full mt-1 py-1.5 border border-dashed border-emerald-200 hover:bg-emerald-50 text-emerald-600 hover:text-emerald-700 font-extrabold text-[10px] uppercase tracking-wider rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5"
-              >
-                <Send className="w-3 h-3" />
-                <span>Jaribu (Broadcast) Kama Cron Inavyofanya</span>
-              </button>
-            </div>
-          )}
-
-          {/* EVERYDAY LEARNING MOTIVATION PROMPT STYLE (Pre-permission onboarding) */}
-          {permissionState !== 'granted' && (
-            <div className="bg-gradient-to-tr from-indigo-50/70 via-indigo-50/30 to-purple-50/60 border border-indigo-100 p-5 rounded-3xl space-y-3.5 text-left relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-3 opacity-10">
-                <Sparkles className="w-16 h-16 text-indigo-600" />
-              </div>
-              
-              <div className="flex items-start gap-3 relative z-10">
-                <div className="w-10 h-10 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-indigo-100 animate-bounce">
-                  <Bell className="w-5 h-5" />
-                </div>
-                <div className="space-y-1">
-                  <h5 className="text-[11px] font-black text-indigo-950 uppercase tracking-widest">Msaidizi wa Masomo (Ujuzi Reminders)</h5>
-                  <p className="text-[10px] text-indigo-600 font-bold uppercase tracking-wider">Mbinu Mpya Kila Siku 🎓</p>
-                </div>
-              </div>
-
-              <div className="bg-white/95 p-4 rounded-2xl border border-neutral-150 text-xs text-neutral-800 leading-relaxed font-semibold relative z-10 animate-fade-in">
-                <p className="leading-relaxed text-slate-700">
-                  &quot;Mkuu, safari yako ya kujifunza na kukua kibiashara haipaswi kusimama! 🚀 Nikufahamishe siri na mbinu mpya za masoko kila asubuhi ili uendeleze <strong>Streak</strong> yako na kuzuia biashara yako kudorora.&quot;
-                </p>
-                <div className="mt-3 flex items-center gap-2 text-[10px] text-emerald-700 font-black uppercase tracking-wider">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>USALAMA MKUBWA • HAKUNA USUMBU</span>
-                </div>
-              </div>
-
-              <div className="flex gap-2 relative z-10">
-                <button
-                  type="button"
-                  onClick={handleRequestPermission}
-                  disabled={isGeneratingToken}
-                  className="flex-1 h-11 bg-black hover:bg-neutral-800 active:scale-95 text-white font-black text-xs uppercase tracking-wider rounded-xl cursor-pointer flex items-center justify-center gap-2 shadow-md transition-all disabled:opacity-50"
-                >
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>Ruhusu Arifa 🔔</span>
-                </button>
-              </div>
             </div>
           )}
         </div>

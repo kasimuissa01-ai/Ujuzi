@@ -9,6 +9,9 @@ export interface ReminderConfig {
   persona: ReminderPersona;
   frequency: NotificationFrequency;
   lastStudiedTimestamp: number;
+  timeMorningActive: boolean;
+  timeAfternoonActive: boolean;
+  timeEveningActive: boolean;
 }
 
 // Creative multi-persona Swahili messages
@@ -62,7 +65,10 @@ const DEFAULT_CONFIG: ReminderConfig = {
   enabled: true,
   persona: 'gentle',
   frequency: 'daily',
-  lastStudiedTimestamp: Date.now()
+  lastStudiedTimestamp: Date.now(),
+  timeMorningActive: true,
+  timeAfternoonActive: true,
+  timeEveningActive: true
 };
 
 // Retrieve configuration from local storage
@@ -74,12 +80,19 @@ export function getNotificationConfig(): ReminderConfig {
     const personaRaw = localStorage.getItem('ujuzi_notif_persona') as ReminderPersona;
     const freqRaw = localStorage.getItem('ujuzi_notif_frequency') as NotificationFrequency;
     const lastStudiedRaw = localStorage.getItem('ujuzi_last_studied_time');
+    
+    const morningRaw = localStorage.getItem('ujuzi_notif_time_morning');
+    const afternoonRaw = localStorage.getItem('ujuzi_notif_time_afternoon');
+    const eveningRaw = localStorage.getItem('ujuzi_notif_time_evening');
 
     return {
       enabled: enabledRaw !== null ? enabledRaw === 'true' : true,
       persona: personaRaw || 'gentle',
       frequency: freqRaw || 'daily',
-      lastStudiedTimestamp: lastStudiedRaw ? parseInt(lastStudiedRaw, 10) : Date.now()
+      lastStudiedTimestamp: lastStudiedRaw ? parseInt(lastStudiedRaw, 10) : Date.now(),
+      timeMorningActive: morningRaw !== null ? morningRaw === 'true' : true,
+      timeAfternoonActive: afternoonRaw !== null ? afternoonRaw === 'true' : true,
+      timeEveningActive: eveningRaw !== null ? eveningRaw === 'true' : true
     };
   } catch (e) {
     return DEFAULT_CONFIG;
@@ -112,6 +125,15 @@ export function saveNotificationConfig(config: Partial<ReminderConfig>) {
   if (config.lastStudiedTimestamp !== undefined) {
     localStorage.setItem('ujuzi_last_studied_time', config.lastStudiedTimestamp.toString());
     localStorage.setItem('ujuzi_missed_notified', 'false');
+  }
+  if (config.timeMorningActive !== undefined) {
+    localStorage.setItem('ujuzi_notif_time_morning', config.timeMorningActive ? 'true' : 'false');
+  }
+  if (config.timeAfternoonActive !== undefined) {
+    localStorage.setItem('ujuzi_notif_time_afternoon', config.timeAfternoonActive ? 'true' : 'false');
+  }
+  if (config.timeEveningActive !== undefined) {
+    localStorage.setItem('ujuzi_notif_time_evening', config.timeEveningActive ? 'true' : 'false');
   }
 }
 
