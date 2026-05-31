@@ -14,8 +14,10 @@
       (function() {
         const hostname = window.location.hostname;
         const isAllowedOneSignalDomain = 
+          window.location.protocol === 'https:' ||
           hostname.includes('ujuzii.vercel.app') || 
           hostname.includes('ujuzi.vercel.app') ||
+          hostname.includes('run.app') ||
           hostname === 'localhost' || 
           hostname === '127.0.0.1';
 
@@ -26,6 +28,7 @@
               await OneSignal.init({
                 appId: "1780c6e8-a0f3-4cc8-a5e1-a328a231a995",
                 safari_web_id: "web.onesignal.auto.01b883ce-5cfa-4aca-8569-bf08de600615",
+                serviceWorkerPath: "sw.js",
                 notifyButton: {
                   enable: true,
                 },

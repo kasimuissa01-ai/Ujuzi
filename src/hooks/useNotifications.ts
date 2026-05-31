@@ -19,14 +19,27 @@ export function useNotifications() {
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
-    // Request permission silently on mount
-    import('../services/notificationService').then(({ requestNotificationPermission }) => {
-      requestNotificationPermission().catch(e => console.warn('Notification permission request bypassed or denied:', e));
+    // Request permission silently and trigger offline reminder check on mount
+    import('../services/notificationService').then(({ requestNotificationPermission, checkAndTriggerReminder }) => {
+      requestNotificationPermission()
+        .then(() => {
+          // Check immediately on mount
+          checkAndTriggerReminder(user?.uid).catch(e => console.warn('Offline reminder check failed:', e));
+        })
+        .catch(e => console.warn('Notification permission request bypassed or denied:', e));
     });
+
+    // Setup an active background check interval to evaluate study times (especially for the 10s-test debug threshold)
+    const checkInterval = setInterval(() => {
+      import('../services/notificationService').then(({ checkAndTriggerReminder }) => {
+        checkAndTriggerReminder(user?.uid).catch(e => console.warn('Interval offline reminder check failed:', e));
+      });
+    }, 15000); // check every 15 seconds
 
     if (!user) {
       setNotifications([]);
       setUnreadCount(0);
+      clearInterval(checkInterval);
       return;
     }
 
@@ -89,7 +102,10 @@ export function useNotifications() {
       }
     });
 
-    return unsubscribe;
+    return () => {
+      clearInterval(checkInterval);
+      unsubscribe();
+    };
   }, [user]);
 
   return { notifications, unreadCount };

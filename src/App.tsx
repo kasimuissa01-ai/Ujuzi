@@ -5,10 +5,11 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Home as HomeIcon, User as UserIcon } from 'lucide-react';
+import { Home as HomeIcon, User as UserIcon, Briefcase as BriefcaseIcon } from 'lucide-react';
 import OnboardingScreen from './screens/OnboardingScreen';
 import HomeScreen from './screens/HomeScreen';
 import ProfileScreen from './screens/ProfileScreen';
+import JobsScreen from './screens/JobsScreen';
 import CourseDetailScreen from './screens/CourseDetailScreen';
 import InteractiveLesson from './screens/InteractiveLesson';
 import { trackEvent } from './lib/mixpanel';
@@ -16,7 +17,7 @@ import { useAuth } from './hooks/useAuth';
 import { Loader2 } from 'lucide-react';
 import InstallPrompt from './components/InstallPrompt';
 
-export type ScreenType = 'onboarding' | 'home' | 'course' | 'lesson' | 'profile';
+export type ScreenType = 'onboarding' | 'home' | 'course' | 'lesson' | 'profile' | 'jobs';
 
 export type HistoryState = {
   screen: ScreenType;
@@ -84,6 +85,7 @@ export default function App() {
             {currentScreen === 'onboarding' && <OnboardingScreen onNavigate={navigate} />}
             {currentScreen === 'home' && <HomeScreen onNavigate={navigate} />}
             {currentScreen === 'profile' && <ProfileScreen onNavigate={navigate} />}
+            {currentScreen === 'jobs' && <JobsScreen onNavigate={navigate} />}
             {currentScreen === 'course' && <CourseDetailScreen onNavigate={navigate} onBack={goBack} params={currentParams} />}
             {currentScreen === 'lesson' && <InteractiveLesson onNavigate={navigate} onBack={goBack} params={currentParams} />}
           </>
@@ -91,13 +93,13 @@ export default function App() {
         
         {/* Inspired Polished Floating Bottom Pill Navigation Bar (Google / Senior Designer Design) */}
         <AnimatePresence>
-          {(currentScreen === 'home' || currentScreen === 'profile') && (
+          {(currentScreen === 'home' || currentScreen === 'profile' || currentScreen === 'jobs') && (
             <motion.div
               initial={{ y: 80, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 80, opacity: 0 }}
               transition={{ type: 'spring', stiffness: 260, damping: 25 }}
-              className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-[270px]"
+              className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-[325px]"
             >
               <div className="bg-white/85 backdrop-blur-xl border border-white/70 shadow-[0_15px_40px_-5px_rgba(0,0,0,0.12)] rounded-full p-2.5 flex items-center justify-between gap-1">
                 {/* Home Tab Button */}
@@ -118,6 +120,28 @@ export default function App() {
                     />
                     {currentScreen === 'home' && (
                       <span className="text-xs font-black text-black tracking-tight font-sans">Home</span>
+                    )}
+                  </div>
+                </button>
+
+                {/* Jobs Tab Button */}
+                <button
+                  onClick={() => navigate('jobs')}
+                  className="relative flex-1 h-12 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 select-none group"
+                >
+                  {currentScreen === 'jobs' && (
+                    <motion.div
+                      layoutId="activeTabPill"
+                      className="absolute inset-0 bg-white rounded-full shadow-[0_4px_16px_rgba(0,0,0,0.08)] border border-neutral-100"
+                      transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+                    />
+                  )}
+                  <div className="relative z-10 flex items-center gap-2">
+                    <BriefcaseIcon 
+                       className={`w-5 h-5 transition-colors duration-200 ${currentScreen === 'jobs' ? 'text-black fill-black' : 'text-neutral-400 group-hover:text-black'}`} 
+                    />
+                    {currentScreen === 'jobs' && (
+                      <span className="text-xs font-black text-black tracking-tight font-sans">Kazi</span>
                     )}
                   </div>
                 </button>

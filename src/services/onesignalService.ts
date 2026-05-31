@@ -8,8 +8,10 @@ export function isOneSignalAllowedOnCurrentDomain(): boolean {
   if (typeof window === 'undefined') return false;
   const hostname = window.location.hostname;
   return (
+    window.location.protocol === 'https:' ||
     hostname.includes('ujuzii.vercel.app') || 
     hostname.includes('ujuzi.vercel.app') || 
+    hostname.includes('run.app') ||
     hostname === 'localhost' || 
     hostname === '127.0.0.1'
   );
@@ -120,6 +122,42 @@ export async function optOutPushNotifications(): Promise<boolean> {
 }
 
 /**
+ * Wait until OneSignal is fully initialized on the window object before proceeding with actions.
+ */
+function runWithInitializedOneSignal(callback: (OneSignal: any) => Promise<void> | void): void {
+  const windowObj = window as any;
+  windowObj.OneSignalDeferred = windowObj.OneSignalDeferred || [];
+  windowObj.OneSignalDeferred.push(async function(OneSignal: any) {
+    if (windowObj.__onesignal_initialized) {
+      try {
+        await callback(OneSignal);
+      } catch (err) {
+        console.error('Error executing OneSignal callback:', err);
+      }
+      return;
+    }
+
+    // Polling for initialization
+    let attempts = 0;
+    const maxAttempts = 60; // 6 seconds max
+    const interval = setInterval(async () => {
+      attempts++;
+      if (windowObj.__onesignal_initialized) {
+        clearInterval(interval);
+        try {
+          await callback(OneSignal);
+        } catch (err) {
+          console.error('Error executing OneSignal callback after polling:', err);
+        }
+      } else if (attempts >= maxAttempts) {
+        clearInterval(interval);
+        console.warn('OneSignal initialization timed out. Bypassing callback execution to avoid internal crashes on uninitialized domains.');
+      }
+    }, 100);
+  });
+}
+
+/**
  * Identify / Log user into OneSignal to associate Firebase User ID safe and securely.
  */
 export async function loginToOneSignal(userId: string): Promise<void> {
@@ -129,11 +167,12 @@ export async function loginToOneSignal(userId: string): Promise<void> {
     return;
   }
 
-  // We push onto the deferred queue to ensure OneSignal is initialized
-  const windowObj = window as any;
-  windowObj.OneSignalDeferred = windowObj.OneSignalDeferred || [];
-  windowObj.OneSignalDeferred.push(async function(OneSignal: any) {
+  runWithInitializedOneSignal(async function(OneSignal: any) {
     try {
+      if (typeof OneSignal?.login !== 'function') {
+        console.warn('OneSignal.login operation is not available yet.');
+        return;
+      }
       console.log('Identifying user in OneSignal with Firebase UID:', userId);
       await OneSignal.login(userId);
 
@@ -142,8 +181,10 @@ export async function loginToOneSignal(userId: string): Promise<void> {
       if (currentUser?.displayName) {
         const firstName = currentUser.displayName.split(' ')[0];
         try {
-          await OneSignal.User.addTag("first_name", firstName);
-          console.log('OneSignal first_name tag synced:', firstName);
+          if (typeof OneSignal?.User?.addTag === 'function') {
+            await OneSignal.User.addTag("first_name", firstName);
+            console.log('OneSignal first_name tag synced:', firstName);
+          }
         } catch (tagErr) {
           console.warn('Failed to sync tag with OneSignal:', tagErr);
         }
@@ -170,10 +211,12 @@ export async function logoutFromOneSignal(): Promise<void> {
     return;
   }
 
-  const windowObj = window as any;
-  windowObj.OneSignalDeferred = windowObj.OneSignalDeferred || [];
-  windowObj.OneSignalDeferred.push(async function(OneSignal: any) {
+  runWithInitializedOneSignal(async function(OneSignal: any) {
     try {
+      if (typeof OneSignal?.logout !== 'function') {
+        console.warn('OneSignal.logout operation is not available.');
+        return;
+      }
       await OneSignal.logout();
       localStorage.removeItem('ujuzi_onesignal_id');
     } catch (e) {
@@ -181,3 +224,4 @@ export async function logoutFromOneSignal(): Promise<void> {
     }
   });
 }
+

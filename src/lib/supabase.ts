@@ -3,12 +3,18 @@ import { createClient } from '@supabase/supabase-js';
 
 // Fallback to the provided keys if the environment variables aren't injected yet.
 // Supabase Anon Keys are safe to expose in the browser client.
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://fhtnqhkxpvrfzxrwwtso.supabase.co';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZodG5xaGt4cHZyZnp4cnd3dHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MzE1OTgsImV4cCI6MjA5NDAwNzU5OH0.3zlPVvDZDXIh8jKI_gY0geyNCBz9oIBpSFXFHTJG3TQ';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = (supabaseUrl && supabaseAnonKey) 
+  ? createClient(supabaseUrl, supabaseAnonKey) 
+  : null;
 
 export async function getLessonContent(lessonId: string): Promise<string | null> {
+  if (!supabase) {
+    console.warn("Supabase client is not initialized.");
+    return null;
+  }
   try {
     const { data, error } = await supabase
       .from('generated_lessons')
@@ -25,6 +31,10 @@ export async function getLessonContent(lessonId: string): Promise<string | null>
 }
 
 export async function saveLessonContent(lessonId: string, content: string): Promise<void> {
+  if (!supabase) {
+    console.warn("Supabase client is not initialized.");
+    return;
+  }
   try {
     await supabase
       .from('generated_lessons')

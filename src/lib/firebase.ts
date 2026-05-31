@@ -1,9 +1,17 @@
 import { initializeApp } from 'firebase/app';
-import { getFirestore, initializeFirestore, doc, getDoc, setDoc, enableMultiTabIndexedDbPersistence, enableIndexedDbPersistence } from 'firebase/firestore';
+import { getFirestore, initializeFirestore, doc, getDoc, setDoc, enableMultiTabIndexedDbPersistence, enableIndexedDbPersistence, setLogLevel } from 'firebase/firestore';
 import { getAuth, GoogleAuthProvider, signInAnonymously, signInWithPopup, linkWithPopup, onAuthStateChanged, User } from 'firebase/auth';
 import firebaseConfig from '../../firebase-applet-config.json'; // relative to src/lib/
 
 const app = initializeApp(firebaseConfig);
+
+// Silence internal Firestore SDK logs (connection failure warnings in sandbox)
+try {
+  setLogLevel('silent');
+} catch (e) {
+  console.warn('Could not set Firestore log level:', e);
+}
+
 export const db = initializeFirestore(app, {
   experimentalForceLongPolling: true,
 }, firebaseConfig.firestoreDatabaseId);

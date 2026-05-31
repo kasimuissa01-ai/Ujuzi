@@ -49,6 +49,7 @@ export default defineConfig(({mode}) => {
         },
         workbox: {
           globPatterns: ['**/*.{js,css,html,ico,png,svg,json}'],
+          importScripts: ['https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js'],
           runtimeCaching: [
             {
               urlPattern: /^https:\/\/i\.postimg\.cc\/.*/i,
