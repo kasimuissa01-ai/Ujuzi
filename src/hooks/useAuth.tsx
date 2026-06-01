@@ -56,7 +56,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       clearTimeout(timeout);
       if (currentUser) {
         sessionStorage.removeItem('ujuzi_auth_in_progress');
-        localStorage.removeItem('ujuzi_mock_guest_user');
         setUser(currentUser);
         identifyUser(currentUser.uid, {
           $email: currentUser.email,
@@ -66,25 +65,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loginToOneSignal(currentUser.uid);
         trackEvent('Session Start', { isAnonymous: currentUser.isAnonymous });
       } else {
-        const savedGuest = localStorage.getItem('ujuzi_mock_guest_user');
-        if (savedGuest) {
-          try {
-            const guestOb = JSON.parse(savedGuest);
-            setUser(guestOb);
-            identifyUser(guestOb.uid, {
-              $email: guestOb.email,
-              $name: guestOb.displayName,
-              isAnonymous: true,
-            });
-            loginToOneSignal(guestOb.uid);
-          } catch (e) {
-            setUser(null);
-            logoutFromOneSignal();
-          }
-        } else {
-          setUser(null);
-          logoutFromOneSignal();
-        }
+        setUser(null);
+        logoutFromOneSignal();
       }
       setLoading(false);
     });
@@ -133,53 +115,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const createMockGuest = () => {
-    const mockUser: any = {
-      uid: "guest_sandbox_user_override",
-      displayName: "Mgeni (Bypass)",
-      email: "mgeni@ujuzimtandaoni.tz",
-      isAnonymous: true,
-      emailVerified: false,
-      phoneNumber: null,
-      photoURL: null,
-      metadata: {},
-      providerData: [],
-      providerId: "firebase",
-      tenantId: null,
-      delete: async () => {},
-      getIdToken: async () => "mock-token",
-      getIdTokenResult: async () => ({ token: "mock-token", claims: {} }),
-      reload: async () => {},
-      toJSON: () => ({ uid: "guest_sandbox_user_override" })
-    };
-    localStorage.setItem('ujuzi_mock_guest_user', JSON.stringify(mockUser));
-    setUser(mockUser);
-    identifyUser(mockUser.uid, {
-      $email: mockUser.email,
-      $name: mockUser.displayName,
-      isAnonymous: true,
-    });
-    loginToOneSignal(mockUser.uid);
-    trackEvent('Login Anonymous Mock Bypass', { userId: mockUser.uid });
-  };
-
   const loginAnonymously = async () => {
-    try {
-      sessionStorage.setItem('ujuzi_auth_in_progress', 'true');
-      const result = await signInAnonymously(auth);
-      sessionStorage.removeItem('ujuzi_auth_in_progress');
-      trackEvent('Login Anonymous Bypass', { userId: result.user.uid });
-    } catch (error: any) {
-      sessionStorage.removeItem('ujuzi_auth_in_progress');
-      console.warn("Real Firebase Anonymous login failed (likely disabled in console). Activating local state bypass...", error);
-      // Perfect fallback: Create a local simulation user
-      createMockGuest();
-    }
+    throw new Error("Kuingia kwa mgeni kumesitishwa. Tafadhali tumia Google Login kuingia mtandaoni.");
   };
 
   const logout = async () => {
     try {
-      localStorage.removeItem('ujuzi_mock_guest_user');
       await signOut(auth);
       setUser(null);
       trackEvent('Logout');

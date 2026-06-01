@@ -36,8 +36,8 @@ export function useProgress() {
       return;
     }
 
-    // Bypass Firestore sync for mock guest or unauthenticated sandbox users to avoid security rule Denials
-    if (user.uid === 'guest_sandbox_user_override' || !auth.currentUser) {
+    // Bypass Firestore sync only if unauthenticated (e.g. guest or transient state)
+    if (!auth.currentUser) {
       setLoading(false);
       return;
     }
@@ -106,7 +106,7 @@ export function useProgress() {
         userId: user?.uid 
       });
       
-      if (user && user.uid !== 'guest_sandbox_user_override' && auth.currentUser) {
+      if (user && auth.currentUser) {
         try {
           await setDoc(doc(db, 'user_progress', user.uid), {
             userId: user.uid,
@@ -137,7 +137,7 @@ export function useProgress() {
         userId: user?.uid
       });
 
-      if (user && user.uid !== 'guest_sandbox_user_override' && auth.currentUser) {
+      if (user && auth.currentUser) {
         try {
           await setDoc(doc(db, 'user_progress', user.uid), {
             userId: user.uid,
