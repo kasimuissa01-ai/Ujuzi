@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, signInAnonymously, onAuthStateChanged, signInWithPopup, signInWithRedirect, getRedirectResult, linkWithPopup, linkWithRedirect, signOut } from 'firebase/auth';
+import { User, signInAnonymously, onAuthStateChanged, signInWithPopup, signInWithRedirect, getRedirectResult, linkWithPopup, linkWithRedirect, signOut, setPersistence, browserLocalPersistence } from 'firebase/auth';
 import { auth, googleProvider } from '../lib/firebase';
 import { identifyUser, trackEvent } from '../lib/mixpanel';
 import { loginToOneSignal, logoutFromOneSignal } from '../services/onesignalService';
@@ -32,8 +32,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(false);
     }, 5000);
 
-    // Dynamic recovery: process redirection result when PWA returns from Google login flow
-    getRedirectResult(auth)
+    // Enforce robust persistent state storage explicitly to survive PWA closes or reloads
+    setPersistence(auth, browserLocalPersistence)
+      .then(() => {
+        // Recover redirect outcome if they did login via redirect
+        return getRedirectResult(auth);
+      })
       .then((result) => {
         if (result) {
           sessionStorage.removeItem('ujuzi_auth_in_progress');
@@ -49,7 +53,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       })
       .catch((error) => {
         sessionStorage.removeItem('ujuzi_auth_in_progress');
-        console.error("Google auth redirect recovery failed:", error);
+        console.error("Google Auth local persistence or redirect setup failed:", error);
       });
 
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -85,32 +89,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const loginWithGoogle = async () => {
     sessionStorage.setItem('ujuzi_auth_in_progress', 'true');
-    const isPWA = isStandaloneApp();
-    if (isPWA) {
-      try {
-        await signInWithRedirect(auth, googleProvider);
-      } catch (redirectError) {
-        sessionStorage.removeItem('ujuzi_auth_in_progress');
-        console.error("Google Standalone redirect failed, fall-backing to popup:", redirectError);
-        try {
-          const result = await signInWithPopup(auth, googleProvider);
-          sessionStorage.removeItem('ujuzi_auth_in_progress');
-          trackEvent('Login', { method: 'GooglePopupFallback', userId: result.user.uid });
-        } catch (error) {
-          sessionStorage.removeItem('ujuzi_auth_in_progress');
-          console.error("Popup fallback failed:", error);
-          throw error;
-        }
-      }
-    } else {
-      try {
-        const result = await signInWithPopup(auth, googleProvider);
-        sessionStorage.removeItem('ujuzi_auth_in_progress');
-        trackEvent('Login', { method: 'Google', userId: result.user.uid });
-      } catch (popupError: any) {
-        console.warn("Popup blocked or failed in this web context. Bubbling error to UI.", popupError);
+    
+    // Popup authentication is extremely robust for PWAs and standalone app displays,
+    // as it stays fully native within the container sheet without page-displacement reloads.
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      sessionStorage.removeItem('ujuzi_auth_in_progress');
+      setUser(result.user);
+      trackEvent('Login Popup Succeeded', { userId: result.user.uid });
+    } catch (popupError: any) {
+      console.warn("Popup blocked or failed. Running slide-back redirect strategy...", popupError);
+      
+      // If popup is closed by user, don't fallback to redirect automatically, just let them retry.
+      if (popupError?.code === 'auth/popup-closed-by-user') {
         sessionStorage.removeItem('ujuzi_auth_in_progress');
         throw popupError;
+      }
+      
+      // Try fallback to redirect ONLY if popup fails due to unsupported features/blocked popup
+      try {
+        await signInWithRedirect(auth, googleProvider);
+      } catch (redirectError: any) {
+        sessionStorage.removeItem('ujuzi_auth_in_progress');
+        console.error("Popup fallback redirect failed:", redirectError);
+        throw redirectError;
       }
     }
   };
@@ -130,22 +132,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const linkAccount = async () => {
-    const isPWA = isStandaloneApp();
     try {
       if (auth.currentUser && auth.currentUser.isAnonymous) {
         try {
-          if (isPWA) {
-            await linkWithRedirect(auth.currentUser, googleProvider);
-          } else {
-            const result = await linkWithPopup(auth.currentUser, googleProvider);
-            trackEvent('Link Account', { method: 'Google', userId: result.user.uid });
-          }
+          const result = await linkWithPopup(auth.currentUser, googleProvider);
+          trackEvent('Link Account Succeeded', { userId: result.user.uid });
         } catch (linkError: any) {
           if (linkError.code === 'auth/credential-already-in-use' || linkError.code === 'auth/email-already-in-use') {
-             // Let them login instead
+             // Already in use, let them login via standard Google flow instead
              await loginWithGoogle();
           } else {
-            throw linkError;
+             // Popup failed or not supported, try fallback to redirect
+             try {
+               await linkWithRedirect(auth.currentUser!, googleProvider);
+             } catch (redirectError) {
+               console.error("Link account with redirect fallthrough failed:", redirectError);
+               throw redirectError;
+             }
           }
         }
       } else {
