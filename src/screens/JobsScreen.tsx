@@ -249,7 +249,7 @@ export default function JobsScreen({ onNavigate }: Props) {
     }));
 
   return (
-    <div className="flex-1 flex flex-col bg-[#ececf0] h-full overflow-y-auto pb-24 relative select-none font-sans">
+    <div className="flex-1 flex flex-col bg-[#ececf0] h-full overflow-y-auto pb-36 relative select-none font-sans">
       {/* Toast Notification Banner */}
       <AnimatePresence>
         {toastMessage && (

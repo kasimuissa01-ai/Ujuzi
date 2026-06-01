@@ -67,7 +67,7 @@ export default function HomeScreen({ onNavigate }: Props) {
   const progressPercent = totalAllLessons > 0 ? Math.round((completedCount / totalAllLessons) * 100) : 0;
 
   return (
-    <div className="flex-1 flex flex-col bg-[#ececf0] h-full overflow-y-auto pb-20 relative">
+    <div className="flex-1 flex flex-col bg-[#ececf0] h-full overflow-y-auto pb-36 relative">
       <div className="px-6 pt-12">
         {/* Header Section */}
         <div className="flex items-center justify-between mb-8 relative z-50">
