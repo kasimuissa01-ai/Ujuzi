@@ -8,12 +8,8 @@ export function isOneSignalAllowedOnCurrentDomain(): boolean {
   if (typeof window === 'undefined') return false;
   const hostname = window.location.hostname;
   return (
-    window.location.protocol === 'https:' ||
     hostname.includes('ujuzii.vercel.app') || 
-    hostname.includes('ujuzi.vercel.app') || 
-    hostname.includes('run.app') ||
-    hostname === 'localhost' || 
-    hostname === '127.0.0.1'
+    hostname.includes('ujuzi.vercel.app')
   );
 }
 

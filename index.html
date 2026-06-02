@@ -14,12 +14,8 @@
       (function() {
         const hostname = window.location.hostname;
         const isAllowedOneSignalDomain = 
-          window.location.protocol === 'https:' ||
           hostname.includes('ujuzii.vercel.app') || 
-          hostname.includes('ujuzi.vercel.app') ||
-          hostname.includes('run.app') ||
-          hostname === 'localhost' || 
-          hostname === '127.0.0.1';
+          hostname.includes('ujuzi.vercel.app');
 
         if (isAllowedOneSignalDomain) {
           window.OneSignalDeferred = window.OneSignalDeferred || [];

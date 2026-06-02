@@ -24,7 +24,31 @@ if (typeof window !== 'undefined') {
   };
 }
 
-registerSW({ immediate: true });
+// Unregister any stale, broken, or dev-mode service workers in sanbox/dev environments to break infinite refresh loops
+if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+  const isProductionDomain = () => {
+    const hostname = window.location.hostname;
+    return hostname.includes('ujuzii.vercel.app') || hostname.includes('ujuzi.vercel.app');
+  };
+
+  if (!import.meta.env.PROD || !isProductionDomain()) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (const registration of registrations) {
+        registration.unregister().then(() => {
+          console.log('[Sandbox Cleanup] Stale Service Worker unregistered successfully.');
+        });
+      }
+    });
+  }
+}
+
+// Only register the PWA service worker on production domains to avoid refresh loops in sandboxes and development
+if (typeof window !== 'undefined' && import.meta.env.PROD) {
+  const isProd = window.location.hostname.includes('ujuzii.vercel.app') || window.location.hostname.includes('ujuzi.vercel.app');
+  if (isProd) {
+    registerSW({ immediate: true });
+  }
+}
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
