@@ -57,6 +57,90 @@ const specializations = [
   { id: 'social_media', label: 'Social Media Management' }
 ];
 
+const LOCAL_OFFLINE_FALLBACK_JOBS: Job[] = [
+  {
+    id: "offline-logo-1",
+    title: "Minimalist Business Logo Design for Tanzania Coffee agency",
+    platform: "Fiverr",
+    budget: "$25",
+    postedAt: "Dakika chache zilizopita",
+    description: "Looking for an expert designer to construct a simple, eye-catching minimalist branding logo for a domestic coffee business in Zanzibar. High-res vector outputs required.",
+    skills: ["Graphic Design", "Logo Design", "Figma", "Branding"],
+    applicants: 2,
+    competition: "low",
+    url: "https://www.fiverr.com/search/gigs?query=logo%20design"
+  },
+  {
+    id: "offline-video-2",
+    title: "Edit 5 Tiktok & Youtube Shorts Reels with Subtitles",
+    platform: "Upwork",
+    budget: "$35",
+    postedAt: "Dakika chache zilizopita",
+    description: "Need a talented editor to compile vertical video Shorts. Must add caption overlays, engaging cuts, zoom effects, and license-free background audio tracks.",
+    skills: ["Video Editing", "CapCut", "TikTok Reels"],
+    applicants: 3,
+    competition: "low",
+    url: "https://www.upwork.com/search/jobs/?q=video+editing"
+  },
+  {
+    id: "offline-write-3",
+    title: "Write 3 Zanzibar Tourism Articles for Travel Blog",
+    platform: "Fiverr",
+    budget: "$15",
+    postedAt: "Muda mfupi uliopita",
+    description: "Looking for a creative tourist blog writer to compose articles highlighting standard budget travel tips for visiting Stone Town and Zanzibar beach locations.",
+    skills: ["Content Writing", "Copywriting", "SEO Articles"],
+    applicants: 1,
+    competition: "low",
+    url: "https://www.fiverr.com/search/gigs?query=copywriting"
+  },
+  {
+    id: "offline-insta-4",
+    title: "Social Media Manager for Boutique Clothing Store",
+    platform: "Upwork",
+    budget: "$50",
+    postedAt: "Muda mfupi uliopita",
+    description: "Boutique shop looking for an Instagram & Pinterest content planner. You will create 3 posts per week with captions and hashtags. Can work remotely from Dar es Salaam.",
+    skills: ["Social Media", "Instagram Marketing", "Canva"],
+    applicants: 4,
+    competition: "low",
+    url: "https://www.upwork.com/search/jobs/?q=social+media"
+  }
+];
+
+const generateClientFallbackProposal = (jobTitle: string, jobBudget: string, userFocus: string): string => {
+  const spec = (userFocus || "").toLowerCase();
+  
+  let opening = `Hi there,\n\nI read through your project details regarding "${jobTitle}" and immediately envisioned how we can launch this cleanly. Working on this requires a clear project deliverable road map.`;
+  let solutionParagraph = "For this contract, my priority is ensuring clear deliverables with robust attention to detail. I specialize in high-quality aesthetic structures, engaging content flows, and professional templates to make your brand stand out.";
+  let workPlan = "- Step 1: Wireframe & review main assets to ensure perfect alignment.\n- Step 2: Custom crafting of outstanding visuals or copy to match your guidelines.\n- Step 3: Optimization, multi-format delivery, and rapid revisions based on your feedback.";
+  let callToAction = "Are you available for a brief, 5-minute chat to discuss the scope and get started on this right away?\n\nBest regards,\nCreative Specialist";
+
+  if (spec.includes("design") || spec.includes("figma") || spec.includes("logo") || spec.includes("graphic")) {
+    opening = `Hello,\n\nYour creative design brief for "${jobTitle}" immediately caught my eye. I specialize in converting raw business concepts into outstanding, professional graphic layouts, logos, or Figma prototypes with excellent typography and color palette pairings.`;
+    solutionParagraph = "My styling approach is modern, highly intuitive, and clean. I focus on creating visual harmony, balanced alignments, and delivering fully editable source files (vector/AI/PSD/Figma) that suit your target audience.";
+    workPlan = "- Initial 2-3 design concepts for your exploration & selection\n- Final stylized layouts/vector assets crafted to perfection\n- Prompt revisions to hit the exact visual vibe you are looking for";
+    callToAction = "Do you have 5 minutes to jump on a quick chat and check some design drafts I have ready?\n\nWarm regards,\nGraphic Design Partner";
+  } else if (spec.includes("video") || spec.includes("edit") || spec.includes("shorts") || spec.includes("tiktok")) {
+    opening = `Hi there,\n\nI noticed you are looking for support with your vertical video edits: "${jobTitle}". I can help edit highly engaging Shorts/Reels/TikToks that maximize watch time and capture immediate viewer attention.`;
+    solutionParagraph = "I have extensive experience working in CapCut, Premiere, and After Effects for social platforms. I prioritize seamless transitions, auto-synced word-by-word subtitles, zoom layouts, and custom sound design to drive engagement.";
+    workPlan = "- Trimming dead weight to ensure a high-retention cinematic hook\n- Custom animated text captions, b-roll footage integration, and sound-effect accents\n- Final color correction and format export ready for high-resolution upload";
+    callToAction = "Do you have a file link? I can draft a 5-second sample, or we can chat briefly to plan your delivery!\n\nBest regards,\nVideo Editing Specialist";
+  } else if (spec.includes("social") || spec.includes("media") || spec.includes("manager") || spec.includes("marketing")) {
+    opening = `Hi there,\n\nI see you need a highly persuasive campaign or page setup for "${jobTitle}". Managing social media accounts is about consistent branding, elegant post layouts, and hyper-engaging copywriting.`;
+    solutionParagraph = "I specialize in building zero-friction content calendars that establish authority. I focus on optimizing captions, deploying trending hashtag trees, scheduling posts at peak hours, and running simple high-ROI ads.";
+    workPlan = "- Social feed audit & target aesthetic grid setup\n- Rapid creation of high-click graphics and compelling captions for the week\n- Smart scheduling & daily community touchpoints to foster real follower growth";
+    callToAction = "Are you open to a quick chat to discuss your brand aesthetic or monthly posting calendar?\n\nBest regards,\nSocial Media Manager";
+  } else if (spec.includes("writing") || spec.includes("copy") || spec.includes("seo") || spec.includes("writer")) {
+    opening = `Hi there,\n\nI read your brief for "${jobTitle}" and would love to help craft highly engaging, polished, and search-optimized copy that speaks to your readers clearly.`;
+    solutionParagraph = "I specialize in converting ideas into simple, high-converting copy that builds trust. I prioritize emotional hooks, active reader-centric formatting, and natural SEO keyword integration for organic reach.";
+    workPlan = "- Competitor SEO research & content structure benchmarking\n- Hand-crafted copy drafts with engaging sub-headers and catchy calls-to-action\n- Multi-point keyword and grammar validation to ensure peak delivery";
+    callToAction = "Could we connect for a brief chat to discuss your project tone and draft the first outline today?\n\nBest regards,\nCopywriter & SEO Partner";
+  }
+
+  return `${opening}\n\n${solutionParagraph}\n\nWhat I propose for your project:\n${workPlan}\n\n${callToAction}`;
+};
+
 export default function JobsScreen({ onNavigate }: Props) {
   // Tabs: 'feed' (Dili), 'applications' (Maombi), 'stats' (Ripoti)
   const [activeTab, setActiveTab] = useState<'feed' | 'applications' | 'stats'>('feed');
@@ -84,10 +168,17 @@ export default function JobsScreen({ onNavigate }: Props) {
       const res = await fetch(getApiUrl('/api/jobs'));
       if (res.ok) {
         const data = await res.json();
-        setJobs(data);
+        if (Array.isArray(data) && data.length > 0) {
+          setJobs(data);
+        } else {
+          setJobs(LOCAL_OFFLINE_FALLBACK_JOBS);
+        }
+      } else {
+        setJobs(LOCAL_OFFLINE_FALLBACK_JOBS);
       }
     } catch (e) {
       console.warn("Failed to retrieve jobs:", e);
+      setJobs(LOCAL_OFFLINE_FALLBACK_JOBS);
     } finally {
       setLoadingJobs(false);
     }
@@ -128,12 +219,21 @@ export default function JobsScreen({ onNavigate }: Props) {
       });
       if (res.ok) {
         const data = await res.json();
-        setJobs(data.allJobs);
-        showToast("Scraper retrieved fresh freelance bids from Fiverr, Upwork, & Freelancer");
+        if (data.allJobs && data.allJobs.length > 0) {
+          setJobs(data.allJobs);
+          showToast("Scraper retrieved fresh freelance bids from Fiverr, Upwork, & Freelancer");
+        } else {
+          setJobs(LOCAL_OFFLINE_FALLBACK_JOBS);
+          showToast("Imesakinishwa fursa mbadala kienyeji (Offline Catalog loaded)");
+        }
+      } else {
+        setJobs(LOCAL_OFFLINE_FALLBACK_JOBS);
+        showToast("Imetumia fursa safi kienyeji (Offline Catalog loaded)");
       }
     } catch (e) {
       console.warn(e);
-      showToast("Could not contact scraper backend");
+      setJobs(LOCAL_OFFLINE_FALLBACK_JOBS);
+      showToast("Imetumia fursa mbadala kienyeji");
     } finally {
       setRefreshingJobs(false);
     }
@@ -163,11 +263,16 @@ export default function JobsScreen({ onNavigate }: Props) {
         const data = await res.json();
         setCurrentProposal(data.proposal);
       } else {
-        throw new Error("Generation failure");
+        const fallback = generateClientFallbackProposal(selectedJob.title, selectedJob.budget, specLabel);
+        setCurrentProposal(fallback);
+        showToast("Imetengeneza templeti safi (Offline Model)");
       }
     } catch (e) {
       console.warn(e);
-      setCurrentProposal("Error: Unable to generate your proposal now. Please ensure your Gemini API key is configured correctly.");
+      const specLabel = specializations.find(s => s.id === selectedSpecialization)?.label || 'Freelancer';
+      const fallback = generateClientFallbackProposal(selectedJob.title, selectedJob.budget, specLabel);
+      setCurrentProposal(fallback);
+      showToast("Unda Kiolezo mbadala kienyeji (Offline Model)");
     } finally {
       setGeneratingProposal(false);
     }

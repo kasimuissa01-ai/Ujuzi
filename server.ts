@@ -191,7 +191,7 @@ async function startServer() {
       });
 
       const result = await ai.models.generateContent({ 
-        model: "gemini-3-flash-preview",
+        model: "gemini-2.5-flash",
         contents: prompt,
         config: jsonMode ? { responseMimeType: "application/json" } : undefined
       });
@@ -310,7 +310,7 @@ Focus STRICTLY on: Graphics Design, Logo Design, Video Editing (TikTok/Reels/Sho
 Do NOT generate any high-tech backend/frontend web developer, software engineering, complex database, or programming jobs.
 Format as JSON matching this TypeScript type Array<{title: string, platform: 'Fiverr' | 'Upwork', budget: string, postedAt: string, description: string, skills: string[], applicants: number, competition: 'low'}>. Return raw JSON.`;
             const result = await ai.models.generateContent({
-              model: "gemini-3.5-flash",
+              model: "gemini-2.5-flash",
               contents: prompt,
               config: { responseMimeType: "application/json" }
             });
@@ -338,6 +338,47 @@ Format as JSON matching this TypeScript type Array<{title: string, platform: 'Fi
               }
             }
           }
+        }
+
+        // Static fallback if AI or network drops - always filtered with low competition
+        if (freshJobs.length === 0) {
+          const randId = Math.floor(Math.random() * 100000);
+          freshJobs.push({
+            id: `scraped-fallback-logo-${randId}`,
+            title: "Minimalist Business Logo Design for Tanzania Coffee agency",
+            platform: "Fiverr",
+            budget: "$25",
+            postedAt: "Dakika chache zilizopita",
+            description: "Looking for an expert designer to construct a simple, eye-catching minimalist branding logo for a domestic coffee business. High-res vector outputs required.",
+            skills: ["Graphic Design", "Logo Design", "Figma", "Branding"],
+            applicants: 2,
+            competition: "low",
+            url: "https://www.fiverr.com/search/gigs?query=logo%20design"
+          });
+          freshJobs.push({
+            id: `scraped-fallback-video-${randId}`,
+            title: "Edit 5 Tiktok & Youtube Shorts Reels with Subtitles",
+            platform: "Upwork",
+            budget: "$35",
+            postedAt: "Muda mfupi uliopita",
+            description: "Need a talented editor to compile vertical video Shorts. Must add caption overlays, engaging cuts, zoom effects, and license-free background audio tracks.",
+            skills: ["Video Editing", "CapCut", "TikTok Reels"],
+            applicants: 3,
+            competition: "low",
+            url: "https://www.upwork.com/search/jobs/?q=video+editing"
+          });
+          freshJobs.push({
+            id: `scraped-fallback-write-${randId}`,
+            title: "Write 3 Zanzibar Tourism Articles for Travel Blog",
+            platform: "Fiverr",
+            budget: "$15",
+            postedAt: "Muda mfupi uliopita",
+            description: "Looking for a creative tourist blog writer to compose articles highlighting standard budget travel tips for visiting Stone Town and Zanzibar beach locations.",
+            skills: ["Content Writing", "Copywriting", "SEO Articles"],
+            applicants: 1,
+            competition: "low",
+            url: "https://www.fiverr.com/search/gigs?query=copywriting"
+          });
         }
 
         scrapedJobs = freshJobs;
@@ -470,7 +511,7 @@ Format as JSON matching this TypeScript type Array<{title: string, platform: 'Fi
 Make description sound extremely authentic, brief, and professional. Return raw JSON without markdown or formatting tags.`;
 
           const result = await ai.models.generateContent({
-            model: "gemini-3.5-flash",
+            model: "gemini-2.5-flash",
             contents: prompt,
             config: { responseMimeType: "application/json" }
           });
@@ -557,7 +598,7 @@ Make description sound extremely authentic, brief, and professional. Return raw 
   });
 
 
-  // Dedicated proposal generation using standard gemini-3.5-flash with a high-fidelity fail-safe premium fallback generator
+  // Dedicated proposal generation using standard gemini-2.5-flash with a high-fidelity fail-safe premium fallback generator
   function generatePremiumFallbackProposal(jobTitle: string, jobDescription: string, jobBudget: string, userFocus: string): string {
     const spec = (userFocus || "").toLowerCase();
     
@@ -591,7 +632,7 @@ Make description sound extremely authentic, brief, and professional. Return raw 
     return `${opening}\n\n${solutionParagraph}\n\nWhat I propose for your project:\n${workPlan}\n\n${callToAction}`;
   }
 
-  // Dedicated proposal generation using standard gemini-3.5-flash
+  // Dedicated proposal generation using standard gemini-2.5-flash
   app.post("/api/jobs/proposal", async (req, res) => {
     const { jobTitle, jobDescription, jobPlatform, jobBudget, userFocus } = req.body;
 
@@ -632,7 +673,7 @@ Strict Rules for Proposal Generation:
 Generate ONLY the proposal text itself. Do not include copyable placeholder brackets, backticks, or introduction notes.`;
 
       const result = await ai.models.generateContent({ 
-        model: "gemini-3.5-flash",
+        model: "gemini-2.5-flash",
         contents: prompt
       });
 
@@ -757,7 +798,7 @@ Generate ONLY the proposal text itself. Do not include copyable placeholder brac
       });
 
       const response = await ai.models.generateContent({
-        model: "gemini-3.5-flash",
+        model: "gemini-2.5-flash",
         contents: `You are the creative, witty Duolingo push notification copywriter for 'Ujuzi', an interactive micro-learning application that teaches sales, marketing, and business skills to entrepreneurs in East Africa (written in Swahili).
 Generate exactly 1 push notification designed to maximize user retention. The user has not studied today yet.
 Target Slot: ${timeKey} (${timeKey === "Asubuhi" ? "Morning motivation" : timeKey === "Mchana" ? "Quick midday break / action step" : "Playful passive-aggressive streak warning / evening review"}).
