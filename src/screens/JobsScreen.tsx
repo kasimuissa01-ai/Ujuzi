@@ -174,7 +174,19 @@ export default function JobsScreen({ onNavigate }: Props) {
   const fetchJobs = async () => {
     try {
       setLoadingJobs(true);
-      const res = await fetch(getApiUrl('/api/jobs'));
+      const apiUrl = getApiUrl('/api/jobs');
+      let res;
+      try {
+        res = await fetch(apiUrl);
+      } catch (err) {
+        if (apiUrl.startsWith('http')) {
+          console.warn("Absolute fetch failed, falling back to relative path:", err);
+          res = await fetch('/api/jobs');
+        } else {
+          throw err;
+        }
+      }
+
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data) && data.length > 0) {
@@ -223,9 +235,23 @@ export default function JobsScreen({ onNavigate }: Props) {
     if (refreshingJobs) return;
     try {
       setRefreshingJobs(true);
-      const res = await fetch(getApiUrl('/api/jobs/refresh'), {
-        method: 'POST'
-      });
+      const apiUrl = getApiUrl('/api/jobs/refresh');
+      let res;
+      try {
+        res = await fetch(apiUrl, {
+          method: 'POST'
+        });
+      } catch (err) {
+        if (apiUrl.startsWith('http')) {
+          console.warn("Absolute refresh failed, falling back to relative path:", err);
+          res = await fetch('/api/jobs/refresh', {
+            method: 'POST'
+          });
+        } else {
+          throw err;
+        }
+      }
+
       if (res.ok) {
         const data = await res.json();
         if (data.allJobs && data.allJobs.length > 0) {

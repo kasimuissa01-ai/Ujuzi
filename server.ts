@@ -81,10 +81,45 @@ function getFirebaseAdminInstance(): typeof admin | null {
     }
   }
 
+  // 4. Default ADC fallback for Cloud Run ambient service account and credentials
+  if (!adminAppInitialized) {
+    try {
+      admin.initializeApp({
+        projectId: firebaseConfig?.projectId,
+      });
+      adminAppInitialized = true;
+      console.log("FCM v1: Firebase Admin imeanzishwa kupitia Application Default Credentials (ADC)! ☁️");
+      return admin;
+    } catch (e) {
+      console.warn("FCM v1: Imeshindwa kuanzisha kwa mazingira ya default credentials:", e);
+    }
+  }
+
   return null;
 }
 
+function getDbAdmin() {
+  if (!adminAppInitialized) {
+    getFirebaseAdminInstance();
+  }
+  if (!adminAppInitialized) {
+    return null;
+  }
+  try {
+    const dbId = firebaseConfig?.firestoreDatabaseId;
+    if (dbId) {
+      return getFirestore(undefined, dbId);
+    }
+  } catch (e) {
+    console.warn("getFirestore failed with dbId, falling back to default:", e);
+  }
+  return admin.firestore();
+}
+
 async function startServer() {
+  // Always initialize Firebase Admin SDK at startup
+  getFirebaseAdminInstance();
+
   const app = express();
   const PORT = 3000;
 
@@ -231,7 +266,7 @@ async function startServer() {
   // Helper: Parse, Clean and Deduplicate Jobs to Firestore or Memory
   async function importScrapedJobs(items: any[]): Promise<any[]> {
     const imported: any[] = [];
-    const dbAdmin = adminAppInitialized ? admin.firestore() : null;
+    const dbAdmin = getDbAdmin();
 
     for (const item of items) {
       if (!item.title && !item.name) continue;
@@ -380,7 +415,7 @@ Text to Translate:
   // Served Instantly from Firestore (The serving layer)
   app.get("/api/jobs", async (req, res) => {
     let resultJobs: any[] = [];
-    const dbAdmin = adminAppInitialized ? admin.firestore() : null;
+    const dbAdmin = getDbAdmin();
 
     if (dbAdmin) {
       try {
@@ -545,7 +580,7 @@ Format as JSON matching this schema: [{ "title": string, "platform": "Fiverr" | 
 
     // Now reload collection
     let allJobs: any[] = [];
-    const dbAdmin = adminAppInitialized ? admin.firestore() : null;
+    const dbAdmin = getDbAdmin();
 
     if (dbAdmin) {
       try {
