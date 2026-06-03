@@ -11,12 +11,35 @@
         "updatedAt": { "type": "string", "format": "timestamp" }
       },
       "required": ["userId", "completedLessons", "streakDates", "updatedAt"]
+    },
+    "ScrapedJob": {
+      "title": "Scraped Job",
+      "description": "Stores freelance jobs imported or scraped from Upwork or Fiverr.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "The unique ID of the job." },
+        "title": { "type": "string", "description": "The job title." },
+        "platform": { "type": "string", "description": "The source platform (Upwork, Fiverr)." },
+        "budget": { "type": "string", "description": "The budget price or rate." },
+        "postedAt": { "type": "string", "description": "Relative human-readable posting time." },
+        "description": { "type": "string", "description": "The detailed job description." },
+        "skills": { "type": "array", "items": { "type": "string" }, "description": "Array of required skills." },
+        "applicants": { "type": "number", "description": "Active number of applicants." },
+        "competition": { "type": "string", "description": "Competition rating (e.g. low)." },
+        "url": { "type": "string", "description": "The original application link." },
+        "createdAt": { "type": "string", "format": "timestamp" }
+      },
+      "required": ["id", "title", "platform", "budget", "description", "skills", "createdAt"]
     }
   },
   "firestore": {
     "/user_progress/{userId}": {
       "schema": { "$ref": "UserProgress" },
       "description": "Stores user progress for each authenticated user."
+    },
+    "/scraped_jobs/{jobId}": {
+      "schema": { "$ref": "ScrapedJob" },
+      "description": "Stores clean, deduplicated scraped freelance jobs."
     }
   }
 }

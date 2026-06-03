@@ -30,5 +30,10 @@ service cloud.firestore {
     match /lessons/{lessonId} {
       allow read, write: if isSignedIn();
     }
+
+    // Scraped Jobs rules: Active freelance listings are viewable by any signed-in user
+    match /scraped_jobs/{jobId} {
+      allow read: if isSignedIn();
+    }
   }
 }

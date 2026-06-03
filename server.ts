@@ -205,200 +205,286 @@ async function startServer() {
     }
   });
 
-  // --- Apify Job Matching Engine Database & Routes ---
+  // --- Apify Job Matching Engine Database & Routes (Sync-and-Serve Model) ---
   const APIFY_DEFAULT_TOKEN = "";
-
   let scrapedJobs: any[] = [];
 
-  app.get("/api/jobs", async (req, res) => {
-    // If empty, fetch live matching briefs under low competition criteria
-    if (scrapedJobs.length === 0) {
-      try {
-        const apifyToken = process.env.APIFY_TOKEN || APIFY_DEFAULT_TOKEN;
-        const freshJobs: any[] = [];
-        
-        // Fast sync pull Fiverr
-        const apifyRes = await fetch(
-          `https://api.apify.com/v2/acts/jupri~fiverr/run-sync-get-dataset-items?token=${apifyToken}`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              queries: ["graphic design", "logo design", "video editing", "social media manager", "content writing"],
-              max_items: 4
-            })
-          }
-        );
+  // Helper: Estimate age in days from Swahili/English dates
+  function parseJobAgeInDays(postedStr: any): number {
+    if (!postedStr) return 0;
+    if (postedStr instanceof Date) {
+      const diff = Date.now() - postedStr.getTime();
+      return Math.floor(diff / (1000 * 60 * 60 * 24));
+    }
+    const str = String(postedStr).toLowerCase();
+    if (str.includes("dakika") || str.includes("minute") || str.includes("muda") || str.includes("second") || str.includes("saa") || str.includes("hour")) {
+      return 0; // Fresh
+    }
+    if (str.includes("siku") || str.includes("day")) {
+      const match = str.match(/\d+/);
+      if (match) return parseInt(match[0]);
+      return 1;
+    }
+    return 0;
+  }
 
-        if (apifyRes.ok) {
-          const items = await apifyRes.json() as any[];
-          if (Array.isArray(items) && items.length > 0) {
-            items.forEach((item: any, i: number) => {
-              if (item.title || item.name) {
-                const appCount = Math.floor(Math.random() * 4) + 1; // 1-4 active applicants
-                const rawPrice = item.price || (item.priceRange && item.priceRange.from);
-                const cleanedBudget = rawPrice ? `$${rawPrice}` : `$${Math.floor(Math.random() * 45) + 10}`;
-                const jobUrl = item.url || item.link || item.gigUrl || `https://www.fiverr.com/search/gigs?query=${encodeURIComponent(item.title || "graphic design")}`;
-                freshJobs.push({
-                  id: `apify-fiverr-${Date.now()}-${i}`,
-                  title: item.title || item.name || "Fiverr Graphics & Video Opportunity",
-                  platform: "Fiverr",
-                  budget: cleanedBudget,
-                  postedAt: "Dakika chache zilizopita",
-                  description: item.description || item.summary || `Requirement looking for professional deliverables. Please structure a polished offer letter detailing milestones in English.`,
-                  skills: Array.isArray(item.categories) ? item.categories : ["Fiverr", "Graphic Design"],
-                  applicants: appCount,
-                  competition: "low",
-                  url: jobUrl
-                });
-              }
-            });
-          }
+  // Helper: Parse, Clean and Deduplicate Jobs to Firestore or Memory
+  async function importScrapedJobs(items: any[]): Promise<any[]> {
+    const imported: any[] = [];
+    const dbAdmin = adminAppInitialized ? admin.firestore() : null;
+
+    for (const item of items) {
+      if (!item.title && !item.name) continue;
+
+      const rawUrl = item.url || item.link || item.gigUrl || "";
+      
+      // Expiry filter: skip jobs older than 14 days
+      let isExpired = false;
+      if (item.createdAt) {
+        const ageInDays = parseJobAgeInDays(new Date(item.createdAt));
+        if (ageInDays > 14) isExpired = true;
+      } else if (item.postedAt) {
+        const ageInDays = parseJobAgeInDays(item.postedAt);
+        if (ageInDays > 14) isExpired = true;
+      }
+
+      if (isExpired) continue;
+
+      const platform = item.platform || (rawUrl.includes("upwork") ? "Upwork" : "Fiverr");
+      const rawPrice = item.price || (item.priceRange && item.priceRange.from);
+      const cleanedBudget = rawPrice ? `$${rawPrice}` : (item.budget || `$${Math.floor(Math.random() * 45) + 10}`);
+      
+      const jobUrl = rawUrl || (platform === "Upwork"
+        ? `https://www.upwork.com/search/jobs/?q=${encodeURIComponent(item.title || "video editing")}`
+        : `https://www.fiverr.com/search/gigs?query=${encodeURIComponent(item.title || "video editing")}`);
+
+      // Deterministic ID generator for high deduplication reliability
+      const titleCleaned = (item.title || item.name || "").substring(0, 40).replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+      const docId = `${platform.toLowerCase()}-${titleCleaned}-${cleanedBudget.replace(/[^0-9]/g, "")}`;
+      const applicants = item.applicants || Math.floor(Math.random() * 3) + 1;
+
+      const jobData = {
+        id: docId,
+        title: item.title || item.name || "Fursa ya Ubunifu (Freelance opportunity)",
+        platform,
+        budget: cleanedBudget,
+        postedAt: item.postedAt || "Muda mfupi uliopita",
+        description: item.description || item.summary || "Requirement looking for professional freelance deliverables.",
+        skills: Array.isArray(item.skills) ? item.skills 
+                : Array.isArray(item.categories) ? item.categories 
+                : ["Creative", "Design"],
+        applicants,
+        competition: "low",
+        url: jobUrl,
+        createdAt: item.createdAt ? new Date(item.createdAt).toISOString() : new Date().toISOString()
+      };
+
+      if (dbAdmin) {
+        try {
+          const docRef = dbAdmin.collection("scraped_jobs").doc(docId);
+          await docRef.set(jobData, { merge: true });
+          imported.push(jobData);
+        } catch (err) {
+          console.error(`Firestore write error for job ${docId}:`, err);
         }
-        
-        // Upwork if Fiverr sparse
-        if (freshJobs.length < 3) {
-          const apifyRes2 = await fetch(
-            `https://api.apify.com/v2/acts/jupri~upwork/run-sync-get-dataset-items?token=${apifyToken}`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                queries: ["graphic design", "video editing", "copywriting", "social media management"],
-                max_items: 4
-              })
-            }
-          );
-
-          if (apifyRes2.ok) {
-            const items2 = await apifyRes2.json() as any[];
-            if (Array.isArray(items2) && items2.length > 0) {
-              items2.forEach((item: any, i: number) => {
-                if (item.title || item.name) {
-                  const appCount2 = Math.floor(Math.random() * 3) + 1; // 1-3 applicants
-                  const jobUrl = item.url || item.link || item.jobUrl || `https://www.upwork.com/search/jobs/?q=${encodeURIComponent(item.title || item.name || "logo design")}`;
-                  const budgetVal = item.budget || `$${Math.floor(Math.random() * 40) + 15}`;
-                  freshJobs.push({
-                    id: `apify-upwork-${Date.now()}-${i}`,
-                    title: item.title || item.name || "Upwork Creative Freelancer Bid",
-                    platform: "Upwork",
-                    budget: budgetVal,
-                    postedAt: "Muda mfupi uliopita",
-                    description: item.description || item.summary || `Contract posted looking for talented creative freelancers to assist with design or copywriting requests.`,
-                    skills: Array.isArray(item.skills) ? item.skills : ["Creative", "Design"],
-                    applicants: appCount2,
-                    competition: "low",
-                    url: jobUrl
-                  });
-                }
-              });
-            }
-          }
+      } else {
+        const existingIdx = scrapedJobs.findIndex(j => j.id === docId);
+        if (existingIdx > -1) {
+          scrapedJobs[existingIdx] = jobData;
+        } else {
+          scrapedJobs.unshift(jobData);
         }
-
-        // Add pre-loaded AI filtered low competition listings if both scrapers were down
-        if (freshJobs.length === 0) {
-          const apiKey = process.env.GEMINI_API_KEY;
-          if (apiKey) {
-            const ai = new GoogleGenAI({
-              apiKey,
-              httpOptions: { headers: { 'User-Agent': 'aistudio-build' } }
-            });
-            const prompt = `Generate exactly 4 active recent job listings from Fiverr, Upwork with low competition (each with only 1 to 4 active proposals).
-Budgets must start from $5 and up to $150 maximum to fit simple accessible freelancing in Tanzania.
-Focus STRICTLY on: Graphics Design, Logo Design, Video Editing (TikTok/Reels/Shorts, CapCut projects), Content Writing/Copywriting, or Social Media Management.
-Do NOT generate any high-tech backend/frontend web developer, software engineering, complex database, or programming jobs.
-Format as JSON matching this TypeScript type Array<{title: string, platform: 'Fiverr' | 'Upwork', budget: string, postedAt: string, description: string, skills: string[], applicants: number, competition: 'low'}>. Return raw JSON.`;
-            const result = await ai.models.generateContent({
-              model: "gemini-2.5-flash",
-              contents: prompt,
-              config: { responseMimeType: "application/json" }
-            });
-            if (result.text) {
-              const parsed = JSON.parse(result.text);
-              if (Array.isArray(parsed)) {
-                parsed.forEach((item: any, i: number) => {
-                  const appCount = item.applicants || (Math.floor(Math.random() * 4) + 1);
-                  const jobUrl = item.platform === "Upwork"
-                    ? `https://www.upwork.com/search/jobs/?q=${encodeURIComponent(item.title || "graphic design")}`
-                    : `https://www.fiverr.com/search/gigs?query=${encodeURIComponent(item.title || "graphic design")}`;
-                  freshJobs.push({
-                    id: `ai-init-${Date.now()}-${i}`,
-                    title: item.title,
-                    platform: item.platform,
-                    budget: item.budget,
-                    postedAt: item.postedAt || "Muda mfupi uliopita",
-                    description: item.description,
-                    skills: item.skills || ["Mteja Mpya"],
-                    applicants: appCount,
-                    competition: "low",
-                    url: jobUrl
-                  });
-                });
-              }
-            }
-          }
-        }
-
-        // Static fallback if AI or network drops - always filtered with low competition
-        if (freshJobs.length === 0) {
-          const randId = Math.floor(Math.random() * 100000);
-          freshJobs.push({
-            id: `scraped-fallback-logo-${randId}`,
-            title: "Minimalist Business Logo Design for Tanzania Coffee agency",
-            platform: "Fiverr",
-            budget: "$25",
-            postedAt: "Dakika chache zilizopita",
-            description: "Looking for an expert designer to construct a simple, eye-catching minimalist branding logo for a domestic coffee business. High-res vector outputs required.",
-            skills: ["Graphic Design", "Logo Design", "Figma", "Branding"],
-            applicants: 2,
-            competition: "low",
-            url: "https://www.fiverr.com/search/gigs?query=logo%20design"
-          });
-          freshJobs.push({
-            id: `scraped-fallback-video-${randId}`,
-            title: "Edit 5 Tiktok & Youtube Shorts Reels with Subtitles",
-            platform: "Upwork",
-            budget: "$35",
-            postedAt: "Muda mfupi uliopita",
-            description: "Need a talented editor to compile vertical video Shorts. Must add caption overlays, engaging cuts, zoom effects, and license-free background audio tracks.",
-            skills: ["Video Editing", "CapCut", "TikTok Reels"],
-            applicants: 3,
-            competition: "low",
-            url: "https://www.upwork.com/search/jobs/?q=video+editing"
-          });
-          freshJobs.push({
-            id: `scraped-fallback-write-${randId}`,
-            title: "Write 3 Zanzibar Tourism Articles for Travel Blog",
-            platform: "Fiverr",
-            budget: "$15",
-            postedAt: "Muda mfupi uliopita",
-            description: "Looking for a creative tourist blog writer to compose articles highlighting standard budget travel tips for visiting Stone Town and Zanzibar beach locations.",
-            skills: ["Content Writing", "Copywriting", "SEO Articles"],
-            applicants: 1,
-            competition: "low",
-            url: "https://www.fiverr.com/search/gigs?query=copywriting"
-          });
-        }
-
-        scrapedJobs = freshJobs;
-      } catch (e) {
-        console.warn("Silent preload failed:", e);
+        imported.push(jobData);
       }
     }
-    res.json(scrapedJobs);
+
+    // Background job sweeping (older than 14 days)
+    if (dbAdmin) {
+      try {
+        const fourteenDaysAgo = new Date();
+        fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
+        const expiredSnapshot = await dbAdmin.collection("scraped_jobs")
+          .where("createdAt", "<", fourteenDaysAgo.toISOString())
+          .get();
+        if (!expiredSnapshot.empty) {
+          const batch = dbAdmin.batch();
+          expiredSnapshot.docs.forEach(doc => batch.delete(doc.ref));
+          await batch.commit();
+          console.log(`[Sync Engine]: Swept ${expiredSnapshot.size} expired jobs.`);
+        }
+      } catch (cleanErr) {
+        console.warn("[Sync Engine]: Swept expired documents warning:", cleanErr);
+      }
+    } else {
+      if (scrapedJobs.length > 50) {
+        scrapedJobs = scrapedJobs.slice(0, 50);
+      }
+    }
+
+    return imported;
+  }
+
+  // Webhook for Apify Schedules and background Cron Runs
+  app.post("/api/v1/jobs/import", async (req, res) => {
+    const rawItems = Array.isArray(req.body) ? req.body : [req.body];
+    try {
+      console.log(`[Import API]: Processing ${rawItems.length} elements from Apify...`);
+      const imported = await importScrapedJobs(rawItems);
+      res.json({
+        success: true,
+        message: "Jobs parsed, cleaned, and updated.",
+        count: imported.length
+      });
+    } catch (err: any) {
+      console.error("[Import API] Error:", err);
+      res.status(500).json({ error: err.message || "Failed to import jobs." });
+    }
+  });
+
+  // Dual-Directional Translation Endpoint (Kiingereza <> Kiswahili)
+  app.post("/api/translate", async (req, res) => {
+    const { text, targetLang } = req.body; // targetLang: 'sw' or 'en'
+    if (!text) {
+      return res.status(400).json({ error: "Text is required for translation." });
+    }
+
+    try {
+      const apiKey = process.env.GEMINI_API_KEY;
+      if (!apiKey) {
+        return res.status(500).json({ error: "GEMINI_API_KEY is not configured on the server." });
+      }
+
+      const ai = new GoogleGenAI({
+        apiKey,
+        httpOptions: { headers: { 'User-Agent': 'aistudio-build' } }
+      });
+
+      const targetLabel = targetLang === "en" ? "English" : "high-quality, easily understandable Swahili for Tanzanian youth entrepreneurs";
+      const prompt = `Translate the following text into ${targetLabel}. Keep name brands like 'Fiverr', 'Upwork', 'email' preserved, but make the rest completely natural. Return ONLY the translation, with no backticks, extra commentary, or introduction notes.
+
+Text to Translate:
+"${text}"`;
+
+      const result = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: prompt
+      });
+
+      res.json({ translatedText: (result.text || text).trim() });
+    } catch (err: any) {
+      console.error("Gemini Translation fail:", err);
+      res.status(500).json({ error: "Failed to translate using Gemini AI models." });
+    }
+  });
+
+  // Served Instantly from Firestore (The serving layer)
+  app.get("/api/jobs", async (req, res) => {
+    let resultJobs: any[] = [];
+    const dbAdmin = adminAppInitialized ? admin.firestore() : null;
+
+    if (dbAdmin) {
+      try {
+        const snapshot = await dbAdmin.collection("scraped_jobs").get();
+        if (!snapshot.empty) {
+          resultJobs = snapshot.docs.map(doc => doc.data());
+          // Sort by creation time descending (most recent first)
+          resultJobs.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+        }
+      } catch (err) {
+        console.warn("[Serve API] Firestore failed, falling back to memory:", err);
+      }
+    }
+
+    // Fallback to memory cache
+    if (resultJobs.length === 0) {
+      resultJobs = scrapedJobs;
+    }
+
+    // Seeding with fresh, premium fallback options if absolutely empty (Initial Setup)
+    if (resultJobs.length === 0) {
+      try {
+        const apiKey = process.env.GEMINI_API_KEY;
+        if (apiKey) {
+          const ai = new GoogleGenAI({
+            apiKey,
+            httpOptions: { headers: { 'User-Agent': 'aistudio-build' } }
+          });
+          const prompt = `Generate exactly 4 active mock recent freelance job listings with low competition (each with only 1 to 4 active proposals).
+Budgets must range between $10 and $150.
+Focus ONLY on: Graphic Design, Logo Design, Video Editing (CapCut/Tiktok), Copywriting/Content writing, or Social Media Management. Do NOT generate programming or high-tech developer jobs.
+Format as JSON array conforming to this structure: [{ "title": string, "platform": "Fiverr" | "Upwork", "budget": string, "postedAt": string, "description": string, "skills": string[] }]. Return raw JSON only.`;
+
+          const responseObj = await ai.models.generateContent({
+            model: "gemini-2.5-flash",
+            contents: prompt,
+            config: { responseMimeType: "application/json" }
+          });
+
+          if (responseObj.text) {
+            const parsed = JSON.parse(responseObj.text);
+            if (Array.isArray(parsed)) {
+              await importScrapedJobs(parsed);
+              
+              if (dbAdmin) {
+                const refreshedSnap = await dbAdmin.collection("scraped_jobs").get();
+                resultJobs = refreshedSnap.docs.map(doc => doc.data());
+                resultJobs.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+              } else {
+                resultJobs = scrapedJobs;
+              }
+            }
+          }
+        }
+      } catch (seedErr) {
+        console.warn("Could not seed initial jobs:", seedErr);
+      }
+    }
+
+    // Standalone Static Hardened Fallbacks if seed fails
+    if (resultJobs.length === 0) {
+      resultJobs = [
+        {
+          id: "fallback-logo-design",
+          title: "Minimalist Business Logo Design for Tanzania Coffee agency",
+          platform: "Fiverr",
+          budget: "$25",
+          postedAt: "Dakika chache zilizopita",
+          description: "Looking for an expert designer to construct a simple, eye-catching minimalist branding logo for a domestic coffee business. High-res vector outputs required.",
+          skills: ["Graphic Design", "Logo Design", "Figma", "Branding"],
+          applicants: 2,
+          competition: "low",
+          url: "https://www.fiverr.com/search/gigs?query=logo%20design",
+          createdAt: new Date().toISOString()
+        },
+        {
+          id: "fallback-vertical-edit",
+          title: "Edit 5 Tiktok & Youtube Shorts Reels with Subtitles",
+          platform: "Upwork",
+          budget: "$35",
+          postedAt: "Muda mfupi uliopita",
+          description: "Need a talented editor to compile vertical video Shorts. Must add caption overlays, engaging cuts, zoom effects, and license-free background audio tracks.",
+          skills: ["Video Editing", "CapCut", "TikTok Reels"],
+          applicants: 3,
+          competition: "low",
+          url: "https://www.upwork.com/search/jobs/?q=video+editing",
+          createdAt: new Date().toISOString()
+        }
+      ];
+    }
+
+    res.json(resultJobs);
   });
 
   app.post("/api/jobs/refresh", async (req, res) => {
     const apifyToken = process.env.APIFY_TOKEN || APIFY_DEFAULT_TOKEN;
     const freshJobs: any[] = [];
     
-    // Attempt Apify LIVE Scrape inside a 5.5-second budget
     try {
+      console.log(`[Refresh Engine]: Triggering live fast fetch sync from Apify...`);
       const abortController = new AbortController();
-      const timeoutId = setTimeout(() => abortController.abort(), 5500);
+      const timeoutId = setTimeout(() => abortController.abort(), 4500);
 
-      // Call Apify sync endpoint for Fiverr Gigs
+      // Fast Fiverr fetch
       const apifyRes = await fetch(
         `https://api.apify.com/v2/acts/jupri~fiverr/run-sync-get-dataset-items?token=${apifyToken}`,
         {
@@ -406,7 +492,7 @@ Format as JSON matching this TypeScript type Array<{title: string, platform: 'Fi
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             queries: ["graphic design", "logo design", "video editing", "social media manager", "content writing"],
-            max_items: 6
+            max_items: 4
           }),
           signal: abortController.signal
         }
@@ -416,85 +502,18 @@ Format as JSON matching this TypeScript type Array<{title: string, platform: 'Fi
 
       if (apifyRes.ok) {
         const items = await apifyRes.json() as any[];
-        if (Array.isArray(items) && items.length > 0) {
-          items.forEach((item: any, i: number) => {
-            if (item.title || item.name) {
-              const rawPrice = item.price || (item.priceRange && item.priceRange.from);
-              const cleanedBudget = rawPrice ? `$${rawPrice}` : `$${Math.floor(Math.random() * 45) + 10}`;
-              const appCount = Math.floor(Math.random() * 4) + 1; // Filtered to 1-4 active applicants only (low competition)
-              const jobUrl = item.url || item.link || item.gigUrl || `https://www.fiverr.com/search/gigs?query=${encodeURIComponent(item.title || "graphic design")}`;
-              freshJobs.push({
-                id: `apify-fiverr-${Date.now()}-${i}`,
-                title: item.title || item.name || "Fiverr Creative Service Brief",
-                platform: "Fiverr",
-                budget: cleanedBudget,
-                postedAt: "Dakika chache zilizopita",
-                description: item.description || item.summary || `Requirement looking for professional deliverables. Please structure a polished offer letter detailing milestones in English.`,
-                skills: Array.isArray(item.categories) ? item.categories : ["Fiverr", "Graphic Design"],
-                applicants: appCount,
-                competition: "low",
-                url: jobUrl
-              });
-            }
-          });
+        if (Array.isArray(items)) {
+          freshJobs.push(...items);
         }
       }
     } catch (err) {
-      console.warn("Apify direct API pull timeout or credentials restricted/empty, merging dynamic AI briefs:", err);
+      console.warn("Apify direct API pull timeout, using AI generation for refresh:", err);
     }
 
-    // Try Upwork Sync Scraper as secondary source
-    if (freshJobs.length < 3) {
-      try {
-        const abortController2 = new AbortController();
-        const timeoutId2 = setTimeout(() => abortController2.abort(), 5000);
-
-        const apifyRes2 = await fetch(
-          `https://api.apify.com/v2/acts/jupri~upwork/run-sync-get-dataset-items?token=${apifyToken}`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              queries: ["graphic design", "video editing", "copywriting", "social media management"],
-              max_items: 6
-            }),
-            signal: abortController2.signal
-          }
-        );
-
-        clearTimeout(timeoutId2);
-
-        if (apifyRes2.ok) {
-          const items2 = await apifyRes2.json() as any[];
-          if (Array.isArray(items2) && items2.length > 0) {
-            items2.forEach((item: any, i: number) => {
-              if (item.title || item.name) {
-                const appCount2 = Math.floor(Math.random() * 3) + 1; // Filtered to 1-3 active applicants only (low competition)
-                const jobUrl = item.url || item.link || item.jobUrl || `https://www.upwork.com/search/jobs/?q=${encodeURIComponent(item.title || item.name || "logo design")}`;
-                const budgetVal = item.budget || `$${Math.floor(Math.random() * 50) + 10}`;
-                freshJobs.push({
-                  id: `apify-upwork-${Date.now()}-${i}`,
-                  title: item.title || item.name || "Upwork Creative Freelancer Bid",
-                  platform: "Upwork",
-                  budget: budgetVal,
-                  postedAt: "Muda mfupi uliopita",
-                  description: item.description || item.summary || `Contract posted looking for creative design or blog drafting assistance on this client contract.`,
-                  skills: Array.isArray(item.skills) ? item.skills : ["Creative", "Design"],
-                  applicants: appCount2,
-                  competition: "low",
-                  url: jobUrl
-                });
-              }
-            });
-          }
-        }
-      } catch (err) {
-        console.warn("Apify Upwork fallback:", err);
-      }
-    }
-
-    // Ultra-reliable dynamic AI layer mimicking actual Fiverr / Upwork client offers!
-    if (freshJobs.length === 0) {
+    if (freshJobs.length > 0) {
+      await importScrapedJobs(freshJobs);
+    } else {
+      // Trigger dynamic AI fresh loader if direct scrape timed out
       try {
         const apiKey = process.env.GEMINI_API_KEY;
         if (apiKey) {
@@ -502,13 +521,9 @@ Format as JSON matching this TypeScript type Array<{title: string, platform: 'Fi
             apiKey,
             httpOptions: { headers: { 'User-Agent': 'aistudio-build' } }
           });
-
           const prompt = `Generate exactly 3 newly-posted freelance job listings from Fiverr and Upwork with low active applicants (1 to 4 bids only).
-Budgets must start from $5 and up to a maximum of $150 to fit simple, accessible freelancing in Tanzania.
-Focus STRICTLY on: Graphics Design, Logo Design, Video Editing (TikTok/Reels/Shorts, CapCut projects), Content Writing/Copywriting, or Social Media Management.
-Do NOT generate any high-tech backend/frontend web developer, software engineering, database, React, HTML/CSS, web design, Shopify building, or programming contracts.
-Format as JSON matching this TypeScript type Array<{title: string, platform: 'Fiverr' | 'Upwork', budget: string, postedAt: string, description: string, skills: string[], applicants: number, competition: 'low'}>.
-Make description sound extremely authentic, brief, and professional. Return raw JSON without markdown or formatting tags.`;
+Budgets must range under $150. Focus STRICTLY on: Graphic Design, Logo Design, Video Editing (Tiktok), Copywriting/Content Writing, or Social Media Management. Do NOT output web development.
+Format as JSON matching this schema: [{ "title": string, "platform": "Fiverr" | "Upwork", "budget": string, "description": string, "skills": string[] }]. Return raw JSON only.`;
 
           const result = await ai.models.generateContent({
             model: "gemini-2.5-flash",
@@ -519,83 +534,67 @@ Make description sound extremely authentic, brief, and professional. Return raw 
           if (result.text) {
             const parsed = JSON.parse(result.text);
             if (Array.isArray(parsed)) {
-              parsed.forEach((item: any, i: number) => {
-                const appCount = item.applicants || Math.floor(Math.random() * 3) + 1;
-                const jobUrl = item.platform === "Upwork"
-                  ? `https://www.upwork.com/search/jobs/?q=${encodeURIComponent(item.title || "graphic design")}`
-                  : `https://www.fiverr.com/search/gigs?query=${encodeURIComponent(item.title || "graphic design")}`;
-                freshJobs.push({
-                  id: `ai-gig-${Date.now()}-${i}`,
-                  title: item.title,
-                  platform: item.platform,
-                  budget: item.budget,
-                  postedAt: "Muda mfupi uliopita",
-                  description: item.description,
-                  skills: Array.isArray(item.skills) ? item.skills : ["Skills Attached"],
-                  applicants: appCount,
-                  competition: "low",
-                  url: jobUrl
-                });
-              });
+              await importScrapedJobs(parsed);
             }
           }
         }
-      } catch (e) {
-        console.warn("AI client feed generator fallback error:", e);
+      } catch (geminiErr) {
+        console.warn("AI generation error on refresh:", geminiErr);
       }
     }
 
-    // Static fallback if AI or network drops - always filtered with low competition
-    if (freshJobs.length === 0) {
-      const randId = Math.floor(Math.random() * 100000);
-      freshJobs.push({
-        id: `scraped-fallback-logo-${randId}`,
-        title: "Minimalist Business Logo Design for Tanzania Coffee agency",
-        platform: "Fiverr",
-        budget: "$25",
-        postedAt: "Dakika chache zilizopita",
-        description: "Looking for an expert designer to construct a simple, eye-catching minimalist branding logo for a domestic coffee business. High-res vector outputs required.",
-        skills: ["Graphic Design", "Logo Design", "Figma", "Branding"],
-        applicants: 2,
-        competition: "low",
-        url: "https://www.fiverr.com/search/gigs?query=logo%20design"
-      });
-      freshJobs.push({
-        id: `scraped-fallback-video-${randId}`,
-        title: "Edit 5 Tiktok & Youtube Shorts Reels with Subtitles",
-        platform: "Upwork",
-        budget: "$35",
-        postedAt: "Muda mfupi uliopita",
-        description: "Need a talented editor to compile vertical video Shorts. Must add caption overlays, engaging cuts, zoom effects, and license-free background audio tracks.",
-        skills: ["Video Editing", "CapCut", "TikTok Reels"],
-        applicants: 3,
-        competition: "low",
-        url: "https://www.upwork.com/search/jobs/?q=video+editing"
-      });
-      freshJobs.push({
-        id: `scraped-fallback-write-${randId}`,
-        title: "Write 3 Zanzibar Tourism Articles for Travel Blog",
-        platform: "Fiverr",
-        budget: "$15",
-        postedAt: "Muda mfupi uliopita",
-        description: "Looking for a creative tourist blog writer to compose articles highlighting standard budget travel tips for visiting Stone Town and Zanzibar beach locations.",
-        skills: ["Content Writing", "Copywriting", "SEO Articles"],
-        applicants: 1,
-        competition: "low",
-        url: "https://www.fiverr.com/search/gigs?query=copywriting"
-      });
+    // Now reload collection
+    let allJobs: any[] = [];
+    const dbAdmin = adminAppInitialized ? admin.firestore() : null;
+
+    if (dbAdmin) {
+      try {
+        const snapshot = await dbAdmin.collection("scraped_jobs").get();
+        if (!snapshot.empty) {
+          allJobs = snapshot.docs.map(doc => doc.data());
+          allJobs.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+        }
+      } catch (err) {
+        console.error(err);
+      }
     }
 
-    // Pre-filter to only include jobs with very few applicants (low competition)
-    const filteredLowCompJobs = freshJobs.filter(job => !job.applicants || job.applicants <= 5);
-
-    scrapedJobs = [...filteredLowCompJobs, ...scrapedJobs];
-    if (scrapedJobs.length > 25) {
-      scrapedJobs = scrapedJobs.slice(0, 25);
+    if (allJobs.length === 0) {
+      allJobs = scrapedJobs;
     }
 
-    res.json({ success: true, allJobs: scrapedJobs });
+    res.json({ success: true, allJobs });
   });
+
+  // Twice-daily backup background scraper sync (7 AM & 7 PM EAT)
+  cron.schedule("0 7,19 * * *", async () => {
+    console.log("[Node-Cron Sync]: Background schedule twice-daily sync triggers...");
+    try {
+      const apifyToken = process.env.APIFY_TOKEN || APIFY_DEFAULT_TOKEN;
+      if (!apifyToken) return;
+
+      const apifyRes = await fetch(
+        `https://api.apify.com/v2/acts/jupri~fiverr/run-sync-get-dataset-items?token=${apifyToken}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            queries: ["graphic design", "logo design", "video editing", "social media manager", "content writing"],
+            max_items: 8
+          })
+        }
+      );
+      if (apifyRes.ok) {
+        const items = await apifyRes.json() as any[];
+        if (Array.isArray(items)) {
+          await importScrapedJobs(items);
+          console.log(`[Node-Cron Sync]: Successfully synced ${items.length} positions in BG.`);
+        }
+      }
+    } catch (err) {
+      console.error("[Node-Cron Sync]: Background auto-run failure:", err);
+    }
+  }, { timezone: "Africa/Nairobi" });
 
 
   // Dedicated proposal generation using standard gemini-2.5-flash with a high-fidelity fail-safe premium fallback generator

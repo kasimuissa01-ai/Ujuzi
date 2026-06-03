@@ -157,6 +157,15 @@ export default function JobsScreen({ onNavigate }: Props) {
   const [generatingProposal, setGeneratingProposal] = useState(false);
   const [currentProposal, setCurrentProposal] = useState('');
   const [copied, setCopied] = useState(false);
+
+  // Job translation states
+  const [translatedJobs, setTranslatedJobs] = useState<Record<string, { title: string; description: string; lang: 'sw' | 'en' }>>({});
+  const [translatingId, setTranslatingId] = useState<string | null>(null);
+
+  // Proposal Translation states
+  const [translatedProposalText, setTranslatedProposalText] = useState<string>('');
+  const [translatingProposal, setTranslatingProposal] = useState(false);
+  const [isProposalInSwahili, setIsProposalInSwahili] = useState(false);
   
   // Toast notifications for minimalist feedback
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -239,11 +248,95 @@ export default function JobsScreen({ onNavigate }: Props) {
     }
   };
 
+  const handleTranslateJob = async (jobId: string, title: string, description: string) => {
+    const cached = translatedJobs[jobId];
+    if (cached) {
+      setTranslatedJobs({
+        ...translatedJobs,
+        [jobId]: {
+          ...cached,
+          lang: cached.lang === 'sw' ? 'en' : 'sw'
+        }
+      });
+      return;
+    }
+
+    try {
+      setTranslatingId(jobId);
+      showToast("Fursa inatafsiriwa kwa Kiswahili na Gemini AI...");
+
+      const titleRes = await fetch(getApiUrl('/api/translate'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: title, targetLang: 'sw' })
+      });
+      const titleData = await titleRes.json();
+
+      const descRes = await fetch(getApiUrl('/api/translate'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: description, targetLang: 'sw' })
+      });
+      const descData = await descRes.json();
+
+      setTranslatedJobs({
+        ...translatedJobs,
+        [jobId]: {
+          title: titleData.translatedText || title,
+          description: descData.translatedText || description,
+          lang: 'sw'
+        }
+      });
+      showToast("Imetafsiriwa kwa Kiswahili kwa ufasaha! 🌍");
+    } catch (err) {
+      console.warn("Translation failed:", err);
+      showToast("Tafsiri imefeli. Tafadhali jaribu tena.");
+    } finally {
+      setTranslatingId(null);
+    }
+  };
+
+  const handleTranslateProposal = async () => {
+    if (!currentProposal) return;
+    
+    if (translatedProposalText) {
+      setIsProposalInSwahili(!isProposalInSwahili);
+      return;
+    }
+
+    try {
+      setTranslatingProposal(true);
+      showToast("Andiko linatafsiriwa kwa Kiswahili na Gemini AI...");
+      
+      const res = await fetch(getApiUrl('/api/translate'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: currentProposal, targetLang: 'sw' })
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        setTranslatedProposalText(data.translatedText);
+        setIsProposalInSwahili(true);
+        showToast("Andiko limetafsiriwa kwa Kiswahili! 🌍");
+      } else {
+        showToast("Imeshindwa kufanya tafsiri ya proposal.");
+      }
+    } catch (err) {
+      console.error(err);
+      showToast("Imeshindwa kufanya tafsiri.");
+    } finally {
+      setTranslatingProposal(false);
+    }
+  };
+
   const handleGenerateProposal = async () => {
     if (!selectedJob) return;
     try {
       setGeneratingProposal(true);
       setCurrentProposal('');
+      setTranslatedProposalText('');
+      setIsProposalInSwahili(false);
       
       const specLabel = specializations.find(s => s.id === selectedSpecialization)?.label || 'Freelancer';
       
@@ -279,10 +372,11 @@ export default function JobsScreen({ onNavigate }: Props) {
   };
 
   const handleCopyProposal = () => {
-    if (!currentProposal) return;
-    navigator.clipboard.writeText(currentProposal);
+    const textToCopy = isProposalInSwahili ? (translatedProposalText || currentProposal) : currentProposal;
+    if (!textToCopy) return;
+    navigator.clipboard.writeText(textToCopy);
     setCopied(true);
-    showToast("Proposal text copied to clipboard");
+    showToast("Imenakiliwa kwenye clipboard (Copied!) 📋");
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -466,68 +560,93 @@ export default function JobsScreen({ onNavigate }: Props) {
                     Apify crawler exploring freelance directories...
                   </div>
                 )}
-                
-                {jobs.map((job) => (
-                  <div 
-                    key={job.id}
-                    className="bg-white border border-neutral-200/60 rounded-[2rem] p-5 shadow-sm transition-all text-left group hover:border-neutral-300 relative overflow-hidden"
-                  >
-                    {/* Platform Brand Indicators */}
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-2">
-                        <span className={`text-[9px] font-black lowercase tracking-wider border px-2 py-0.5 rounded-full ${
-                          job.platform === 'Upwork' ? 'border-[#14a800] bg-[#14a800]/5 text-[#14a800]' :
-                          job.platform === 'Fiverr' ? 'border-[#1dbf73] bg-[#1dbf73]/5 text-[#1dbf73]' :
-                          'border-[#29b2fe] bg-[#29b2fe]/5 text-[#29b2fe]'
-                        }`}>
-                          {job.platform}
-                        </span>
-                        <span className="text-[10px] font-mono text-neutral-400">
-                          {job.postedAt}
+                           {jobs.map((job) => {
+                  const isTranslated = translatedJobs[job.id]?.lang === 'sw';
+                  const displayTitle = isTranslated ? (translatedJobs[job.id]?.title || job.title) : job.title;
+                  const displayDescription = isTranslated ? (translatedJobs[job.id]?.description || job.description) : job.description;
+
+                  return (
+                    <div 
+                      key={job.id}
+                      className="bg-white border border-neutral-200/60 rounded-[2rem] p-5 shadow-sm transition-all text-left group hover:border-neutral-300 relative overflow-hidden"
+                    >
+                      {/* Platform Brand Indicators */}
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <span className={`text-[9px] font-black lowercase tracking-wider border px-2 py-0.5 rounded-full ${
+                            job.platform === 'Upwork' ? 'border-[#14a800] bg-[#14a800]/5 text-[#14a800]' :
+                            job.platform === 'Fiverr' ? 'border-[#1dbf73] bg-[#1dbf73]/5 text-[#1dbf73]' :
+                            'border-[#29b2fe] bg-[#29b2fe]/5 text-[#29b2fe]'
+                          }`}>
+                            {job.platform}
+                          </span>
+                          <span className="text-[10px] font-mono text-neutral-400">
+                            {job.postedAt}
+                          </span>
+                        </div>
+                        <span className="text-xs font-extrabold text-neutral-900 font-mono">
+                          {job.budget}
                         </span>
                       </div>
-                      <span className="text-xs font-extrabold text-neutral-900 font-mono">
-                        {job.budget}
-                      </span>
-                    </div>
 
-                    <h3 className="text-sm font-black text-neutral-950 leading-tight">
-                      {job.title}
-                    </h3>
+                      <h3 className="text-sm font-black text-neutral-950 leading-tight">
+                        {displayTitle}
+                      </h3>
 
-                    {/* Highly Targeted Low Competition Badge (As requested by User to secure immediate bids) */}
-                    <div className="flex items-center gap-1.5 mt-2.5 mb-1.5 bg-[#1dbf73]/5 border border-[#1dbf73]/20 rounded-full px-3 py-1 w-fit">
-                      <span className="w-2 h-2 rounded-full bg-[#1dbf73] animate-pulse shrink-0" />
-                      <span className="text-[10px] font-black uppercase text-[#1dbf73] tracking-widest font-mono">
-                        Waombaji: {job.applicants || Math.floor(Math.random() * 3) + 1} tu • Fursa Kuu ⚡
-                      </span>
-                    </div>
-                    
-                    <p className="text-[11px] text-neutral-500 leading-relaxed font-medium mt-2 mb-4 line-clamp-3">
-                      {job.description}
-                    </p>
-
-                    <div className="flex items-center justify-between pt-1 border-t border-neutral-100/75">
-                      <div className="flex flex-wrap gap-1">
-                        {job.skills.slice(0, 3).map((subSkill) => (
-                          <span key={subSkill} className="text-[9px] text-slate-500 font-bold bg-neutral-50 border border-neutral-150 px-1.5 py-0.5 rounded-md">
-                            {subSkill}
-                          </span>
-                        ))}
+                      {/* Highly Targeted Low Competition Badge (As requested by User to secure immediate bids) */}
+                      <div className="flex items-center gap-1.5 mt-2.5 mb-1.5 bg-[#1dbf73]/5 border border-[#1dbf73]/20 rounded-full px-3 py-1 w-fit">
+                        <span className="w-2 h-2 rounded-full bg-[#1dbf73] animate-pulse shrink-0" />
+                        <span className="text-[10px] font-black uppercase text-[#1dbf73] tracking-widest font-mono">
+                          Waombaji: {job.applicants || Math.floor(Math.random() * 3) + 1} tu • Fursa Kuu ⚡
+                        </span>
                       </div>
                       
-                      <button 
-                        onClick={() => {
-                          setSelectedJob(job);
-                          setCurrentProposal('');
-                        }}
-                        className="px-5 h-8 bg-neutral-950 hover:bg-neutral-800 text-white font-extrabold text-[10px] tracking-widest uppercase rounded-full transition-all cursor-pointer flex items-center justify-center shadow-sm"
-                      >
-                        OMBA
-                      </button>
+                      <p className="text-[11px] text-neutral-500 leading-relaxed font-medium mt-2 mb-4 line-clamp-3">
+                        {displayDescription}
+                      </p>
+
+                      <div className="flex items-center justify-between pt-1 border-t border-neutral-100/75">
+                        <div className="flex flex-wrap gap-1">
+                          {job.skills.slice(0, 3).map((subSkill) => (
+                            <span key={subSkill} className="text-[9px] text-slate-500 font-bold bg-neutral-50 border border-neutral-150 px-1.5 py-0.5 rounded-md">
+                              {subSkill}
+                            </span>
+                          ))}
+                        </div>
+                        
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleTranslateJob(job.id, job.title, job.description);
+                            }}
+                            disabled={translatingId === job.id}
+                            className="px-3.5 h-8 border border-neutral-300 hover:border-neutral-400 bg-white text-neutral-800 hover:bg-neutral-50 font-extrabold text-[10px] tracking-widest uppercase rounded-full transition-all cursor-pointer flex items-center justify-center gap-1 shadow-sm active:scale-90 disabled:opacity-50"
+                          >
+                            {translatingId === job.id ? (
+                              <Loader2 className="w-3 h-3 text-neutral-500 animate-spin shrink-0" />
+                            ) : (
+                              <span className="text-[10px]">{isTranslated ? "EN 🇬🇧" : "SW 🇹🇿"}</span>
+                            )}
+                            <span className="text-[10px]">{isTranslated ? "Asili" : "Tafsiri"}</span>
+                          </button>
+
+                          <button 
+                            onClick={() => {
+                              setSelectedJob(job);
+                              setCurrentProposal('');
+                              setTranslatedProposalText('');
+                              setIsProposalInSwahili(false);
+                            }}
+                            className="px-5 h-8 bg-neutral-950 hover:bg-neutral-800 text-white font-extrabold text-[10px] tracking-widest uppercase rounded-full transition-all cursor-pointer flex items-center justify-center shadow-sm"
+                          >
+                            OMBA
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
@@ -765,11 +884,33 @@ export default function JobsScreen({ onNavigate }: Props) {
               <div className="bg-neutral-50 rounded-2xl border border-neutral-200/80 p-4.5 space-y-3.5 relative">
                 <div className="flex items-center justify-between">
                   <span className="text-[9px] font-black uppercase text-neutral-400 tracking-widest">
-                    Proposal ya Kiingereza (English Bid)
+                    {isProposalInSwahili ? "Andiko kwa Kiswahili" : "Andiko la Kiingereza (English Bid)"}
                   </span>
                   
                   {currentProposal && (
-                    <div className="flex gap-2">
+                    <div className="flex items-center gap-3">
+                      {/* Language Choice Switcher */}
+                      <div className="flex items-center bg-neutral-100 p-0.5 rounded-lg border border-neutral-200">
+                        <button
+                          onClick={() => setIsProposalInSwahili(false)}
+                          className={`px-2 py-0.5 text-[8px] font-black rounded-md transition-all ${
+                            !isProposalInSwahili ? "bg-white text-black shadow-xs" : "text-neutral-500 hover:text-neutral-900"
+                          }`}
+                        >
+                          EN 🇬🇧
+                        </button>
+                        <button
+                          onClick={handleTranslateProposal}
+                          disabled={translatingProposal}
+                          className={`px-2 py-0.5 text-[8px] font-black rounded-md transition-all flex items-center gap-1 ${
+                            isProposalInSwahili ? "bg-white text-black shadow-xs" : "text-neutral-500 hover:text-neutral-900"
+                          }`}
+                        >
+                          {translatingProposal && <Loader2 className="w-2 h-2 animate-spin text-neutral-500 shrink-0" />}
+                          <span>SW 🇹🇿</span>
+                        </button>
+                      </div>
+
                       <button 
                         onClick={handleCopyProposal}
                         className="p-1 text-neutral-400 hover:text-neutral-900"
@@ -785,13 +926,13 @@ export default function JobsScreen({ onNavigate }: Props) {
                   <div className="py-8 flex flex-col items-center justify-center text-center">
                     <Loader2 className="w-6 h-6 text-neutral-800 animate-spin mb-2" />
                     <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider">
-                      AI is writing your personalized client pitch (English)...
+                      AI inatengeneza andiko maalum la kazi hii (English)...
                     </span>
                   </div>
                 ) : currentProposal ? (
                   <div className="space-y-3.5">
-                    <p className="text-[11px] font-medium text-neutral-800 leading-normal bg-white p-3.5 rounded-xl border border-neutral-100 font-serif select-all break-words max-h-52 overflow-y-auto">
-                      {currentProposal}
+                    <p className="text-[11px] font-medium text-neutral-805 leading-normal bg-white p-3.5 rounded-xl border border-neutral-100 font-serif select-all break-words max-h-52 overflow-y-auto">
+                      {isProposalInSwahili ? (translatedProposalText || currentProposal) : currentProposal}
                     </p>
 
                     {/* How to Apply Stepper Assist Box */}

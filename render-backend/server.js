@@ -130,7 +130,7 @@ app.get("/api/jobs", async (req, res) => {
             body: JSON.stringify({
               queries: ["graphic design", "video editing", "copywriting", "social media management"],
               max_items: 4
-            }
+            })
           }
         );
 
